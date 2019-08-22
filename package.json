@@ -1,0 +1,18 @@
+{
+  "name": "fcc-anonmsgboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently --kill-others \"npm run backend\" \"npm run frontend\"",
+    "start": "cd backend && npm start",
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^4.1.2"
+  }
+}
