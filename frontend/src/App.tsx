@@ -14,7 +14,7 @@ class App extends Component<AppProps> {
   onSubmit = async (e: React.FormEvent) => {
     console.log('onSubmit ');
     e.preventDefault();
-    this.props.login('shela');
+    this.props.login('shelajoyhuiso');
   };
   render() {
     return (

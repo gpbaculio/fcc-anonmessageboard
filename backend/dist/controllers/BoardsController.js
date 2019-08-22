@@ -13,15 +13,20 @@ class BoardsController {
     constructor() {
         this.createBoard = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { name } = req.body;
-            const board = yield Board_1.default.find({ name });
-            if (board)
-                res.status(400).send('Board already exists');
-            yield Board_1.default.create({ name }, (error, newBoard) => {
+            yield Board_1.default.findOne({ name }, (error, board) => __awaiter(this, void 0, void 0, function* () {
                 if (error)
                     res.status(400).send(error);
+                if (!board) {
+                    yield Board_1.default.create({ name }, (error, newBoard) => {
+                        if (error)
+                            res.status(400).send(error);
+                        else
+                            res.status(200).json({ board: newBoard });
+                    });
+                }
                 else
-                    res.status(200).json({ board: newBoard });
-            });
+                    res.status(400).send('Board already exists');
+            }));
         });
     }
 }
