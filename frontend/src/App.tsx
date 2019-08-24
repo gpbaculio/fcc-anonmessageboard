@@ -1,42 +1,30 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Input, Form } from 'reactstrap';
-import logo from './logo.svg';
+import { Switch, Route } from 'react-router-dom';
+
 import './App.css';
-import { AppState } from './store';
-import { login } from './store/boards/actions';
+import { Home, Header } from './components';
 
-interface AppProps {
-  login: (name: string) => void;
-}
+// interface AppProps {
+//   createBoard: (name: string) => void;
+// }
 
-class App extends Component<AppProps> {
-  onSubmit = async (e: React.FormEvent) => {
-    console.log('onSubmit ');
-    e.preventDefault();
-    this.props.login('shelajoyhuiso');
-  };
+class App extends Component {
   render() {
     return (
-      <div>
-        asd
-        <Form onSubmit={this.onSubmit}>
-          <Input value='shela' />
-        </Form>
-      </div>
+      <Fragment>
+        <Header />
+        <Switch>
+          <Route
+            exact
+            path='/(home)?'
+            render={renderProps => <Home {...renderProps} />}
+          />
+        </Switch>
+      </Fragment>
     );
   }
 }
 
-const mapStateToProps = ({ boards }: AppState) => ({
-  boards
-});
-
-const mapDispatchToProps = {
-  login
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App);
+export default App;

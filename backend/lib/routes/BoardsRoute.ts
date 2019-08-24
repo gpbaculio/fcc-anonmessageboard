@@ -13,6 +13,9 @@ import BoardsController from '../controllers/BoardsController';
 export default class BoardsRoute {
   private boardsController: BoardsController = new BoardsController();
   public routes = (app): void => {
-    app.route('/api/boards').post(this.boardsController.createBoard);
+    app
+      .route('/api/boards')
+      .get(this.boardsController.getBoards)
+      .post(this.boardsController.createBoard);
   };
 }

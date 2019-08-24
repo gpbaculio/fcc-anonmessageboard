@@ -14,4 +14,10 @@ export default class BoardsController {
       } else res.status(400).send('Board already exists');
     });
   };
+  public getBoards = async (_req: Request, res: Response) => {
+    await Board.find({}, async (error, boards) => {
+      if (error) res.status(400).send(error);
+      else res.status(200).json({ boards });
+    });
+  };
 }

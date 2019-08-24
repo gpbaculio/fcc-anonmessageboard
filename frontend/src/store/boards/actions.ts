@@ -1,11 +1,8 @@
-import { CREATE_BOARD_REQUEST } from '../../sagas/types';
+import { CREATE_BOARD_REQUEST } from './types';
 
-export const login = (name: string) => {
-  console.log('boards actions login');
-  return {
-    type: CREATE_BOARD_REQUEST,
-    payload: {
-      name
-    }
-  };
-};
+export const createBoard = (name: string) => ({
+  type: CREATE_BOARD_REQUEST,
+  payload: {
+    name
+  }
+});

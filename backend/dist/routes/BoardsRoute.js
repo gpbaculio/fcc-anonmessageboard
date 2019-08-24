@@ -12,7 +12,10 @@ class BoardsRoute {
     constructor() {
         this.boardsController = new BoardsController_1.default();
         this.routes = (app) => {
-            app.route('/api/boards').post(this.boardsController.createBoard);
+            app
+                .route('/api/boards')
+                .get(this.boardsController.getBoards)
+                .post(this.boardsController.createBoard);
         };
     }
 }

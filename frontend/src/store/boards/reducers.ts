@@ -1,12 +1,38 @@
-export default function counter(state = 0, action: any) {
+import {
+  BoardsActionTypes,
+  CREATE_BOARD_REQUEST,
+  CREATE_BOARD_SUCCESS,
+  CREATE_BOARD_FAILURE,
+  BoardsReducerState
+} from './types';
+import { AnyAction } from 'redux';
+const initState: BoardsReducerState = {
+  loading: false,
+  boards: {}
+};
+
+const boardsReducer = (state = initState, action: BoardsActionTypes) => {
   switch (action.type) {
-    case 'INCREMENT':
-      return state + 1;
-    case 'INCREMENT_IF_ODD':
-      return state % 2 !== 0 ? state + 1 : state;
-    case 'DECREMENT':
-      return state - 1;
+    case CREATE_BOARD_REQUEST: {
+      return { ...state, loading: true };
+    }
+    case CREATE_BOARD_SUCCESS: {
+      const { board } = action.payload;
+      return {
+        ...state,
+        loading: false,
+        boards: {
+          ...state.boards,
+          [board._id]: board
+        }
+      };
+    }
+    case CREATE_BOARD_FAILURE: {
+      return { ...state, loading: false };
+    }
     default:
       return state;
   }
-}
+};
+
+export default boardsReducer;

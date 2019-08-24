@@ -1,21 +1,22 @@
 import { takeEvery, call, put } from 'redux-saga/effects';
 import Api from '../Api';
 import {
-  BoardActionTypes,
+  BoardsActionTypes,
   CREATE_BOARD_REQUEST,
   CREATE_BOARD_SUCCESS,
-  CREATE_BOARD_FAILURE
-} from './types';
+  CREATE_BOARD_FAILURE,
+  createBoardRequest
+} from '../store/boards/types';
+import { AnyAction } from 'redux';
 
-export function* createBoard(action: BoardActionTypes) {
-  console.log('createBoardSAGA');
+export function* createBoard(action: AnyAction) {
   try {
-    const data = yield call(Api.boards.createBoard, action.payload.name);
-    console.log('createBoard action', action);
-    console.log('createBoard data', data);
-    yield put({ type: CREATE_BOARD_SUCCESS, data });
+    const {
+      data: { board }
+    } = yield call(Api.boards.createBoard, action.payload.name);
+    yield put({ type: CREATE_BOARD_SUCCESS, payload: { board } });
   } catch (error) {
-    yield put({ type: CREATE_BOARD_FAILURE, error });
+    yield put({ type: CREATE_BOARD_FAILURE, payload: { error } });
   }
 }
 

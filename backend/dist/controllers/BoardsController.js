@@ -28,6 +28,14 @@ class BoardsController {
                     res.status(400).send('Board already exists');
             }));
         });
+        this.getBoards = (_req, res) => __awaiter(this, void 0, void 0, function* () {
+            yield Board_1.default.find({}, (error, boards) => __awaiter(this, void 0, void 0, function* () {
+                if (error)
+                    res.status(400).send(error);
+                else
+                    res.status(200).json({ boards });
+            }));
+        });
     }
 }
 exports.default = BoardsController;
