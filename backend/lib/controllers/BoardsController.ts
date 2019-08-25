@@ -15,9 +15,14 @@ export default class BoardsController {
     });
   };
   public getBoards = async (_req: Request, res: Response) => {
-    await Board.find({}, async (error, boards) => {
-      if (error) res.status(400).send(error);
-      else res.status(200).json({ boards });
-    });
+    await Board.find(
+      {},
+      null,
+      { sort: '-createdAt', limit: 10 },
+      (error, boards) => {
+        if (error) res.status(400).send(error);
+        else res.status(200).json({ boards });
+      }
+    );
   };
 }

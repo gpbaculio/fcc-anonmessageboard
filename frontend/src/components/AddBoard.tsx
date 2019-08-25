@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 //   title: string;   // This one is coming from the router
 // }
 // interface HomeProps extends RouteComponentProps<HomeRouterProps> {
-interface HomeProps extends RouteComponentProps {
+interface AddBoardProps extends RouteComponentProps {
   // Add your regular properties here
 }
 
@@ -21,10 +21,10 @@ interface AddBoardState {
 }
 
 class AddBoard extends Component<
-  HomeProps & AddBoardDispatchProps,
+  AddBoardProps & AddBoardDispatchProps,
   AddBoardState
 > {
-  constructor(props: HomeProps & AddBoardDispatchProps) {
+  constructor(props: AddBoardProps & AddBoardDispatchProps) {
     super(props);
     this.state = {
       text: ''
