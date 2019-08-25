@@ -8,8 +8,9 @@ import {
   BoardsLoadingType,
   BoardsErrorType
 } from '../store/boards/types';
-import { Row, Col } from 'reactstrap';
+import { Row, Col, Card, CardBody, CardTitle } from 'reactstrap';
 import { timeDifferenceForDate } from './utils';
+import { Link } from 'react-router-dom';
 
 interface BoardsProps extends RouteComponentProps {
   // Add your regular properties here
@@ -28,17 +29,34 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
     await this.props.fetchBoards();
   };
   render() {
-    console.log('props.boards', this.props);
     const { boards } = this.props;
     return (
       <Row>
-        {boards.map(b => (
-          <Col xs='3' key={b._id}>
-            <div>
-              {b.name} <span>{timeDifferenceForDate(b.createdAt)}</span>
-            </div>
-          </Col>
-        ))}
+        {boards.map(board => {
+          return (
+            <Col xs='4' key={board._id}>
+              <Card>
+                <Link
+                  to={{
+                    pathname: `/board/${board._id}`,
+                    state: { board }
+                  }}>
+                  <CardBody>
+                    <CardTitle className='mb-0'>
+                      <div className='d-flex justify-content-between'>
+                        <div className='d-flex flex-column'>
+                          <h6>{board.name}</h6>
+                          <small>{board.threadIds.length}</small>
+                        </div>
+                        <div>{timeDifferenceForDate(board.createdAt)}</div>
+                      </div>
+                    </CardTitle>
+                  </CardBody>{' '}
+                </Link>
+              </Card>
+            </Col>
+          );
+        })}
       </Row>
     );
   }

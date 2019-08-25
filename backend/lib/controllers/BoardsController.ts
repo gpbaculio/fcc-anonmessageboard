@@ -18,7 +18,7 @@ export default class BoardsController {
     await Board.find(
       {},
       null,
-      { sort: '-createdAt', limit: 10 },
+      { sort: '-createdAt', limit: 9 },
       (error, boards) => {
         if (error) res.status(400).send(error);
         else res.status(200).json({ boards });
