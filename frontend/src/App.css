@@ -27,7 +27,18 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+.board-container {
+  width: 100%;
+  height: calc(100vh - 62.4px);
+}
+
+.board-card {
+  width: 300px;
+  height: auto;
 }

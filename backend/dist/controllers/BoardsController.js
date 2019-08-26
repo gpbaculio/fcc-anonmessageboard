@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Board_1 = require("../models/Board");
+const Thread_1 = require("../models/Thread");
 class BoardsController {
     constructor() {
         this.createBoard = (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -29,12 +30,50 @@ class BoardsController {
             }));
         });
         this.getBoards = (_req, res) => __awaiter(this, void 0, void 0, function* () {
-            yield Board_1.default.find({}, null, { sort: '-createdAt', limit: 10 }, (error, boards) => {
+            yield Board_1.default.find({}, null, { sort: '-createdAt', limit: 9 }, (error, boards) => {
                 if (error)
                     res.status(400).send(error);
                 else
                     res.status(200).json({ boards });
             });
+        });
+        this.createThread = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { boardId } = req.params;
+            const { text, delete_password } = req.body;
+            yield Thread_1.default.create({ boardId, text, delete_password }, (error, thread) => {
+                if (error)
+                    res.status(400).send(error);
+                else
+                    res.status(200).json({ thread });
+            });
+        });
+        this.getThreads = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { boardId } = req.params;
+            yield Thread_1.default.find({ boardId }, null, { sort: '-createdAt', limit: 10 }, (error, threads) => {
+                if (error)
+                    res.status(400).send(error);
+                else
+                    res.status(200).json({ threads });
+            });
+        });
+        this.deleteThread = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { boardId } = req.params;
+            const { thread_id, delete_password } = req.body;
+            yield Thread_1.default.findOne({ boardId, _id: thread_id }, (error, thread) => __awaiter(this, void 0, void 0, function* () {
+                if (error)
+                    res.status(400).send(error);
+                const correctPassword = yield thread.authenticate(delete_password);
+                if (!correctPassword)
+                    res.status(400).send('incorrect password');
+                else
+                    yield Thread_1.default.findOneAndRemove({ _id: thread._id }, (error, thread) => {
+                        if (error)
+                            res.status(400).send(error);
+                        console.log('findOneandRemove THread ', thread);
+                        res.status(200).send('success');
+                    });
+            }));
+            // return Book.findOneAndRemove({ _id: bookDbId })
         });
     }
 }
