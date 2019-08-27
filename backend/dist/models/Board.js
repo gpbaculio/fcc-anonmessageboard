@@ -6,14 +6,14 @@ const BoardSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    threadIds: [
+    threads: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Thread'
         }
     ]
 }, {
-    timestamps: true,
+    timestamps: { createdAt: 'created_on', updatedAt: 'updated_on' },
     versionKey: false
 });
 exports.default = mongoose.model('Board', BoardSchema);

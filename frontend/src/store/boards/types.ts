@@ -5,11 +5,19 @@ export const CREATE_BOARD_REQUEST = 'CREATE_BOARD_REQUEST';
 export const CREATE_BOARD_SUCCESS = 'CREATE_BOARD_SUCCESS';
 export const CREATE_BOARD_FAILURE = 'CREATE_BOARD_FAILURE';
 
+export interface ThreadType {
+  _id: string;
+  text: string;
+  created_on: string;
+}
+
 export interface BoardType {
-  createdAt: string;
+  created_on: string;
   name: string;
-  threadIds: string[];
-  updatedAt: string;
+  threads: {
+    [_id: string]: ThreadType;
+  };
+  updated_on: string;
   _id: string;
 }
 
@@ -27,7 +35,7 @@ export interface BoardsReducerState {
   loading: BoardsLoadingType;
   error: BoardsErrorType;
   boards: {
-    [text: string]: BoardType;
+    [_id: string]: BoardType;
   };
 }
 
@@ -54,13 +62,19 @@ interface createBoardFailure {
 
 export interface fetchBoardsRequest {
   type: typeof FETCH_BOARDS_REQUEST;
+  payload: {
+    name: string;
+  };
 }
 
-interface fetchBoardsSuccess {
+export interface fetchBoardsSuccess {
   type: typeof FETCH_BOARDS_SUCCESS;
   payload: {
     boards: {
       [_id: string]: BoardType;
+    };
+    threads: {
+      [_id: string]: ThreadType;
     };
   };
 }

@@ -23,7 +23,7 @@ class App extends Component {
             render={renderProps => <Home {...renderProps} />}
           />
           <Route
-            path='/board/:boardId'
+            path='/b/:boardId'
             render={renderProps => <Board {...renderProps} />}
           />
         </Switch>

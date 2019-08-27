@@ -2,7 +2,8 @@ import * as mongoose from 'mongoose';
 
 export interface BoardDocument extends mongoose.Document {
   name: string;
-  threadIds: string[];
+  threads: string[];
+  _doc: BoardDocument;
 }
 
 const BoardSchema = new mongoose.Schema(
@@ -11,7 +12,7 @@ const BoardSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    threadIds: [
+    threads: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Thread'
@@ -19,7 +20,7 @@ const BoardSchema = new mongoose.Schema(
     ]
   },
   {
-    timestamps: true,
+    timestamps: { createdAt: 'created_on', updatedAt: 'updated_on' },
     versionKey: false
   }
 );

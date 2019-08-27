@@ -38,7 +38,7 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
               <Card>
                 <Link
                   to={{
-                    pathname: `/board/${board._id}`,
+                    pathname: `/b/${board._id}`,
                     state: { board }
                   }}>
                   <CardBody>
@@ -46,12 +46,12 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
                       <div className='d-flex justify-content-between'>
                         <div className='d-flex flex-column'>
                           <h6>{board.name}</h6>
-                          <small>{board.threadIds.length}</small>
+                          <small>{board.threads.length}</small>
                         </div>
-                        <div>{timeDifferenceForDate(board.createdAt)}</div>
+                        <div>{timeDifferenceForDate(board.created_on)}</div>
                       </div>
                     </CardTitle>
-                  </CardBody>{' '}
+                  </CardBody>
                 </Link>
               </Card>
             </Col>
@@ -63,7 +63,10 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
 }
 
 const mapStateToProps = ({ boards: { boards, loading, error } }: AppState) => ({
-  boards: Object.keys(boards).map(k => boards[k]),
+  boards: Object.keys(boards).map(k => {
+    const board = boards[k];
+    return board;
+  }),
   loading,
   error
 });

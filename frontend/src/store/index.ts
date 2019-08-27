@@ -3,11 +3,12 @@ import createSagaMiddleware from 'redux-saga';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 import boards from './boards/reducers';
-// import threads from './threads/reducers';
+import threads from './threads/reducers';
 // import replies from './replies/reducers';
 
 const rootReducer = combineReducers({
-  boards
+  boards,
+  threads
 });
 
 export type AppState = ReturnType<typeof rootReducer>;

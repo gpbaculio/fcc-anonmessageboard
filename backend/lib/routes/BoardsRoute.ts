@@ -18,7 +18,7 @@ export default class BoardsRoute {
       .get(this.boardsController.getBoards)
       .post(this.boardsController.createBoard);
     app
-      .route('/api/threads/:boardId')
+      .route('/api/threads/:board_id')
       .get(this.boardsController.getThreads)
       .post(this.boardsController.createThread)
       .delete(this.boardsController.deleteThread);

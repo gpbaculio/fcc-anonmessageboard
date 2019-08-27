@@ -1,40 +1,28 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 
-export interface ThreadDocument extends mongoose.Document {
+export interface ReplyDocument extends mongoose.Document {
   text: string;
-  board_id: string;
+  thread_id: string;
   delete_password: string;
-  bumped_on: Date;
   encryptPassword: (delete_password: string) => Promise<string>;
   authenticate: (plainTextPassword: string) => boolean;
 }
 
-const ThreadSchema = new mongoose.Schema(
+const ReplySchema = new mongoose.Schema(
   {
     text: {
       type: String,
       required: true
     },
-    board_id: {
+    thread_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Board'
+      ref: 'Thread'
     },
     delete_password: {
       type: String,
       hidden: true
-    },
-    bumped_on: {
-      type: Date,
-      required: false,
-      default: Date.now
-    },
-    replies: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Reply'
-      }
-    ]
+    }
   },
   {
     timestamps: { createdAt: 'created_on', updatedAt: 'updated_on' },
@@ -42,7 +30,7 @@ const ThreadSchema = new mongoose.Schema(
   }
 );
 
-ThreadSchema.pre<ThreadDocument>('save', function(next) {
+ReplySchema.pre<ReplyDocument>('save', function(next) {
   if (this.isModified('delete_password')) {
     this.encryptPassword(this.delete_password)
       .then(hash => {
@@ -53,7 +41,7 @@ ThreadSchema.pre<ThreadDocument>('save', function(next) {
   } else return next();
 });
 
-ThreadSchema.methods = {
+ReplySchema.methods = {
   authenticate(plainTextPassword: string) {
     try {
       return bcrypt.compare(plainTextPassword, this.delete_password);
@@ -66,4 +54,4 @@ ThreadSchema.methods = {
   }
 };
 
-export default mongoose.model<ThreadDocument>('Thread', ThreadSchema);
+export default mongoose.model<ReplyDocument>('Reply', ReplySchema);

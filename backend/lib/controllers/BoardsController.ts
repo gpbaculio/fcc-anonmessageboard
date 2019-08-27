@@ -19,19 +19,29 @@ export default class BoardsController {
     await Board.find(
       {},
       null,
-      { sort: '-createdAt', limit: 9 },
+      { sort: '-createdAt', limit: 9, populate: 'threads' },
       (error, boards) => {
         if (error) res.status(400).send(error);
-        else res.status(200).json({ boards });
+        res.status(200).json({ boards });
       }
     );
   };
-  public createThread = async (req: Request, res: Response) => {
-    const { boardId } = req.params;
+  public createThread = async function(req: Request, res: Response) {
+    const { board_id } = req.params;
     const { text, delete_password } = req.body;
-    await Thread.create({ boardId, text, delete_password }, (error, thread) => {
+    await Thread.create({ board_id, text, delete_password }, async function(
+      error,
+      thread
+    ) {
       if (error) res.status(400).send(error);
-      else res.status(200).json({ thread });
+      await Board.findById(board_id, async function(err, board) {
+        if (err) return res.send(err);
+        board.threads.push(thread);
+        await board.save(function(err) {
+          if (err) return res.send(err);
+          else res.redirect(`/b/${board_id}`);
+        });
+      });
     });
   };
   public getThreads = async (req: Request, res: Response) => {
