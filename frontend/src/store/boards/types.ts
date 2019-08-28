@@ -9,14 +9,14 @@ export interface ThreadType {
   _id: string;
   text: string;
   created_on: string;
+  replies: string[];
+  bumped_on: string;
 }
 
 export interface BoardType {
   created_on: string;
   name: string;
-  threads: {
-    [_id: string]: ThreadType;
-  };
+  threads: string[];
   updated_on: string;
   _id: string;
 }

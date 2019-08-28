@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
 import './index.css';
 import App from './App';
@@ -9,14 +10,17 @@ import configureStore from './store';
 import * as serviceWorker from './serviceWorker';
 import rootSaga from './sagas';
 
-const store = configureStore();
-store.runSaga(rootSaga);
+const { store, runSaga, persistor } = configureStore();
+
+runSaga(rootSaga);
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <PersistGate loading={null} persistor={persistor}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </PersistGate>
   </Provider>,
   document.getElementById('root')
 );

@@ -1,5 +1,7 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 import boards from './boards/reducers';
@@ -11,15 +13,27 @@ const rootReducer = combineReducers({
   threads
 });
 
+const persistConfig = {
+  key: 'root',
+  storage
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export type AppState = ReturnType<typeof rootReducer>;
 
+const sagaMiddleware = createSagaMiddleware();
+const store = createStore(
+  persistedReducer,
+  composeWithDevTools(applyMiddleware(sagaMiddleware))
+);
+
+let persistor = persistStore(store);
+
 export default function configureStore() {
-  const sagaMiddleware = createSagaMiddleware();
   return {
-    ...createStore(
-      rootReducer,
-      composeWithDevTools(applyMiddleware(sagaMiddleware))
-    ),
+    store,
+    persistor,
     runSaga: sagaMiddleware.run
   };
 }

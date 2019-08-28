@@ -56,7 +56,6 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
       modal: !state.modal
     }));
   };
-
   onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const {
@@ -73,6 +72,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
   };
   render() {
     const { board } = this.props.location.state;
+    const { threads } = this.props;
     return (
       <div className='board-container d-flex justify-content-center align-items-center'>
         <Row>
@@ -80,9 +80,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
             <div className='table-threads p-3 d-flex flex-column'>
               <div className='d-flex justify-content-between mb-3 align-items-center'>
                 <legend className='mb-0 w-auto'>BOARD: {board.name}</legend>
-                <Button size='sm' color='primary'>
-                  Post New Thread
-                </Button>
+                <Button color='primary'>Post New Thread</Button>
               </div>
               <Table hover responsive>
                 <thead>
@@ -93,16 +91,16 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope='row'>1</th>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                  </tr>
-                  <tr>
-                    <th scope='row'>2</th>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                  </tr>
+                  {board.threads.map(thId => {
+                    const thread = threads[thId];
+                    return (
+                      <tr>
+                        <td scope='row'>{thread.text}</td>
+                        <td>{thread.replies.length}</td>
+                        <td>{new Date(thread.bumped_on).toUTCString()}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </Table>
             </div>
