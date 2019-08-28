@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as H from 'history';
-import { BoardType } from '../store/boards/types';
+import { BoardType, ThreadType } from '../store/boards/types';
 import { createThread } from '../store/threads/actions';
 import {
   Card,
@@ -13,19 +13,23 @@ import {
   ModalBody,
   ModalFooter,
   Input,
-  InputGroup,
-  InputGroupAddon,
   Form,
   FormGroup,
   Label,
-  Col
+  Col,
+  Table,
+  Row
 } from 'reactstrap';
 import { timeDifferenceForDate } from './utils';
 import { connect } from 'react-redux';
 import { createThreadArgs } from '../Api';
+import { AppState } from '../store';
 
 interface BoardProps extends RouteComponentProps {
   location: H.Location<{ board: BoardType }>;
+  threads: {
+    [_id: string]: ThreadType;
+  };
 }
 
 interface BoardDispatchProps {
@@ -71,79 +75,53 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
     const { board } = this.props.location.state;
     return (
       <div className='board-container d-flex justify-content-center align-items-center'>
-        <Card className='board-card'>
-          <CardBody>
-            <CardTitle className='mb-0'>
-              <div className='d-flex mb-3 justify-content-between'>
-                <div className='d-flex flex-column'>
-                  <h6>{board.name}</h6>
-                </div>
-                <div>{timeDifferenceForDate(board.created_on)}</div>
+        <Row>
+          <Col>
+            <div className='table-threads p-3 d-flex flex-column'>
+              <div className='d-flex justify-content-between mb-3 align-items-center'>
+                <legend className='mb-0 w-auto'>BOARD: {board.name}</legend>
+                <Button size='sm' color='primary'>
+                  Post New Thread
+                </Button>
               </div>
-              <Button
-                className='btn-block'
-                color='primary'
-                onClick={this.toggle}>
-                Post New Thread
-              </Button>
-              <Modal isOpen={this.state.modal} toggle={this.toggle}>
-                <ModalHeader toggle={this.toggle}>Post New Thread</ModalHeader>
-                <Form onSubmit={this.onSubmit}>
-                  <ModalBody>
-                    <FormGroup row>
-                      <Label for='thread_text' sm={4}>
-                        Text
-                      </Label>
-                      <Col>
-                        <Input
-                          type='text'
-                          name='text'
-                          id='thread_text'
-                          placeholder='Text'
-                          autoComplete='off'
-                          required
-                        />
-                      </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label for='thread_delete_password' sm={4}>
-                        Delete Password
-                      </Label>
-                      <Col>
-                        <Input
-                          type='password'
-                          name='delete_password'
-                          id='thread_delete_password'
-                          placeholder='Delete Password'
-                          autoComplete='off'
-                          required
-                        />
-                      </Col>
-                    </FormGroup>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color='primary' type='submit'>
-                      Submit New Thread
-                    </Button>
-                    <Button color='secondary' onClick={this.toggle}>
-                      Cancel
-                    </Button>
-                  </ModalFooter>
-                </Form>
-              </Modal>
-            </CardTitle>
-          </CardBody>
-        </Card>
+              <Table hover responsive>
+                <thead>
+                  <tr>
+                    <th>Thread Title</th>
+                    <th>Replies</th>
+                    <th>Last Bumped</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope='row'>1</th>
+                    <td>Table cell</td>
+                    <td>Table cell</td>
+                  </tr>
+                  <tr>
+                    <th scope='row'>2</th>
+                    <td>Table cell</td>
+                    <td>Table cell</td>
+                  </tr>
+                </tbody>
+              </Table>
+            </div>
+          </Col>
+        </Row>
       </div>
     );
   }
 }
+
+const mapStateToProps = ({ threads: { threads } }: AppState) => ({
+  threads
+});
 
 const mapDispatchToProps = {
   createThread
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(withRouter(Board));

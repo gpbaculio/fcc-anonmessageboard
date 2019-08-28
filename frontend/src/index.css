@@ -16,3 +16,12 @@ header {
   background-color: #006400;
   color: #fff;
 }
+
+.table-threads {
+  width: 500px;
+  border: solid #ececec 1px !important;
+}
+
+.thead-title {
+  width: 50% !important;
+}
