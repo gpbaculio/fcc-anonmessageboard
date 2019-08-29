@@ -6,6 +6,7 @@ export interface ThreadDocument extends mongoose.Document {
   board_id: string;
   delete_password: string;
   bumped_on: Date;
+  replies: string[];
   encryptPassword: (delete_password: string) => Promise<string>;
   authenticate: (plainTextPassword: string) => boolean;
 }

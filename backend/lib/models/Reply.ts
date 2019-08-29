@@ -22,6 +22,10 @@ const ReplySchema = new mongoose.Schema(
     delete_password: {
       type: String,
       hidden: true
+    },
+    reported: {
+      type: Boolean,
+      hidden: true
     }
   },
   {

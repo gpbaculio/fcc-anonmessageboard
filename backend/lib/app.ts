@@ -12,6 +12,8 @@ require('dotenv').config();
 
 import FccTestingRoute from './routes/FccTestingRoute';
 import BoardsRoute from './routes/BoardsRoute';
+import ThreadsRoute from './routes/ThreadsRoute';
+import RepliesRoute from './routes/RepliesRoute';
 
 interface sessionConfigType {
   secret: string;
@@ -25,6 +27,8 @@ class App {
   public app: express.Application = express();
   private fccTestingRoute: FccTestingRoute = new FccTestingRoute();
   private boardsRoute: BoardsRoute = new BoardsRoute();
+  private threadsRoute: ThreadsRoute = new ThreadsRoute();
+  private repliesRoute: RepliesRoute = new RepliesRoute();
   private mongoSetup = (): void => {
     (<any>mongoose).Promise = global.Promise;
     mongoose.connect(process.env.MONGO_DB_URL, {
@@ -57,14 +61,16 @@ class App {
 
     this.fccTestingRoute.routes(this.app);
     this.boardsRoute.routes(this.app);
+    this.threadsRoute.routes(this.app);
+    this.repliesRoute.routes(this.app);
     // Serve any static files
-    const staticPath = path.join(__dirname, '..', '..', 'frontend', 'build');
+    const staticPath = path.join(__dirname, '..', '..', 'frontend', 'public'); // change /public to /build on deploy
     const publicPath = path.join(
       __dirname,
       '..',
       '..',
       'frontend',
-      'build',
+      'public',
       'index.html'
     );
     this.app.use(express.static(staticPath));

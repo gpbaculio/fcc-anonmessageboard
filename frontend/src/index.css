@@ -25,3 +25,7 @@ header {
 .thead-title {
   width: 50% !important;
 }
+
+.table-header {
+  border-bottom: 1px solid #ececec;
+}

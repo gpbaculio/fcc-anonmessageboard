@@ -54,7 +54,6 @@ const boardsReducer = (
         loading: { createThread: false }
       };
     }
-
     case CREATE_THREAD_FAILURE: {
       const { error } = action.payload;
       return {
