@@ -13,7 +13,7 @@ export interface createThreadRequest {
   };
 }
 
-interface createThreadSuccess {
+export interface createThreadSuccess {
   type: typeof CREATE_THREAD_SUCCESS;
   payload: {
     thread: ThreadType;

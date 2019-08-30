@@ -6,11 +6,12 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 
 import boards from './boards/reducers';
 import threads from './threads/reducers';
-// import replies from './replies/reducers';
+import replies from './replies/reducers';
 
 const rootReducer = combineReducers({
   boards,
-  threads
+  threads,
+  replies
 });
 
 const persistConfig = {

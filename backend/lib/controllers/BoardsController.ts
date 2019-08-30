@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Board from '../models/Board';
+import { ThreadDocument } from 'models/Thread';
 
 export default class BoardsController {
   public createBoard = async (req: Request, res: Response) => {
@@ -23,9 +24,12 @@ export default class BoardsController {
         limit: 9,
         populate: {
           path: 'threads',
+          model: 'Thread',
+          select: '-delete_password -reported',
           populate: {
             path: 'replies',
-            model: 'Reply'
+            model: 'Reply',
+            select: '-delete_password -reported'
           }
         }
       },

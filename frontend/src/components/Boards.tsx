@@ -40,7 +40,7 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
                 <Link
                   to={{
                     pathname: `/b/${board._id}`,
-                    state: { board }
+                    state: { board_id: board._id }
                   }}>
                   <CardBody>
                     <CardTitle className='mb-0'>

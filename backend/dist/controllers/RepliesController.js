@@ -36,6 +36,10 @@ class RepliesController {
                 });
             });
         });
+        this.getThreadReplies = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { board_id } = req.params;
+            const { thread_id } = req.query;
+        });
     }
 }
 exports.default = RepliesController;

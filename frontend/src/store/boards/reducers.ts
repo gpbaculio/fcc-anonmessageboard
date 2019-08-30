@@ -8,6 +8,7 @@ import {
   FETCH_BOARDS_SUCCESS,
   FETCH_BOARDS_FAILURE
 } from './types';
+import { createThreadSuccess, CREATE_THREAD_SUCCESS } from '../threads/types';
 
 const initState: BoardsReducerState = {
   loading: { createBoard: false, fetchBoards: false },
@@ -18,7 +19,10 @@ const initState: BoardsReducerState = {
   }
 };
 
-const boardsReducer = (state = initState, action: BoardsActionTypes) => {
+const boardsReducer = (
+  state = initState,
+  action: BoardsActionTypes | createThreadSuccess
+) => {
   switch (action.type) {
     case FETCH_BOARDS_REQUEST: {
       return { ...state, loading: { ...state.loading, fetchBoards: true } };
@@ -30,6 +34,20 @@ const boardsReducer = (state = initState, action: BoardsActionTypes) => {
         boards: {
           ...state.boards,
           ...action.payload.boards
+        }
+      };
+    }
+    case CREATE_THREAD_SUCCESS: {
+      const { thread } = action.payload;
+      const board = state.boards[thread.board_id];
+      return {
+        ...state,
+        boards: {
+          ...state.boards,
+          [board._id]: {
+            ...board,
+            threads: [...board.threads, thread._id]
+          }
         }
       };
     }

@@ -15,6 +15,11 @@ const ThreadSchema = new mongoose.Schema({
         type: String,
         hidden: true
     },
+    reported: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
     bumped_on: {
         type: Date,
         required: false,

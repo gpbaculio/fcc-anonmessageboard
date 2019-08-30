@@ -1,12 +1,13 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcryptjs';
+import { ReplyDocument } from './Reply';
 
 export interface ThreadDocument extends mongoose.Document {
   text: string;
   board_id: string;
   delete_password: string;
   bumped_on: Date;
-  replies: string[];
+  replies: ReplyDocument[];
   encryptPassword: (delete_password: string) => Promise<string>;
   authenticate: (plainTextPassword: string) => boolean;
 }
@@ -24,6 +25,11 @@ const ThreadSchema = new mongoose.Schema(
     delete_password: {
       type: String,
       hidden: true
+    },
+    reported: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     bumped_on: {
       type: Date,

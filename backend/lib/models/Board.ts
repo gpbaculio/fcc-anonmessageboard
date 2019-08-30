@@ -1,8 +1,9 @@
 import * as mongoose from 'mongoose';
+import { ThreadDocument } from './Thread';
 
 export interface BoardDocument extends mongoose.Document {
   name: string;
-  threads: string[];
+  threads: ThreadDocument[];
   _doc: BoardDocument;
 }
 

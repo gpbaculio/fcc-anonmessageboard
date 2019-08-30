@@ -26,4 +26,8 @@ export default class RepliesController {
         });
     });
   };
+  public getThreadReplies = async (req: Request, res: Response) => {
+    const { board_id } = req.params;
+    const { thread_id } = req.query;
+  };
 }

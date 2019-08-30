@@ -14,6 +14,7 @@ class ThreadsRoute {
         this.routes = (app) => {
             app
                 .route('/api/replies/:board_id')
+                .get(this.repliesController.getThreadReplies)
                 .post(this.repliesController.createReply);
         };
     }

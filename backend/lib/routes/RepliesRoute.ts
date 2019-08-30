@@ -15,6 +15,7 @@ export default class ThreadsRoute {
   public routes = (app): void => {
     app
       .route('/api/replies/:board_id')
+      .get(this.repliesController.getThreadReplies)
       .post(this.repliesController.createReply);
   };
 }

@@ -5,12 +5,20 @@ export const CREATE_BOARD_REQUEST = 'CREATE_BOARD_REQUEST';
 export const CREATE_BOARD_SUCCESS = 'CREATE_BOARD_SUCCESS';
 export const CREATE_BOARD_FAILURE = 'CREATE_BOARD_FAILURE';
 
+export interface ReplyType {
+  _id: string;
+  text: string;
+  created_on: string;
+  thread_id: string;
+}
+
 export interface ThreadType {
   _id: string;
   text: string;
   created_on: string;
   replies: string[];
   bumped_on: string;
+  board_id: string;
 }
 
 export interface BoardType {
@@ -75,6 +83,9 @@ export interface fetchBoardsSuccess {
     };
     threads: {
       [_id: string]: ThreadType;
+    };
+    replies: {
+      [_id: string]: ReplyType;
     };
   };
 }

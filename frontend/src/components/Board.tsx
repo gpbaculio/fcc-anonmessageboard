@@ -4,9 +4,6 @@ import * as H from 'history';
 import { BoardType, ThreadType } from '../store/boards/types';
 import { createThread } from '../store/threads/actions';
 import {
-  Card,
-  CardTitle,
-  CardBody,
   Button,
   Modal,
   ModalHeader,
@@ -20,15 +17,18 @@ import {
   Table,
   Row
 } from 'reactstrap';
-import { timeDifferenceForDate } from './utils';
 import { connect } from 'react-redux';
 import { createThreadArgs } from '../Api';
 import { AppState } from '../store';
+import { Link } from 'react-router-dom';
 
 interface BoardProps extends RouteComponentProps {
-  location: H.Location<{ board: BoardType }>;
+  location: H.Location<{ board_id: string }>;
   threads: {
     [_id: string]: ThreadType;
+  };
+  boards: {
+    [_id: string]: BoardType;
   };
 }
 
@@ -66,13 +66,13 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
   onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { thread_text, thread_delete_password } = this.state;
-    const { board } = this.props.location.state;
+    const { board_id } = this.props.location.state;
     if (thread_text && thread_delete_password) {
       this.setState({ loading: true });
       await this.props.createThread({
         text: thread_text,
         delete_password: thread_delete_password,
-        board_id: board._id
+        board_id
       });
       this.setState(this.initState);
     }
@@ -82,8 +82,9 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
     this.setState({ [name]: value });
   };
   render() {
-    const { board } = this.props.location.state;
-    const { threads } = this.props;
+    const { board_id } = this.props.location.state;
+    const { threads, boards } = this.props;
+    const board = boards[board_id];
     return (
       <Fragment>
         <Modal isOpen={this.state.modal} toggle={this.toggle}>
@@ -142,15 +143,17 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
           <Row>
             <Col>
               <div className='table-threads p-3 d-flex flex-column text-center'>
-                <h4 className='table-header pb-3 mb-0'>BOARD</h4>
-                <div className='d-flex justify-content-between my-3 align-items-center'>
-                  <legend className='mb-0 w-auto'> {board.name}</legend>
+                <div className='d-flex justify-content-between mb-3 align-items-center'>
+                  <legend className='mb-0 w-auto'>
+                    BOARD:
+                    <span className='font-weight-lighter'> {board.name}</span>
+                  </legend>
                   <Button color='primary' onClick={this.toggle}>
                     Post New Thread
                   </Button>
                 </div>
                 <Table hover responsive>
-                  <thead>
+                  <thead className='thead-light'>
                     <tr>
                       <th>Thread Title</th>
                       <th>Replies</th>
@@ -162,7 +165,15 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                       const thread = threads[thId];
                       return (
                         <tr key={thread._id}>
-                          <td scope='row'>{thread.text}</td>
+                          <td scope='row'>
+                            <Link
+                              to={{
+                                pathname: `/b/${board._id}/${thread._id}`,
+                                state: { thread_id: thread._id }
+                              }}>
+                              {thread.text}
+                            </Link>
+                          </td>
                           <td>{thread.replies.length}</td>
                           <td>{new Date(thread.bumped_on).toUTCString()}</td>
                         </tr>
@@ -179,8 +190,12 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
   }
 }
 
-const mapStateToProps = ({ threads: { threads } }: AppState) => ({
-  threads
+const mapStateToProps = ({
+  threads: { threads },
+  boards: { boards }
+}: AppState) => ({
+  threads,
+  boards
 });
 
 const mapDispatchToProps = {

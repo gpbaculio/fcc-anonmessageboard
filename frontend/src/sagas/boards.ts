@@ -23,20 +23,23 @@ export function* createBoard(action: createBoardRequest) {
 export function* fetchBoards() {
   try {
     const { data } = yield call(Api.boards.getBoards);
-    const thread = new schema.Entity('threads', {}, { idAttribute: '_id' });
+    const reply = new schema.Entity('replies', {}, { idAttribute: '_id' });
+    const thread = new schema.Entity(
+      'threads',
+      { replies: [reply] },
+      { idAttribute: '_id' }
+    );
     const board = new schema.Entity(
       'boards',
       { threads: [thread] },
       { idAttribute: '_id' }
     );
-    const { boards, threads } = normalize(data, { boards: [board] }).entities;
+    const { boards, threads, replies } = normalize(data, {
+      boards: [board]
+    }).entities;
     yield put({
       type: FETCH_BOARDS_SUCCESS,
-      payload: { boards }
-    });
-    yield put({
-      type: FETCH_BOARDS_SUCCESS,
-      payload: { threads }
+      payload: { boards, threads, replies }
     });
   } catch (error) {
     yield put({ type: FETCH_BOARDS_FAILURE, payload: { error } });

@@ -34,9 +34,12 @@ class BoardsController {
                 limit: 9,
                 populate: {
                     path: 'threads',
+                    model: 'Thread',
+                    select: '-delete_password -reported',
                     populate: {
                         path: 'replies',
-                        model: 'Reply'
+                        model: 'Reply',
+                        select: '-delete_password -reported'
                     }
                 }
             }, (error, boards) => {
