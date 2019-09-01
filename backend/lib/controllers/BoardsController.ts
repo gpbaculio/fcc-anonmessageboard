@@ -15,6 +15,29 @@ export default class BoardsController {
       } else res.status(400).send('Board already exists');
     });
   };
+  public getBoard = async (req: Request, res: Response) => {
+    const { board_id } = req.params;
+    await Board.findById(
+      board_id,
+      null,
+      {
+        populate: {
+          path: 'threads',
+          model: 'Thread',
+          select: '-delete_password -reported',
+          populate: {
+            path: 'replies',
+            model: 'Reply',
+            select: '-delete_password -reported'
+          }
+        }
+      },
+      (error, board) => {
+        if (error) res.status(400).send(error);
+        res.status(200).json({ board });
+      }
+    );
+  };
   public getBoards = async (_req: Request, res: Response) => {
     await Board.find(
       {},

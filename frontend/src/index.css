@@ -29,3 +29,8 @@ header {
 .table-header {
   border-bottom: 1px solid #ececec;
 }
+
+.thread-title-container,
+.reply-title {
+  background-color: #f7f7f7;
+}

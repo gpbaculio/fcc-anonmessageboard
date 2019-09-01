@@ -41,8 +41,8 @@ class ThreadsController {
             });
         };
         this.getThreads = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { boardId } = req.params;
-            yield Thread_1.default.find({ boardId }, null, { sort: '-createdAt', limit: 10 }, (error, threads) => {
+            const { board_id } = req.params;
+            yield Thread_1.default.find({ boardId: board_id }, null, { sort: '-createdAt', limit: 10 }, (error, threads) => {
                 if (error)
                     res.status(400).send(error);
                 else
@@ -50,9 +50,9 @@ class ThreadsController {
             });
         });
         this.deleteThread = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { boardId } = req.params;
+            const { board_id } = req.params;
             const { thread_id, delete_password } = req.body;
-            yield Thread_1.default.findOne({ boardId, _id: thread_id }, (error, thread) => __awaiter(this, void 0, void 0, function* () {
+            yield Thread_1.default.findOne({ boardId: board_id, _id: thread_id }, (error, thread) => __awaiter(this, void 0, void 0, function* () {
                 if (error)
                     res.status(400).send(error);
                 const correctPassword = yield thread.authenticate(delete_password);

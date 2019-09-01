@@ -26,9 +26,9 @@ export default class ThreadsController {
     });
   };
   public getThreads = async (req: Request, res: Response) => {
-    const { boardId } = req.params;
+    const { board_id } = req.params;
     await Thread.find(
-      { boardId },
+      { boardId: board_id },
       null,
       { sort: '-createdAt', limit: 10 },
       (error, threads) => {
@@ -38,17 +38,23 @@ export default class ThreadsController {
     );
   };
   public deleteThread = async (req: Request, res: Response) => {
-    const { boardId } = req.params;
+    const { board_id } = req.params;
     const { thread_id, delete_password } = req.body;
-    await Thread.findOne({ boardId, _id: thread_id }, async (error, thread) => {
-      if (error) res.status(400).send(error);
-      const correctPassword = await thread.authenticate(delete_password);
-      if (!correctPassword) res.status(400).send('incorrect password');
-      else
-        await Thread.findOneAndRemove({ _id: thread._id }, (error, thread) => {
-          if (error) res.status(400).send(error);
-          res.status(200).send('success');
-        });
-    });
+    await Thread.findOne(
+      { boardId: board_id, _id: thread_id },
+      async (error, thread) => {
+        if (error) res.status(400).send(error);
+        const correctPassword = await thread.authenticate(delete_password);
+        if (!correctPassword) res.status(400).send('incorrect password');
+        else
+          await Thread.findOneAndRemove(
+            { _id: thread._id },
+            (error, thread) => {
+              if (error) res.status(400).send(error);
+              res.status(200).send('success');
+            }
+          );
+      }
+    );
   };
 }

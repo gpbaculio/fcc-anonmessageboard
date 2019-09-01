@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import * as H from 'history';
 import { ThreadType, ReplyType } from '../store/boards/types';
-import { Row, Col, Button } from 'reactstrap';
+import { Row, Col, Button, Input, Form, FormGroup, Label } from 'reactstrap';
 import { connect } from 'react-redux';
 import { AppState } from '../store';
-import { timeDifferenceForDate } from './utils';
+import { timeDifferenceForDate, getTimeDate } from './utils';
 
 interface ThreadProps extends RouteComponentProps {
   location: H.Location<{ thread_id: string }>;
@@ -38,18 +38,76 @@ class Thread extends Component<ThreadProps> {
       <div className='board-container d-flex justify-content-center align-items-center'>
         <Row>
           <Col>
-            <div className='table-threads p-3 d-flex flex-column text-center'>
-              <div className='d-flex mb-3 align-items-center justify-content-between'>
+            <div className='table-threads d-flex flex-column text-center'>
+              <div className='thread-title-container d-flex p-3 align-items-center justify-content-between'>
                 <legend className='mb-0 w-auto'>
                   THREAD:
                   <span className='font-weight-lighter'> {thread.text}</span>
                 </legend>
-                <span>{timeDifferenceForDate(thread.created_on)}</span>
+                <span>{getTimeDate(thread.created_on)}</span>
               </div>
-              {thread.replies.map(rId => {
-                const reply = replies[rId];
-                return <span key={reply._id}>{reply.text}</span>;
-              })}
+              <div className='replies-container'>
+                <legend className='text-center reply-title mb-0 py-1'>
+                  Reply on Thread
+                </legend>
+                <div className='reply-form-container'>
+                  <Form className='p-3'>
+                    <FormGroup>
+                      <Label for='thread_id'>Thread Id</Label>
+                      <Col>
+                        <Input
+                          type='text'
+                          name='thread_id'
+                          id='thread_id'
+                          placeholder='Thread Id'
+                          autoComplete='off'
+                          required
+                          disabled
+                          value={thread_id}
+                        />
+                      </Col>
+                    </FormGroup>
+                    <FormGroup>
+                      <Label for='reply_text'>Text</Label>
+                      <Col>
+                        <Input
+                          type='text'
+                          name='reply_text'
+                          id='reply_text'
+                          placeholder='Text'
+                          autoComplete='off'
+                          required
+                        />
+                      </Col>
+                    </FormGroup>
+                    <FormGroup>
+                      <Label for='reply_delete_password'>Delete Password</Label>
+                      <Col>
+                        <Input
+                          type='password'
+                          name='reply_delete_password'
+                          id='reply_delete_password'
+                          placeholder='Delete Password'
+                          autoComplete='off'
+                          required
+                        />
+                      </Col>
+                    </FormGroup>
+                    <Button color='primary'>Submit Reply</Button>
+                  </Form>
+                </div>
+                {thread.replies.map(rId => {
+                  const reply = replies[rId];
+                  return (
+                    <div
+                      key={reply._id}
+                      className='reply-container my-3 d-flex justify-content-between'>
+                      <span>{reply.text}</span>
+                      <span>{timeDifferenceForDate(reply.created_on)}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </Col>
         </Row>

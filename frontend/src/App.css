@@ -42,3 +42,19 @@
   width: 300px;
   height: auto;
 }
+
+.replies-container {
+  border-top: solid #ececec 1px;
+  padding: 1.5rem;
+}
+
+.reply-container {
+  background-color: #F2F3F5;
+  padding: .5rem;
+  border-radius: 5px;
+}
+
+.reply-form-container {
+  border: solid #ececec 1px;
+  padding: .5rem;
+}

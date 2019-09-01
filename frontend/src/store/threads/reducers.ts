@@ -1,7 +1,8 @@
 import {
   ThreadType,
   FETCH_BOARDS_SUCCESS,
-  fetchBoardsSuccess
+  fetchBoardsSuccess,
+  FETCH_BOARD_SUCCESS
 } from '../boards/types';
 import {
   CREATE_THREAD_REQUEST,
@@ -10,13 +11,13 @@ import {
   CREATE_THREAD_FAILURE
 } from './types';
 
-interface ThreadsState {
+export interface ThreadsState {
   threads: { [_id: string]: ThreadType };
   loading: {
     createThread: boolean;
   };
   error: {
-    createThread: string;
+    createThread: string | null;
   };
 }
 const initState: ThreadsState = {
@@ -30,6 +31,12 @@ const boardsReducer = (
   action: ThreadsActionTypes | fetchBoardsSuccess
 ) => {
   switch (action.type) {
+    case FETCH_BOARD_SUCCESS: {
+      return {
+        ...state,
+        threads: { ...state.threads, ...action.payload.threads }
+      };
+    }
     case FETCH_BOARDS_SUCCESS: {
       return {
         ...state,
@@ -47,6 +54,10 @@ const boardsReducer = (
       const { thread } = action.payload;
       return {
         ...state,
+        error: {
+          ...state.error,
+          createThread: null
+        },
         threads: {
           ...state.threads,
           [thread._id]: { ...thread }

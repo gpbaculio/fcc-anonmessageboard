@@ -2,7 +2,8 @@ import {
   ThreadType,
   FETCH_BOARDS_SUCCESS,
   fetchBoardsSuccess,
-  ReplyType
+  ReplyType,
+  FETCH_BOARD_SUCCESS
 } from '../boards/types';
 
 interface RepliesState {
@@ -22,6 +23,12 @@ const initState: RepliesState = {
 
 const repliesReducer = (state = initState, action: fetchBoardsSuccess) => {
   switch (action.type) {
+    case FETCH_BOARD_SUCCESS: {
+      return {
+        ...state,
+        replies: { ...state.replies, ...action.payload.replies }
+      };
+    }
     case FETCH_BOARDS_SUCCESS: {
       return {
         ...state,

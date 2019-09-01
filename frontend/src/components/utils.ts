@@ -30,3 +30,22 @@ export const timeDifferenceForDate = (date: string) => {
   const updated = new Date(date).getTime();
   return timeDifference(now, updated);
 };
+
+export const getTimeDate = (date: string) => {
+  const today = new Date(Date.now());
+  const timeDate = new Date(date);
+  const month = timeDate.getMonth() + 1;
+  const day = timeDate.getDate();
+  var hours: string | number = timeDate.getHours();
+  var minutes: string | number = timeDate.getMinutes();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  if (today.getDate() === day) return `Today, ${strTime}`;
+  if (today.getDate() - 1 === day - 1) return `Yesterday, ${strTime}`;
+  return `${month <= 9 ? `0${month}` : month}-${
+    day <= 9 ? `0${day}` : day
+  }-${timeDate.getFullYear()}, ${strTime}`;
+};

@@ -3,19 +3,23 @@ import {
   CREATE_BOARD_REQUEST,
   CREATE_BOARD_SUCCESS,
   CREATE_BOARD_FAILURE,
-  BoardsReducerState,
+  BoardsState,
   FETCH_BOARDS_REQUEST,
   FETCH_BOARDS_SUCCESS,
-  FETCH_BOARDS_FAILURE
+  FETCH_BOARDS_FAILURE,
+  FETCH_BOARD_REQUEST,
+  FETCH_BOARD_SUCCESS,
+  FETCH_BOARD_FAILURE
 } from './types';
 import { createThreadSuccess, CREATE_THREAD_SUCCESS } from '../threads/types';
 
-const initState: BoardsReducerState = {
-  loading: { createBoard: false, fetchBoards: false },
+const initState: BoardsState = {
+  loading: { createBoard: false, fetchBoards: false, fetchBoard: false },
   boards: {},
   error: {
     createBoard: '',
-    fetchBoards: ''
+    fetchBoards: '',
+    fetchBoard: ''
   }
 };
 
@@ -24,17 +28,23 @@ const boardsReducer = (
   action: BoardsActionTypes | createThreadSuccess
 ) => {
   switch (action.type) {
-    case FETCH_BOARDS_REQUEST: {
-      return { ...state, loading: { ...state.loading, fetchBoards: true } };
+    case FETCH_BOARD_REQUEST: {
+      return { ...state, loading: { ...state.loading, fetchBoard: true } };
     }
-    case FETCH_BOARDS_SUCCESS: {
+    case FETCH_BOARD_SUCCESS: {
       return {
         ...state,
-        loading: { ...state.loading, fetchBoards: false },
+        loading: { ...state.loading, fetchBoard: false },
         boards: {
-          ...state.boards,
           ...action.payload.boards
         }
+      };
+    }
+    case FETCH_BOARD_FAILURE: {
+      return {
+        ...state,
+        error: { ...state.error, fetchBoards: action.payload.error },
+        loading: { ...state.loading, fetchBoard: false }
       };
     }
     case CREATE_THREAD_SUCCESS: {
@@ -48,6 +58,18 @@ const boardsReducer = (
             ...board,
             threads: [...board.threads, thread._id]
           }
+        }
+      };
+    }
+    case FETCH_BOARDS_REQUEST: {
+      return { ...state, loading: { ...state.loading, fetchBoards: true } };
+    }
+    case FETCH_BOARDS_SUCCESS: {
+      return {
+        ...state,
+        loading: { ...state.loading, fetchBoards: false },
+        boards: {
+          ...action.payload.boards
         }
       };
     }

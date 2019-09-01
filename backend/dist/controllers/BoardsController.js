@@ -28,6 +28,25 @@ class BoardsController {
                     res.status(400).send('Board already exists');
             }));
         });
+        this.getBoard = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { board_id } = req.params;
+            yield Board_1.default.findById(board_id, null, {
+                populate: {
+                    path: 'threads',
+                    model: 'Thread',
+                    select: '-delete_password -reported',
+                    populate: {
+                        path: 'replies',
+                        model: 'Reply',
+                        select: '-delete_password -reported'
+                    }
+                }
+            }, (error, board) => {
+                if (error)
+                    res.status(400).send(error);
+                res.status(200).json({ board });
+            });
+        });
         this.getBoards = (_req, res) => __awaiter(this, void 0, void 0, function* () {
             yield Board_1.default.find({}, null, {
                 sort: '-createdAt',

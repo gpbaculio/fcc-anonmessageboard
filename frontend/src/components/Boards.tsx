@@ -9,7 +9,7 @@ import {
   BoardsErrorType
 } from '../store/boards/types';
 import { Row, Col, Card, CardBody, CardTitle } from 'reactstrap';
-import { timeDifferenceForDate } from './utils';
+import { timeDifferenceForDate, getTimeDate } from './utils';
 import { Link } from 'react-router-dom';
 
 interface BoardsProps extends RouteComponentProps {
@@ -49,7 +49,7 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
                           <h6>{board.name}</h6>
                           <small>{board.threads.length}</small>
                         </div>
-                        <div>{timeDifferenceForDate(board.created_on)}</div>
+                        <div>{getTimeDate(board.created_on)}</div>
                       </div>
                     </CardTitle>
                   </CardBody>

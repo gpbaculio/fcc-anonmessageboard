@@ -9,7 +9,8 @@ export interface createThreadArgs {
 export default {
   boards: {
     createBoard: (name: string) => axios.post('/api/boards', { name }),
-    getBoards: () => axios.get('/api/boards')
+    getBoards: () => axios.get('/api/boards'),
+    fetchBoard: (board_id: string) => axios.get(`/api/board/${board_id}`)
   },
   threads: {
     createThread: ({ text, delete_password, board_id }: createThreadArgs) => {

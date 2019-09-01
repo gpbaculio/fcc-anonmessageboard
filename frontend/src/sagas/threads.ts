@@ -13,6 +13,9 @@ export function* createThread(action: createThreadRequest) {
     } = yield call(Api.threads.createThread, action.payload);
     yield put({ type: CREATE_THREAD_SUCCESS, payload: { thread } });
   } catch (error) {
-    yield put({ type: CREATE_THREAD_FAILURE, payload: { error } });
+    yield put({
+      type: CREATE_THREAD_FAILURE,
+      payload: { error: error.message }
+    });
   }
 }
