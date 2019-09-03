@@ -232,7 +232,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                     Post New Thread
                   </Button>
                 </div>
-                <Table hover responsive>
+                <Table hover responsive className='threads-table'>
                   <thead className='thead-light'>
                     <tr>
                       <th>Thread Title</th>
@@ -241,6 +241,11 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                     </tr>
                   </thead>
                   <tbody>
+                    {board.threads.length === 0 && (
+                      <tr>
+                        <td colSpan={3}>No Threads</td>
+                      </tr>
+                    )}
                     {board.threads.map(thId => {
                       const thread = threads.threads[thId];
                       return (

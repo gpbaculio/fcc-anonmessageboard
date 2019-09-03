@@ -5,7 +5,9 @@ import { ThreadType, ReplyType } from '../store/boards/types';
 import { Row, Col, Button, Input, Form, FormGroup, Label } from 'reactstrap';
 import { connect } from 'react-redux';
 import { AppState } from '../store';
+import { createReply } from '../store/replies/actions';
 import { timeDifferenceForDate, getTimeDate } from './utils';
+import { createReplyArgs } from '../Api';
 
 interface ThreadProps extends RouteComponentProps {
   location: H.Location<{ thread_id: string }>;
@@ -17,19 +19,53 @@ interface ThreadProps extends RouteComponentProps {
   };
 }
 
-// interface BoardDispatchProps {
-//   createThread: ({ delete_password, text, board_id }: createThreadArgs) => void;
-// }
+interface ThreadDispatchProps {
+  createReply: ({
+    delete_password,
+    text,
+    board_id,
+    thread_id
+  }: createReplyArgs) => void;
+}
 
-// interface BoardState {
-//   modal: boolean;
-//   thread_text: string;
-//   thread_delete_password: string;
-//   [name: string]: string | boolean;
-//   loading: boolean;
-// }
+interface ThreadState {
+  reply_text: string;
+  reply_delete_password: string;
+  [name: string]: string;
+}
 
-class Thread extends Component<ThreadProps> {
+class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
+  private initState = {
+    reply_text: '',
+    reply_delete_password: ''
+  };
+  constructor(props: ThreadProps & ThreadDispatchProps) {
+    super(props);
+    this.state = this.initState;
+  }
+  onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const { reply_text, reply_delete_password } = this.state;
+    const { threads, location } = this.props;
+    console.log('location ', location.state);
+    const { thread_id } = location.state;
+    const thread = threads[thread_id];
+    const text = reply_text.trim();
+    const delete_password = reply_delete_password.trim();
+    if (reply_text && reply_delete_password)
+      this.props.createReply({
+        text,
+        delete_password,
+        board_id: thread.board_id,
+        thread_id
+      });
+  };
+  onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    this.setState({
+      [name]: value
+    });
+  };
   render() {
     const { replies, threads, location } = this.props;
     const { thread_id } = location.state;
@@ -51,7 +87,7 @@ class Thread extends Component<ThreadProps> {
                   Reply on Thread
                 </legend>
                 <div className='reply-form-container'>
-                  <Form className='p-3'>
+                  <Form className='p-3' onSubmit={this.onSubmit}>
                     <FormGroup>
                       <Label for='thread_id'>Thread Id</Label>
                       <Col>
@@ -77,6 +113,7 @@ class Thread extends Component<ThreadProps> {
                           placeholder='Text'
                           autoComplete='off'
                           required
+                          onChange={this.onChange}
                         />
                       </Col>
                     </FormGroup>
@@ -90,14 +127,20 @@ class Thread extends Component<ThreadProps> {
                           placeholder='Delete Password'
                           autoComplete='off'
                           required
+                          onChange={this.onChange}
                         />
                       </Col>
                     </FormGroup>
-                    <Button color='primary'>Submit Reply</Button>
+                    <Button color='primary' type='submit'>
+                      Submit Reply
+                    </Button>
                   </Form>
                 </div>
                 {thread.replies.map(rId => {
                   const reply = replies[rId];
+                  console.log('rId ', rId);
+                  console.log('thread.replies ', thread.replies);
+                  console.log('replies ', replies);
                   return (
                     <div
                       key={reply._id}
@@ -124,8 +167,11 @@ const mapStateToProps = ({
   replies
 });
 
-// const mapDispatchToProps = {
-//   createReply
-// };
+const mapDispatchToProps = {
+  createReply
+};
 
-export default connect(mapStateToProps)(withRouter(Thread));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(Thread));

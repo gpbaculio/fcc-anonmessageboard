@@ -25,7 +25,7 @@ const ReplySchema = new mongoose.Schema(
     },
     reported: {
       type: Boolean,
-      hidden: true
+      default: false
     }
   },
   {

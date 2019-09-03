@@ -6,6 +6,10 @@ export interface createThreadArgs {
   board_id: string;
 }
 
+export interface createReplyArgs extends createThreadArgs {
+  thread_id: string;
+}
+
 export default {
   boards: {
     createBoard: (name: string) => axios.post('/api/boards', { name }),
@@ -15,6 +19,20 @@ export default {
   threads: {
     createThread: ({ text, delete_password, board_id }: createThreadArgs) => {
       return axios.post(`/api/threads/${board_id}`, { text, delete_password });
+    }
+  },
+  replies: {
+    createReply: ({
+      text,
+      delete_password,
+      thread_id,
+      board_id
+    }: createReplyArgs) => {
+      return axios.post(`/api/replies/${board_id}`, {
+        text,
+        delete_password,
+        thread_id
+      });
     }
   }
 };

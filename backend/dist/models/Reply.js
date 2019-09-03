@@ -17,7 +17,7 @@ const ReplySchema = new mongoose.Schema({
     },
     reported: {
         type: Boolean,
-        hidden: true
+        default: false
     }
 }, {
     timestamps: { createdAt: 'created_on', updatedAt: 'updated_on' },

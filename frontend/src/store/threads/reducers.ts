@@ -10,6 +10,7 @@ import {
   CREATE_THREAD_SUCCESS,
   CREATE_THREAD_FAILURE
 } from './types';
+import { createReplySuccess, CREATE_REPLY_SUCCESS } from '../replies/types';
 
 export interface ThreadsState {
   threads: { [_id: string]: ThreadType };
@@ -28,9 +29,23 @@ const initState: ThreadsState = {
 
 const boardsReducer = (
   state = initState,
-  action: ThreadsActionTypes | fetchBoardsSuccess
+  action: ThreadsActionTypes | fetchBoardsSuccess | createReplySuccess
 ) => {
   switch (action.type) {
+    case CREATE_REPLY_SUCCESS: {
+      const { reply } = action.payload;
+      const thread = state.threads[reply.thread_id];
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            replies: [...thread.replies, reply._id]
+          }
+        }
+      };
+    }
     case FETCH_BOARD_SUCCESS: {
       return {
         ...state,

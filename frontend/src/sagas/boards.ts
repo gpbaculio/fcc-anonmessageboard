@@ -1,5 +1,5 @@
 import { call, put } from 'redux-saga/effects';
-import { normalize, schema } from 'normalizr';
+import { normalize } from 'normalizr';
 import Api from '../Api';
 import {
   CREATE_BOARD_SUCCESS,
