@@ -49,23 +49,35 @@ class ThreadsController {
                     res.status(200).json({ threads });
             });
         });
-        this.deleteThread = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { board_id } = req.params;
-            const { thread_id, delete_password } = req.body;
-            yield Thread_1.default.findOne({ boardId: board_id, _id: thread_id }, (error, thread) => __awaiter(this, void 0, void 0, function* () {
-                if (error)
-                    res.status(400).send(error);
-                const correctPassword = yield thread.authenticate(delete_password);
-                if (!correctPassword)
-                    res.status(400).send('incorrect password');
-                else
-                    yield Thread_1.default.findOneAndRemove({ _id: thread._id }, (error, thread) => {
-                        if (error)
-                            res.status(400).send(error);
-                        res.status(200).send('success');
-                    });
-            }));
-        });
+        this.deleteThread = function (req, res) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const { board_id } = req.params;
+                const { thread_id, delete_password } = req.body;
+                yield Thread_1.default.findOne({ boardId: board_id, _id: thread_id }, (error, thread) => __awaiter(this, void 0, void 0, function* () {
+                    if (error)
+                        res.status(400).send(error);
+                    const correctPassword = yield thread.authenticate(delete_password);
+                    if (!correctPassword)
+                        res.status(400).send('incorrect password');
+                    else
+                        yield Thread_1.default.findOneAndRemove({ _id: thread._id }, (error, thread) => {
+                            if (error)
+                                res.status(400).send(error);
+                            res.status(200).send('success');
+                        });
+                }));
+            });
+        };
+        this.getThread = function (req, res) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const { thread_id } = req.params;
+                yield Thread_1.default.findById(thread_id, '-delete_password', function (error, thread) {
+                    if (error)
+                        res.status(400).send(error);
+                    res.status(200).json({ thread });
+                });
+            });
+        };
     }
 }
 exports.default = ThreadsController;

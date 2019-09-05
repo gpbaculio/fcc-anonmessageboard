@@ -26,8 +26,12 @@ import { Link } from 'react-router-dom';
 import { getTimeDate } from './utils';
 import { ThreadsState } from '../store/threads/reducers';
 
-interface BoardProps extends RouteComponentProps<{ board_id: string }> {
-  location: H.Location<{ board_id: string }>;
+interface LocationState {
+  board_id: string;
+}
+
+interface BoardProps extends RouteComponentProps<LocationState> {
+  location: H.Location;
   threads: ThreadsState;
   boards: BoardsState;
 }

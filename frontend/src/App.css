@@ -54,6 +54,10 @@
   border-radius: 5px;
 }
 
+.reply-container:last-of-type {
+  margin-bottom: 0 !important;
+}
+
 .reply-form-container {
   border: solid #ececec 1px;
   padding: .5rem;

@@ -18,5 +18,6 @@ export default class ThreadsRoute {
       .get(this.threadsController.getThreads)
       .post(this.threadsController.createThread)
       .delete(this.threadsController.deleteThread);
+    app.route('/api/thread/:thread_id').get(this.threadsController.getThread);
   };
 }

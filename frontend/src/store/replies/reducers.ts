@@ -11,7 +11,7 @@ import {
   CREATE_REPLY_FAILURE
 } from './types';
 
-interface RepliesState {
+export interface RepliesState {
   replies: { [_id: string]: ReplyType };
   loading: {
     createReply: boolean;
@@ -43,12 +43,15 @@ const repliesReducer = (
     }
     case CREATE_REPLY_SUCCESS: {
       const { reply } = action.payload;
-      console.log('reply success ', reply);
       return {
         ...state,
         replies: {
-          ...state.replies,
-          [reply._id]: reply
+          [reply._id]: reply,
+          ...state.replies
+        },
+        loading: {
+          ...state.loading,
+          createReply: false
         }
       };
     }

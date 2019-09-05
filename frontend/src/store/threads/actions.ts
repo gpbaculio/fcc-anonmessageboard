@@ -1,4 +1,4 @@
-import { CREATE_THREAD_REQUEST } from './types';
+import { CREATE_THREAD_REQUEST, GET_THREAD_REQUEST } from './types';
 import { createThreadArgs } from '../../Api';
 
 export const createThread = ({
@@ -8,4 +8,9 @@ export const createThread = ({
 }: createThreadArgs) => ({
   type: CREATE_THREAD_REQUEST,
   payload: { board_id, text, delete_password }
+});
+
+export const getThread = (thread_id: string) => ({
+  type: GET_THREAD_REQUEST,
+  payload: { thread_id }
 });

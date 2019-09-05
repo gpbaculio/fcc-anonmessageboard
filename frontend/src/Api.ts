@@ -19,7 +19,8 @@ export default {
   threads: {
     createThread: ({ text, delete_password, board_id }: createThreadArgs) => {
       return axios.post(`/api/threads/${board_id}`, { text, delete_password });
-    }
+    },
+    getThread: (thread_id: string) => axios.get(`/api/thread/${thread_id}`)
   },
   replies: {
     createReply: ({

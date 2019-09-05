@@ -37,7 +37,7 @@ export default class ThreadsController {
       }
     );
   };
-  public deleteThread = async (req: Request, res: Response) => {
+  public deleteThread = async function(req: Request, res: Response) {
     const { board_id } = req.params;
     const { thread_id, delete_password } = req.body;
     await Thread.findOne(
@@ -56,5 +56,15 @@ export default class ThreadsController {
           );
       }
     );
+  };
+  public getThread = async function(req: Request, res: Response) {
+    const { thread_id } = req.params;
+    await Thread.findById(thread_id, '-delete_password', function(
+      error,
+      thread
+    ) {
+      if (error) res.status(400).send(error);
+      res.status(200).json({ thread });
+    });
   };
 }
