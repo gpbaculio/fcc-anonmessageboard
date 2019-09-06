@@ -59,12 +59,27 @@ export default class ThreadsController {
   };
   public getThread = async function(req: Request, res: Response) {
     const { thread_id } = req.params;
-    await Thread.findById(thread_id, '-delete_password', function(
-      error,
-      thread
-    ) {
-      if (error) res.status(400).send(error);
-      res.status(200).json({ thread });
-    });
+    await Thread.findById(
+      thread_id,
+      '-delete_password -reported',
+      {
+        populate: [
+          {
+            path: 'replies',
+            model: 'Reply',
+            select: '-delete_password -reported'
+          },
+          {
+            path: 'board_id',
+            model: 'Board',
+            select: '-delete_password -reported'
+          }
+        ]
+      },
+      function(error, thread) {
+        if (error) res.status(400).send(error);
+        res.status(200).json({ thread });
+      }
+    );
   };
 }

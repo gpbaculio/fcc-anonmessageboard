@@ -11,7 +11,12 @@ import {
   FETCH_BOARD_SUCCESS,
   FETCH_BOARD_FAILURE
 } from './types';
-import { createThreadSuccess, CREATE_THREAD_SUCCESS } from '../threads/types';
+import {
+  createThreadSuccess,
+  CREATE_THREAD_SUCCESS,
+  getThreadSuccess,
+  GET_THREAD_SUCCESS
+} from '../threads/types';
 
 const initState: BoardsState = {
   loading: { createBoard: false, fetchBoards: false, fetchBoard: false },

@@ -1,4 +1,4 @@
-import { ThreadType } from '../boards/types';
+import { ThreadType, ReplyType } from '../boards/types';
 
 export const CREATE_THREAD_REQUEST = 'CREATE_THREAD_REQUEST';
 export const CREATE_THREAD_SUCCESS = 'CREATE_THREAD_SUCCESS';
@@ -24,8 +24,8 @@ export interface createThreadSuccess {
   };
 }
 
-interface createThreadFailure {
-  type: typeof CREATE_THREAD_FAILURE;
+interface threadsFailureTypes {
+  type: typeof CREATE_THREAD_FAILURE | typeof GET_THREAD_FAILURE;
   payload: {
     error: string;
   };
@@ -37,9 +37,19 @@ export interface getThreadRequest {
     thread_id: string;
   };
 }
+export interface getThreadSuccess {
+  type: typeof GET_THREAD_SUCCESS;
+  payload: {
+    thread: ThreadType;
+    replies: {
+      [_id: string]: ReplyType;
+    };
+  };
+}
 
 export type ThreadsActionTypes =
   | getThreadRequest
+  | getThreadSuccess
   | createThreadRequest
   | createThreadSuccess
-  | createThreadFailure;
+  | threadsFailureTypes;

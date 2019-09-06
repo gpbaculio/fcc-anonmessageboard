@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as H from 'history';
+import classNames from 'classnames';
 import { BoardsState, BoardType } from '../store/boards/types';
 import { fetchBoard } from '../store/boards/actions';
 import { createThread } from '../store/threads/actions';
@@ -117,23 +118,23 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
         error: boardsErrorState,
         boards: boardsState
       },
-      match
+      match: {
+        params: { board_id }
+      }
     } = this.props;
     if (
-      prevThreadsLoading.createThread === true &&
-      threadsLoadingState.createThread === false &&
+      prevThreadsLoading.createThread &&
+      !threadsLoadingState.createThread &&
       !threadsErrorState.createThread
     ) {
-      const { board_id } = match.params;
       const board = boardsState[board_id];
       this.setState({ ...this.initState, board });
     }
     if (
-      prevBoardsLoading.fetchBoard === true &&
-      boardsLoadingState.fetchBoard === false &&
+      prevBoardsLoading.fetchBoard &&
+      !boardsLoadingState.fetchBoard &&
       !boardsErrorState.fetchBoard
     ) {
-      const { board_id } = match.params;
       const board = boardsState[board_id];
       this.setState({ board });
     }
@@ -147,15 +148,13 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
     const { board } = this.state;
     return (
       <Fragment>
-        {boards.loading.fetchBoard && (
-          <div className='mx-auto d-flex justify-content-center'>
-            <Spinner color='info' className='mr-2' /> Fetching Board...
-          </div>
-        )}
         <Modal isOpen={this.state.modal} toggle={this.toggle}>
           <ModalHeader toggle={this.toggle}>Post New Thread</ModalHeader>
           <Form onSubmit={this.onSubmit}>
-            <ModalBody>
+            <ModalBody
+              className={classNames({
+                'fade-load': threads.loading.createThread
+              })}>
               <FormGroup row>
                 <Label for='board_id' sm={4}>
                   Board Id
@@ -224,52 +223,63 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
         <div className='board-container d-flex justify-content-center align-items-center'>
           <Row>
             <Col>
-              <div
-                style={{ opacity: boards.loading.fetchBoard ? 0.5 : 1 }}
-                className='table-threads p-3 d-flex flex-column text-center'>
-                <div className='d-flex justify-content-between mb-3 align-items-center'>
-                  <legend className='mb-0 w-auto'>
-                    BOARD:
-                    <span className='font-weight-lighter'> {board.name}</span>
-                  </legend>
-                  <Button color='primary' onClick={this.toggle}>
-                    Post New Thread
-                  </Button>
+              <div className='table-threads'>
+                <div
+                  className={classNames(
+                    'loader w-100 d-flex align-items-center justify-content-center position-absolute',
+                    { hide: !boards.loading.fetchBoard }
+                  )}>
+                  <Spinner color='info' className='mr-2' />
+                  <strong>Fetching Board...</strong>
                 </div>
-                <Table hover responsive className='threads-table'>
-                  <thead className='thead-light'>
-                    <tr>
-                      <th>Thread Title</th>
-                      <th>Replies</th>
-                      <th>Last Bumped</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {board.threads.length === 0 && (
+                <div
+                  className={classNames('p-3 d-flex flex-column text-center', {
+                    'fade-load': boards.loading.fetchBoard
+                  })}>
+                  <div className='d-flex justify-content-between mb-3 align-items-center'>
+                    <legend className='mb-0 w-auto'>
+                      BOARD:
+                      <span className='font-weight-lighter'> {board.name}</span>
+                    </legend>
+                    <Button color='primary' onClick={this.toggle}>
+                      Post New Thread
+                    </Button>
+                  </div>
+                  <Table hover responsive className='threads-table'>
+                    <thead className='thead-light'>
                       <tr>
-                        <td colSpan={3}>No Threads</td>
+                        <th>Thread Title</th>
+                        <th>Replies</th>
+                        <th>Last Bumped</th>
                       </tr>
-                    )}
-                    {board.threads.map(thId => {
-                      const thread = threads.threads[thId];
-                      return (
-                        <tr key={thread._id}>
-                          <td scope='row'>
-                            <Link
-                              to={{
-                                pathname: `/b/${board._id}/${thread._id}`,
-                                state: { thread_id: thread._id }
-                              }}>
-                              {thread.text}
-                            </Link>
-                          </td>
-                          <td>{thread.replies.length}</td>
-                          <td>{getTimeDate(thread.bumped_on)}</td>
+                    </thead>
+                    <tbody>
+                      {board.threads.length === 0 && (
+                        <tr>
+                          <td colSpan={3}>No Threads</td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </Table>
+                      )}
+                      {board.threads.map(thId => {
+                        const thread = threads.threads[thId];
+                        return (
+                          <tr key={thread._id}>
+                            <td scope='row'>
+                              <Link
+                                to={{
+                                  pathname: `/b/${board._id}/${thread._id}`,
+                                  state: { thread_id: thread._id }
+                                }}>
+                                {thread.text}
+                              </Link>
+                            </td>
+                            <td>{thread.replies.length}</td>
+                            <td>{getTimeDate(thread.bumped_on)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </Table>
+                </div>
               </div>
             </Col>
           </Row>

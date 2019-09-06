@@ -71,7 +71,20 @@ class ThreadsController {
         this.getThread = function (req, res) {
             return __awaiter(this, void 0, void 0, function* () {
                 const { thread_id } = req.params;
-                yield Thread_1.default.findById(thread_id, '-delete_password', function (error, thread) {
+                yield Thread_1.default.findById(thread_id, '-delete_password -reported', {
+                    populate: [
+                        {
+                            path: 'replies',
+                            model: 'Reply',
+                            select: '-delete_password -reported'
+                        },
+                        {
+                            path: 'board_id',
+                            model: 'Board',
+                            select: '-delete_password -reported'
+                        }
+                    ]
+                }, function (error, thread) {
                     if (error)
                         res.status(400).send(error);
                     res.status(200).json({ thread });

@@ -10,6 +10,7 @@ import {
   CREATE_REPLY_REQUEST,
   CREATE_REPLY_FAILURE
 } from './types';
+import { getThreadSuccess, GET_THREAD_SUCCESS } from '../threads/types';
 
 export interface RepliesState {
   replies: { [_id: string]: ReplyType };
@@ -29,9 +30,19 @@ const initState: RepliesState = {
 
 const repliesReducer = (
   state = initState,
-  action: RepliesActionTypes | fetchBoardsSuccess
+  action: RepliesActionTypes | fetchBoardsSuccess | getThreadSuccess
 ) => {
   switch (action.type) {
+    case GET_THREAD_SUCCESS: {
+      console.log('action replies', action);
+      return {
+        ...state,
+        replies: {
+          ...state.replies,
+          ...action.payload.replies
+        }
+      };
+    }
     case CREATE_REPLY_REQUEST: {
       return {
         ...state,

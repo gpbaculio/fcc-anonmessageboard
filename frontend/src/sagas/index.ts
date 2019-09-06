@@ -4,9 +4,12 @@ import {
   FETCH_BOARDS_REQUEST,
   FETCH_BOARD_REQUEST
 } from '../store/boards/types';
-import { CREATE_THREAD_REQUEST } from '../store/threads/types';
+import {
+  CREATE_THREAD_REQUEST,
+  GET_THREAD_REQUEST
+} from '../store/threads/types';
 import { createBoard, fetchBoards, fetchBoard } from './boards';
-import { createThread } from './threads';
+import { createThread, getThread } from './threads';
 import { CREATE_REPLY_REQUEST } from '../store/replies/types';
 import { createReply } from './replies';
 
@@ -17,4 +20,5 @@ export default function* rootSaga() {
   yield takeEvery(FETCH_BOARDS_REQUEST, fetchBoards);
   yield takeEvery(CREATE_THREAD_REQUEST, createThread);
   yield takeEvery(CREATE_REPLY_REQUEST, createReply);
+  yield takeEvery(GET_THREAD_REQUEST, getThread);
 }

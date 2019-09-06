@@ -102,7 +102,7 @@ export interface fetchBoardRequest {
   };
 }
 
-interface failureType {
+interface boardsfailureTypes {
   type:
     | typeof FETCH_BOARDS_FAILURE
     | typeof CREATE_BOARD_FAILURE
@@ -114,7 +114,7 @@ interface failureType {
 
 export type BoardsActionTypes =
   | fetchBoardRequest
-  | failureType
+  | boardsfailureTypes
   | createBoardRequest
   | createBoardSuccess
   | fetchBoardsRequest

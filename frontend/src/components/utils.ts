@@ -32,6 +32,7 @@ export const timeDifferenceForDate = (date: string) => {
 };
 
 export const getTimeDate = (date: string) => {
+  if (!date) return '';
   const today = new Date(Date.now());
   const timeDate = new Date(date);
   const month = timeDate.getMonth() + 1;

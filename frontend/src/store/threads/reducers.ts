@@ -8,7 +8,10 @@ import {
   CREATE_THREAD_REQUEST,
   ThreadsActionTypes,
   CREATE_THREAD_SUCCESS,
-  CREATE_THREAD_FAILURE
+  CREATE_THREAD_FAILURE,
+  GET_THREAD_REQUEST,
+  GET_THREAD_SUCCESS,
+  GET_THREAD_FAILURE
 } from './types';
 import { createReplySuccess, CREATE_REPLY_SUCCESS } from '../replies/types';
 
@@ -16,15 +19,17 @@ export interface ThreadsState {
   threads: { [_id: string]: ThreadType };
   loading: {
     createThread: boolean;
+    getThread: boolean;
   };
   error: {
-    createThread: string | null;
+    createThread: string;
+    getThread: string;
   };
 }
 const initState: ThreadsState = {
   threads: {},
-  loading: { createThread: false },
-  error: { createThread: '' }
+  loading: { createThread: false, getThread: false },
+  error: { createThread: '', getThread: '' }
 };
 
 const boardsReducer = (
@@ -32,6 +37,38 @@ const boardsReducer = (
   action: ThreadsActionTypes | fetchBoardsSuccess | createReplySuccess
 ) => {
   switch (action.type) {
+    case GET_THREAD_REQUEST: {
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          getThread: true
+        }
+      };
+    }
+    case GET_THREAD_SUCCESS: {
+      const { thread } = action.payload;
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          getThread: false
+        },
+        threads: {
+          ...state.threads,
+          [thread._id]: thread
+        }
+      };
+    }
+    case GET_THREAD_FAILURE: {
+      return {
+        ...state,
+        error: {
+          ...state.error,
+          error: action.payload.error
+        }
+      };
+    }
     case CREATE_REPLY_SUCCESS: {
       const { reply } = action.payload;
       const thread = state.threads[reply.thread_id];
@@ -62,7 +99,7 @@ const boardsReducer = (
       return {
         ...state,
 
-        loading: { createThread: true }
+        loading: { ...state.loading, createThread: true }
       };
     }
     case CREATE_THREAD_SUCCESS: {
@@ -71,21 +108,21 @@ const boardsReducer = (
         ...state,
         error: {
           ...state.error,
-          createThread: null
+          createThread: ''
         },
         threads: {
           ...state.threads,
           [thread._id]: { ...thread }
         },
-        loading: { createThread: false }
+        loading: { ...state.loading, createThread: false }
       };
     }
     case CREATE_THREAD_FAILURE: {
       const { error } = action.payload;
       return {
         ...state,
-        loading: { createThread: false },
-        error: { createThread: error }
+        loading: { ...state.loading, createThread: false },
+        error: { ...state.error, createThread: error }
       };
     }
     default:

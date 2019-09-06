@@ -4,8 +4,12 @@ import {
   createThreadRequest,
   CREATE_THREAD_SUCCESS,
   CREATE_THREAD_FAILURE,
-  getThreadRequest
+  getThreadRequest,
+  GET_THREAD_FAILURE,
+  GET_THREAD_SUCCESS
 } from '../store/threads/types';
+import { thread } from './normalizrEntities';
+import { normalize } from 'normalizr';
 
 export function* createThread(action: createThreadRequest) {
   try {
@@ -27,12 +31,15 @@ export function* getThread(action: getThreadRequest) {
       Api.threads.getThread,
       action.payload.thread_id
     );
-    console.log('data getThread', data);
-    // yield put({ type: CREATE_THREAD_SUCCESS, payload: { thread } });
+    const { replies, threads } = normalize(data, { thread }).entities;
+    yield put({
+      type: GET_THREAD_SUCCESS,
+      payload: { thread: threads[action.payload.thread_id], replies }
+    });
   } catch (error) {
-    // yield put({
-    //   type: CREATE_THREAD_FAILURE,
-    //   payload: { error: error.message }
-    // });
+    yield put({
+      type: GET_THREAD_FAILURE,
+      payload: { error: error.message }
+    });
   }
 }

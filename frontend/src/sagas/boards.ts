@@ -30,7 +30,6 @@ export function* createBoard(action: createBoardRequest) {
 export function* fetchBoard(action: fetchBoardRequest) {
   try {
     const { data } = yield call(Api.boards.fetchBoard, action.payload.board_id);
-    console.log('fetchBoard ', data);
     const { boards, threads, replies } = normalize(data, { board }).entities;
     yield put({
       type: FETCH_BOARD_SUCCESS,
