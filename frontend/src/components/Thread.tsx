@@ -80,10 +80,7 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
   }
   onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const { reply_text, reply_delete_password } = this.state;
-    const { threads, location } = this.props;
-    const { thread_id } = location.state;
-    const thread = threads.threads[thread_id];
+    const { reply_text, reply_delete_password, thread } = this.state;
     const text = reply_text.trim();
     const delete_password = reply_delete_password.trim();
     if (reply_text && reply_delete_password)
@@ -91,7 +88,7 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
         text,
         delete_password,
         board_id: thread.board_id,
-        thread_id
+        thread_id: thread._id
       });
   };
   onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,15 +101,24 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
     prevProps: ThreadProps & ThreadDispatchProps,
     _prevState: ThreadState
   ) {
-    const { threads: prevThreads } = prevProps;
+    const { threads: prevThreadsProp, replies: prevRepliesProp } = prevProps;
     const {
       threads: threadsProp,
       match: {
         params: { thread_id }
-      }
+      },
+      replies: repliesProp
     } = this.props;
-    if (prevThreads.loading.getThread && !threadsProp.loading.getThread) {
+    if (prevThreadsProp.loading.getThread && !threadsProp.loading.getThread) {
       const thread = threadsProp.threads[thread_id];
+      this.setState({ thread });
+    }
+    if (
+      prevRepliesProp.loading.createReply &&
+      !repliesProp.loading.createReply
+    ) {
+      const thread = threadsProp.threads[thread_id];
+      console.log('re render thread ', thread);
       this.setState({ thread });
     }
   }
@@ -123,10 +129,7 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
     return (
       <Row>
         <Col>
-          <div
-            className={classNames(
-              'table-threads mx-auto my-5 d-flex flex-column text-center'
-            )}>
+          <div className='table-threads mx-auto my-5 d-flex flex-column text-center'>
             <div
               className={classNames(
                 'loader w-100 d-flex align-items-center justify-content-center position-absolute',
@@ -153,11 +156,21 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
                 <legend className='text-center reply-title mb-0 py-1'>
                   Reply on Thread
                 </legend>
-                <div
-                  className={classNames('reply-form-container', {
-                    'fade-load': replies.loading.createReply
-                  })}>
-                  <Form onSubmit={this.onSubmit}>
+
+                <div className='reply-form-container position-relative'>
+                  <div
+                    className={classNames(
+                      'loader  w-100 d-flex align-items-center justify-content-center position-absolute',
+                      { hide: !replies.loading.createReply }
+                    )}>
+                    <Spinner color='info' className='mr-2' />
+                    <strong>Processing...</strong>
+                  </div>
+                  <Form
+                    className={classNames('p-3', {
+                      'fade-load': replies.loading.createReply
+                    })}
+                    onSubmit={this.onSubmit}>
                     <FormGroup>
                       <Label for='thread_id'>Thread Id</Label>
                       <Col>

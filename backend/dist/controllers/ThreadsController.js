@@ -77,12 +77,12 @@ class ThreadsController {
                             path: 'replies',
                             model: 'Reply',
                             select: '-delete_password -reported'
-                        },
-                        {
-                            path: 'board_id',
-                            model: 'Board',
-                            select: '-delete_password -reported'
                         }
+                        // {
+                        //   path: 'board_id',
+                        //   model: 'Board',
+                        //   select: '-delete_password -reported'
+                        // }
                     ]
                 }, function (error, thread) {
                     if (error)
