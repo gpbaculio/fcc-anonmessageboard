@@ -90,6 +90,7 @@ const boardsReducer = (
     }
     case CREATE_BOARD_SUCCESS: {
       const { board } = action.payload;
+      console.log('CREATE_BOARD_SUCCESS ', board);
       return {
         ...state,
         loading: { ...state.loading, createBoard: false },

@@ -12,18 +12,21 @@ import {
   FETCH_BOARD_FAILURE
 } from '../store/boards/types';
 import { board } from './normalizrEntities';
+import { Saga, SagaIterator } from 'redux-saga';
+import { AxiosResponse } from 'axios';
+import {
+  createBoardSuccess,
+  createBoardFailure
+} from '../store/boards/actions';
 
 export function* createBoard(action: createBoardRequest) {
   try {
     const {
       data: { board }
     } = yield call(Api.boards.createBoard, action.payload.name);
-    yield put({ type: CREATE_BOARD_SUCCESS, payload: { board } });
+    yield put(createBoardSuccess(board));
   } catch (error) {
-    yield put({
-      type: CREATE_BOARD_FAILURE,
-      payload: { error: error.message }
-    });
+    yield put(createBoardFailure(error.message));
   }
 }
 
@@ -57,3 +60,9 @@ export function* fetchBoards() {
     });
   }
 }
+
+export default {
+  createBoard,
+  fetchBoard,
+  fetchBoards
+};

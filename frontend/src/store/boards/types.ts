@@ -59,7 +59,7 @@ export interface createBoardRequest {
   };
 }
 
-interface createBoardSuccess {
+export interface createBoardSuccess {
   type: typeof CREATE_BOARD_SUCCESS;
   payload: {
     board: BoardType;
