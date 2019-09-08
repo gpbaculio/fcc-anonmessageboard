@@ -136,7 +136,7 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
                 { hide: !threads.loading.getThread }
               )}>
               <Spinner color='info' className='mr-2' />
-              <strong>Fetching Board...</strong>
+              <strong>Fetching Thread...</strong>
             </div>
             <div
               className={classNames(

@@ -150,6 +150,14 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
       <Fragment>
         <Modal isOpen={this.state.modal} toggle={this.toggle}>
           <ModalHeader toggle={this.toggle}>Post New Thread</ModalHeader>
+          <div
+            className={classNames(
+              'loader  w-100 d-flex align-items-center justify-content-center position-absolute',
+              { hide: !threads.loading.createThread }
+            )}>
+            <Spinner color='info' className='mr-2' />
+            <strong>Processing...</strong>
+          </div>
           <Form onSubmit={this.onSubmit}>
             <ModalBody
               className={classNames({
