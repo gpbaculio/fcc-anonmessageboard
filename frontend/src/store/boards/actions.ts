@@ -4,7 +4,10 @@ import {
   FETCH_BOARD_REQUEST,
   CREATE_BOARD_SUCCESS,
   BoardType,
-  CREATE_BOARD_FAILURE
+  CREATE_BOARD_FAILURE,
+  ThreadType,
+  ReplyType,
+  FETCH_BOARD_SUCCESS
 } from './types';
 
 export const createBoard = (name: string) => ({
@@ -12,17 +15,6 @@ export const createBoard = (name: string) => ({
   payload: {
     name
   }
-});
-
-export const fetchBoard = (board_id: string) => ({
-  type: FETCH_BOARD_REQUEST,
-  payload: {
-    board_id
-  }
-});
-
-export const fetchBoards = () => ({
-  type: FETCH_BOARDS_REQUEST
 });
 
 export const createBoardSuccess = (board: BoardType) => ({
@@ -33,4 +25,38 @@ export const createBoardSuccess = (board: BoardType) => ({
 export const createBoardFailure = (error: string) => ({
   type: CREATE_BOARD_FAILURE,
   payload: { error: error }
+});
+
+export const fetchBoard = (board_id: string) => ({
+  type: FETCH_BOARD_REQUEST,
+  payload: {
+    board_id
+  }
+});
+export interface fetchBoardsSuccessArgs {
+  boards: {
+    [_id: string]: BoardType;
+  };
+  threads: {
+    [_id: string]: ThreadType;
+  };
+  replies: {
+    [_id: string]: ReplyType;
+  };
+}
+export const fetchBoardSuccess = ({
+  boards,
+  threads,
+  replies
+}: fetchBoardsSuccessArgs) => ({
+  type: FETCH_BOARD_SUCCESS,
+  payload: {
+    boards,
+    threads,
+    replies
+  }
+});
+
+export const fetchBoards = () => ({
+  type: FETCH_BOARDS_REQUEST
 });

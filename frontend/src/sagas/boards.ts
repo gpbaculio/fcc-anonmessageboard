@@ -16,7 +16,8 @@ import { Saga, SagaIterator } from 'redux-saga';
 import { AxiosResponse } from 'axios';
 import {
   createBoardSuccess,
-  createBoardFailure
+  createBoardFailure,
+  fetchBoardSuccess
 } from '../store/boards/actions';
 
 export function* createBoard(action: createBoardRequest) {
@@ -34,10 +35,7 @@ export function* fetchBoard(action: fetchBoardRequest) {
   try {
     const { data } = yield call(Api.boards.fetchBoard, action.payload.board_id);
     const { boards, threads, replies } = normalize(data, { board }).entities;
-    yield put({
-      type: FETCH_BOARD_SUCCESS,
-      payload: { boards, threads, replies }
-    });
+    yield put(fetchBoardSuccess({ boards, threads, replies }));
   } catch (error) {
     yield put({ type: FETCH_BOARD_FAILURE, payload: { error: error.message } });
   }
