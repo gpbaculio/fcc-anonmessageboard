@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { Container, Col, Row, Spinner } from 'reactstrap';
+import { Container, Col, Row, Spinner, Alert } from 'reactstrap';
 import classNames from 'classnames';
 import SearchInput from './SearchInput';
 import AddBoard from './AddBoard';
@@ -8,19 +8,23 @@ import Boards from './Boards';
 import { AppState } from '../store';
 import { connect } from 'react-redux';
 import { BoardsState } from '../store/boards/types';
+import { resetError } from '../store/boards/actions';
 
 interface HomeProps extends RouteComponentProps {
   // Add your regular properties here
   boards: BoardsState;
 }
-
 interface HomeDispatchProps {
-  // Add your dispatcher properties here
+  resetError: () => void;
+}
+interface HomeState {
+  errorKey: string;
 }
 
-class Home extends Component<HomeProps & HomeDispatchProps> {
+class Home extends Component<HomeProps & HomeDispatchProps, HomeState> {
   render() {
-    const { boards } = this.props;
+    const { boards, resetError } = this.props;
+    type BoardsErrorKeys = 'createBoard' | 'fetchBoards' | 'fetchBoard';
     return (
       <Container className='position-relative'>
         <div
@@ -44,6 +48,17 @@ class Home extends Component<HomeProps & HomeDispatchProps> {
             <AddBoard />
           </Col>
         </Row>
+        <Alert
+          color='danger'
+          isOpen={Object.keys(boards.error).some(k => {
+            const errorMsg = boards.error[k as BoardsErrorKeys];
+            return Boolean(errorMsg);
+          })}
+          toggle={() => resetError()}>
+          {Object.keys(boards.error).map(k => {
+            return boards.error[k as BoardsErrorKeys];
+          })}
+        </Alert>
         <Row>
           <Col>
             <Boards />
@@ -58,4 +73,11 @@ const mapStateToProps = ({ boards }: AppState) => ({
   boards
 });
 
-export default connect(mapStateToProps)(withRouter(Home));
+const mapDispatchToProps = {
+  resetError
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(Home));

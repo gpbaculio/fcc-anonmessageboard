@@ -10,6 +10,18 @@ import { normalize } from 'normalizr';
 import { board } from '../sagas/normalizrEntities';
 
 describe.only('Boards Sagas', () => {
+  class AxiosResponseErrorType extends Error {
+    response: {
+      data: string;
+    };
+    constructor(data: string) {
+      super(data);
+      this.response = {
+        data
+      };
+    }
+  }
+
   type BoardsSagasKeys = 'createBoard' | 'getBoards' | 'fetchBoard';
 
   beforeEach(() => {
@@ -53,11 +65,22 @@ describe.only('Boards Sagas', () => {
     );
   });
   it('should fail to create board', async () => {
-    // const mockBoardData = {
-    //   date: new Date().toISOString(),
-    //   name: 'ADD BOARD TEST',
-    //   _id: uuidv1()
-    // };
+    const mockBoardName = 'REJECT CREATE BOARD TEST';
+    const errorText = 'Something went wrong';
+    const errorResponse = new AxiosResponseErrorType(errorText);
+    (Api.boards.createBoard as jest.Mock).mockImplementation(
+      () => Promise.reject(errorResponse) as Promise<AxiosResponse<any>>
+    );
+
+    const dispatched = await recordSaga(
+      boardsSagas.createBoard as Saga,
+      BoardsActions.createBoard(mockBoardName)
+    );
+
+    expect(Api.boards.createBoard).toHaveBeenCalledWith(mockBoardName);
+    expect(dispatched).toContainEqual(
+      BoardsActions.createBoardFailure(errorResponse.response.data)
+    );
   });
   it('should fetch board', async () => {
     const mockBoardData = {

@@ -26,7 +26,6 @@ interface BoardsDispatchProps {
 
 class Boards extends Component<BoardsProps & BoardsDispatchProps> {
   componentDidMount = async () => {
-    console.log('fetchBoards cdm!');
     await this.props.fetchBoards();
   };
   render() {

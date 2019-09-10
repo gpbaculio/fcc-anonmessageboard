@@ -9,23 +9,25 @@ import {
   FETCH_BOARDS_FAILURE,
   FETCH_BOARD_REQUEST,
   FETCH_BOARD_SUCCESS,
-  FETCH_BOARD_FAILURE
+  FETCH_BOARD_FAILURE,
+  RESET_ERROR_STATE
 } from './types';
-import {
-  createThreadSuccess,
-  CREATE_THREAD_SUCCESS,
-  getThreadSuccess,
-  GET_THREAD_SUCCESS
-} from '../threads/types';
+import { createThreadSuccess, CREATE_THREAD_SUCCESS } from '../threads/types';
 
+const initError = {
+  createBoard: '',
+  fetchBoards: '',
+  fetchBoard: ''
+};
+const initLoading = {
+  createBoard: false,
+  fetchBoards: false,
+  fetchBoard: false
+};
 const initState: BoardsState = {
-  loading: { createBoard: false, fetchBoards: false, fetchBoard: false },
+  loading: initLoading,
   boards: {},
-  error: {
-    createBoard: '',
-    fetchBoards: '',
-    fetchBoard: ''
-  }
+  error: initError
 };
 
 const boardsReducer = (
@@ -33,6 +35,12 @@ const boardsReducer = (
   action: BoardsActionTypes | createThreadSuccess
 ) => {
   switch (action.type) {
+    case RESET_ERROR_STATE: {
+      return {
+        ...state,
+        error: initError
+      };
+    }
     case FETCH_BOARD_REQUEST: {
       return { ...state, loading: { ...state.loading, fetchBoard: true } };
     }
@@ -90,7 +98,6 @@ const boardsReducer = (
     }
     case CREATE_BOARD_SUCCESS: {
       const { board } = action.payload;
-      console.log('CREATE_BOARD_SUCCESS ', board);
       return {
         ...state,
         loading: { ...state.loading, createBoard: false },

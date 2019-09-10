@@ -7,6 +7,7 @@ export const FETCH_BOARDS_FAILURE = 'FETCH_BOARDS_FAILURE';
 export const CREATE_BOARD_REQUEST = 'CREATE_BOARD_REQUEST';
 export const CREATE_BOARD_SUCCESS = 'CREATE_BOARD_SUCCESS';
 export const CREATE_BOARD_FAILURE = 'CREATE_BOARD_FAILURE';
+export const RESET_ERROR_STATE = 'RESET_ERROR_STATE';
 
 export interface ReplyType {
   _id: string;
@@ -112,10 +113,15 @@ interface boardsfailureTypes {
   };
 }
 
+interface resetErrorState {
+  type: typeof RESET_ERROR_STATE;
+}
+
 export type BoardsActionTypes =
   | fetchBoardRequest
   | boardsfailureTypes
   | createBoardRequest
   | createBoardSuccess
   | fetchBoardsRequest
-  | fetchBoardsSuccess;
+  | fetchBoardsSuccess
+  | resetErrorState;

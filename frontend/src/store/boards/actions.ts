@@ -7,7 +7,8 @@ import {
   CREATE_BOARD_FAILURE,
   ThreadType,
   ReplyType,
-  FETCH_BOARD_SUCCESS
+  FETCH_BOARD_SUCCESS,
+  RESET_ERROR_STATE
 } from './types';
 
 export const createBoard = (name: string) => ({
@@ -15,6 +16,10 @@ export const createBoard = (name: string) => ({
   payload: {
     name
   }
+});
+
+export const resetError = () => ({
+  type: RESET_ERROR_STATE
 });
 
 export const createBoardSuccess = (board: BoardType) => ({
