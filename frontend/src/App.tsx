@@ -12,25 +12,23 @@ class App extends Component {
     return (
       <Fragment>
         <Header />
-        <Container>
-          <Switch>
-            <Route
-              exact
-              path='/(home)?'
-              render={renderProps => <Home {...renderProps} />}
-            />
-            <Route
-              path='/b/:board_id'
-              exact
-              render={renderProps => <Board {...renderProps} />}
-            />
-            <Route
-              exact
-              path='/b/:board_id/:thread_id'
-              render={renderProps => <Thread {...renderProps} />}
-            />
-          </Switch>
-        </Container>
+        <Switch>
+          <Route
+            exact
+            path='/(home)?'
+            render={renderProps => <Home {...renderProps} />}
+          />
+          <Route
+            path='/b/:board_id'
+            exact
+            render={renderProps => <Board {...renderProps} />}
+          />
+          <Route
+            exact
+            path='/b/:board_id/:thread_id'
+            render={renderProps => <Thread {...renderProps} />}
+          />
+        </Switch>
       </Fragment>
     );
   }

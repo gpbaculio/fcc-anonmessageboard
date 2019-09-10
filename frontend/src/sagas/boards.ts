@@ -27,7 +27,7 @@ export function* createBoard(action: createBoardRequest) {
     } = yield call(Api.boards.createBoard, action.payload.name);
     yield put(createBoardSuccess(board));
   } catch (error) {
-    yield put(createBoardFailure(error.message));
+    yield put(createBoardFailure(error.response.data));
   }
 }
 

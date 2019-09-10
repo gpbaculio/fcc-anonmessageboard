@@ -1,16 +1,17 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { Container, Col, Row } from 'reactstrap';
+import { Container, Col, Row, Spinner } from 'reactstrap';
+import classNames from 'classnames';
 import SearchInput from './SearchInput';
 import AddBoard from './AddBoard';
 import Boards from './Boards';
+import { AppState } from '../store';
+import { connect } from 'react-redux';
+import { BoardsState } from '../store/boards/types';
 
-interface HomeRouterProps {
-  title: string; // This one is coming from the router
-}
-
-interface HomeProps extends RouteComponentProps<HomeRouterProps> {
+interface HomeProps extends RouteComponentProps {
   // Add your regular properties here
+  boards: BoardsState;
 }
 
 interface HomeDispatchProps {
@@ -19,8 +20,22 @@ interface HomeDispatchProps {
 
 class Home extends Component<HomeProps & HomeDispatchProps> {
   render() {
+    const { boards } = this.props;
     return (
-      <Container>
+      <Container className='position-relative'>
+        <div
+          className={classNames('position-absolute home-fade', {
+            'fade-load': boards.loading.fetchBoards
+          })}
+        />
+        <div
+          className={classNames(
+            'loader home-loader w-100 d-flex align-items-center justify-content-center position-absolute',
+            { hide: !boards.loading.fetchBoards }
+          )}>
+          <Spinner color='info' className='mr-2' />
+          <strong>Fetching boards...</strong>
+        </div>
         <Row>
           <Col>
             <SearchInput />
@@ -39,4 +54,8 @@ class Home extends Component<HomeProps & HomeDispatchProps> {
   }
 }
 
-export default withRouter(Home);
+const mapStateToProps = ({ boards }: AppState) => ({
+  boards
+});
+
+export default connect(mapStateToProps)(withRouter(Home));
