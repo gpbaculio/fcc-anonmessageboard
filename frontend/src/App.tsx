@@ -5,7 +5,6 @@ import './App.css';
 import { Home, Header } from './components';
 import Board from './components/Board';
 import Thread from './components/Thread';
-import { Container } from 'reactstrap';
 
 class App extends Component {
   render() {

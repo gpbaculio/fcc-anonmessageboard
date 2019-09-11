@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Input } from 'reactstrap';
+import { Form, Input, Button } from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { createBoard } from '../store/boards/actions';
 import { connect } from 'react-redux';
@@ -13,10 +13,12 @@ interface AddBoardProps extends RouteComponentProps {
 
 interface AddBoardDispatchProps {
   // Add your dispatcher properties here
-  createBoard: (name: string) => void;
+  createBoard: (name: string, delete_password: string) => void;
 }
 
 interface AddBoardState {
+  text: string;
+  delete_password: string;
   [text: string]: string;
 }
 
@@ -27,13 +29,15 @@ class AddBoard extends Component<
   constructor(props: AddBoardProps & AddBoardDispatchProps) {
     super(props);
     this.state = {
-      text: ''
+      text: '',
+      delete_password: ''
     };
   }
   onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const text = this.state.text.trim();
-    if (text) this.props.createBoard(text);
+    const { delete_password } = this.state;
+    if (text && delete_password) this.props.createBoard(text, delete_password);
   };
   onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,10 +46,26 @@ class AddBoard extends Component<
     });
   };
   render() {
-    const { text } = this.state;
+    const { text, delete_password } = this.state;
     return (
-      <Form onSubmit={this.onSubmit}>
-        <Input name='text' value={text} onChange={this.onChange} />
+      <Form onSubmit={this.onSubmit} className='d-flex'>
+        <Input
+          name='text'
+          type='text'
+          value={text}
+          onChange={this.onChange}
+          className='mr-2'
+          placeholder='Board Name'
+        />
+        <Input
+          className='mr-2'
+          type='password'
+          placeholder='Delete Password'
+          name='delete_password'
+          value={delete_password}
+          onChange={this.onChange}
+        />
+        <Button type='submit'>Submit</Button>
       </Form>
     );
   }

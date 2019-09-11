@@ -8,13 +8,31 @@ import {
   ThreadType,
   ReplyType,
   FETCH_BOARD_SUCCESS,
-  RESET_ERROR_STATE
+  RESET_ERROR_STATE,
+  UPDATE_NAME_REQUEST,
+  UPDATE_NAME_SUCCESS,
+  UPDATE_NAME_FAILURE
 } from './types';
+import { updateNameArgs } from '../../Api';
 
-export const createBoard = (name: string) => ({
+export const updateName = (
+  { board_id, board_name, delete_password }: updateNameArgs,
+  callBack?: () => void
+) => ({
+  type: UPDATE_NAME_REQUEST,
+  payload: {
+    board_id,
+    board_name,
+    delete_password
+  },
+  callBack
+});
+
+export const createBoard = (name: string, delete_password: string) => ({
   type: CREATE_BOARD_REQUEST,
   payload: {
-    name
+    name,
+    delete_password
   }
 });
 
@@ -22,14 +40,24 @@ export const resetError = () => ({
   type: RESET_ERROR_STATE
 });
 
-export const createBoardSuccess = (board: BoardType) => ({
+export const createboardSuccess = (board: BoardType) => ({
   type: CREATE_BOARD_SUCCESS,
+  payload: { board }
+});
+
+export const updateNameSuccess = (board: BoardType) => ({
+  type: UPDATE_NAME_SUCCESS,
   payload: { board }
 });
 
 export const createBoardFailure = (error: string) => ({
   type: CREATE_BOARD_FAILURE,
-  payload: { error: error }
+  payload: { error }
+});
+
+export const updateNameFailure = (error: string) => ({
+  type: UPDATE_NAME_FAILURE,
+  payload: { error }
 });
 
 export const fetchBoard = (board_id: string) => ({

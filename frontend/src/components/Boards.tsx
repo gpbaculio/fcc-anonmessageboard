@@ -9,7 +9,7 @@ import {
   BoardsErrorType
 } from '../store/boards/types';
 import { Row, Col, Card, CardBody, CardTitle } from 'reactstrap';
-import { timeDifferenceForDate, getTimeDate } from './utils';
+import { getTimeDate } from './utils';
 import { Link } from 'react-router-dom';
 
 interface BoardsProps extends RouteComponentProps {

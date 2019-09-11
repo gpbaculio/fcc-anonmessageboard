@@ -15,6 +15,7 @@ export interface createThreadRequest {
     delete_password: string;
     board_id: string;
   };
+  callBack: () => void;
 }
 
 export interface createThreadSuccess {

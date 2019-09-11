@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { Container, Col, Row, Spinner, Alert } from 'reactstrap';
 import classNames from 'classnames';
@@ -14,9 +14,11 @@ interface HomeProps extends RouteComponentProps {
   // Add your regular properties here
   boards: BoardsState;
 }
+
 interface HomeDispatchProps {
   resetError: () => void;
 }
+
 interface HomeState {
   errorKey: string;
 }

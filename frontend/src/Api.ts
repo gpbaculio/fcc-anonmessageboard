@@ -9,12 +9,25 @@ export interface createThreadArgs {
 export interface createReplyArgs extends createThreadArgs {
   thread_id: string;
 }
+export interface createBoardArgs {
+  name: string;
+  delete_password: string;
+}
+
+export interface updateNameArgs {
+  board_id: string;
+  board_name: string;
+  delete_password: string;
+}
 
 export default {
   boards: {
-    createBoard: (name: string) => axios.post('/api/boards', { name }),
+    createBoard: ({ name, delete_password }: createBoardArgs) =>
+      axios.post('/api/boards', { name, delete_password }),
     getBoards: () => axios.get('/api/boards'),
-    fetchBoard: (board_id: string) => axios.get(`/api/board/${board_id}`)
+    fetchBoard: (board_id: string) => axios.get(`/api/board/${board_id}`),
+    updateName: ({ board_id, board_name, delete_password }: updateNameArgs) =>
+      axios.post(`/api/board/${board_id}`, { board_name, delete_password })
   },
   threads: {
     createThread: ({ text, delete_password, board_id }: createThreadArgs) => {

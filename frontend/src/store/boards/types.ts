@@ -8,6 +8,9 @@ export const CREATE_BOARD_REQUEST = 'CREATE_BOARD_REQUEST';
 export const CREATE_BOARD_SUCCESS = 'CREATE_BOARD_SUCCESS';
 export const CREATE_BOARD_FAILURE = 'CREATE_BOARD_FAILURE';
 export const RESET_ERROR_STATE = 'RESET_ERROR_STATE';
+export const UPDATE_NAME_REQUEST = 'UPDATE_NAME_REQUEST';
+export const UPDATE_NAME_SUCCESS = 'UPDATE_NAME_SUCCESS';
+export const UPDATE_NAME_FAILURE = 'UPDATE_NAME_FAILURE';
 
 export interface ReplyType {
   _id: string;
@@ -25,12 +28,17 @@ export interface ThreadType {
   board_id: string;
 }
 
+export interface BoardLoadingType {
+  update_name: boolean;
+}
+
 export interface BoardType {
   created_on: string;
   name: string;
   threads: string[];
   updated_on: string;
   _id: string;
+  loading: BoardLoadingType;
 }
 
 export interface BoardsLoadingType {
@@ -57,20 +65,24 @@ export interface createBoardRequest {
   type: typeof CREATE_BOARD_REQUEST;
   payload: {
     name: string;
+    delete_password: string;
   };
 }
 
-export interface createBoardSuccess {
-  type: typeof CREATE_BOARD_SUCCESS;
+export interface updateNameRequest {
+  type: typeof UPDATE_NAME_REQUEST;
+  payload: {
+    board_name: string;
+    board_id: string;
+    delete_password: string;
+  };
+  callBack: () => void;
+}
+
+export interface boardSuccess {
+  type: typeof CREATE_BOARD_SUCCESS | typeof UPDATE_NAME_SUCCESS;
   payload: {
     board: BoardType;
-  };
-}
-
-interface createBoardFailure {
-  type: typeof CREATE_BOARD_FAILURE;
-  payload: {
-    error: string;
   };
 }
 
@@ -103,17 +115,18 @@ export interface fetchBoardRequest {
   };
 }
 
-interface boardsfailureTypes {
+export interface boardsfailureTypes {
   type:
     | typeof FETCH_BOARDS_FAILURE
     | typeof CREATE_BOARD_FAILURE
-    | typeof FETCH_BOARD_FAILURE;
+    | typeof FETCH_BOARD_FAILURE
+    | typeof UPDATE_NAME_FAILURE;
   payload: {
     error: string;
   };
 }
 
-interface resetErrorState {
+export interface resetErrorState {
   type: typeof RESET_ERROR_STATE;
 }
 
@@ -121,7 +134,8 @@ export type BoardsActionTypes =
   | fetchBoardRequest
   | boardsfailureTypes
   | createBoardRequest
-  | createBoardSuccess
+  | boardSuccess
   | fetchBoardsRequest
   | fetchBoardsSuccess
-  | resetErrorState;
+  | resetErrorState
+  | updateNameRequest;

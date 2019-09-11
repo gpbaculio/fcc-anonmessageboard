@@ -12,21 +12,50 @@ const Board_1 = require("../models/Board");
 class BoardsController {
     constructor() {
         this.createBoard = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { name } = req.body;
+            const { name, delete_password } = req.body;
             yield Board_1.default.findOne({ name }, (error, board) => __awaiter(this, void 0, void 0, function* () {
                 if (error)
                     res.status(400).send(error);
                 if (!board) {
-                    yield Board_1.default.create({ name }, (error, newBoard) => {
+                    yield Board_1.default.create({ name, delete_password }, (error, newBoard) => {
                         if (error)
                             res.status(400).send(error);
-                        else
-                            res.status(200).json({ board: newBoard });
+                        else {
+                            const parseBoard = newBoard.toObject();
+                            delete parseBoard['delete_password'];
+                            res.status(200).json({ board: parseBoard });
+                        }
                     });
                 }
                 else
                     res.status(400).send('Board already exists');
             }));
+        });
+        this.updateBoardName = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { board_name, delete_password } = req.body;
+            const { board_id } = req.params;
+            console.log('updateBoardName 1');
+            yield Board_1.default.findById(board_id, function (error, board) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error)
+                        res.status(400).send(error);
+                    console.log('updateBoardName 2');
+                    const correctPassword = yield board.authenticate(delete_password);
+                    if (!correctPassword)
+                        res.status(400).send('Incorrect Delete Password');
+                    else {
+                        board.name = board_name;
+                        board.save(function (error) {
+                            if (error)
+                                res.status(400).send(error);
+                            console.log('updateBoardName 3');
+                            const parseBoard = board.toObject();
+                            delete parseBoard['delete_password'];
+                            res.status(200).json({ board: parseBoard });
+                        });
+                    }
+                });
+            });
         });
         this.getBoard = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { board_id } = req.params;

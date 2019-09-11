@@ -1,5 +1,5 @@
 jest.mock('../Api');
-import Api from '../Api';
+import Api, { updateNameArgs } from '../Api';
 import boardsSagas from '../sagas/boards';
 import { Saga } from 'redux-saga';
 import uuidv1 from 'uuid/v1';
@@ -36,36 +36,200 @@ describe.only('Boards Sagas', () => {
     const mockBoardData = {
       date: new Date().toISOString(),
       name: 'ADD BOARD TEST',
-      _id: uuidv1()
+      _id: uuidv1(),
+      delete_password: 'abcd123'
     };
 
-    const getCreatedMockBoard = (name: string) => ({
+    const getCreatedMockBoard = (name: string, delete_password: string) => ({
       created_on: mockBoardData.date,
       name,
       threads: [],
       updated_on: mockBoardData.date,
-      _id: mockBoardData._id
+      _id: mockBoardData._id,
+      delete_password,
+      loading: {
+        update_name: false
+      }
     });
 
     (Api.boards.createBoard as jest.Mock).mockImplementation(
       () =>
         Promise.resolve({
-          data: { board: getCreatedMockBoard(mockBoardData.name) }
+          data: {
+            board: getCreatedMockBoard(
+              mockBoardData.name,
+              mockBoardData.delete_password
+            )
+          }
         }) as Promise<AxiosResponse<any>>
     );
 
     const dispatched = await recordSaga(
       boardsSagas.createBoard as Saga,
-      BoardsActions.createBoard(mockBoardData.name)
+      BoardsActions.createBoard(
+        mockBoardData.name,
+        mockBoardData.delete_password
+      )
     );
 
-    expect(Api.boards.createBoard).toHaveBeenCalledWith(mockBoardData.name);
+    expect(Api.boards.createBoard).toHaveBeenCalledWith({
+      name: mockBoardData.name,
+      delete_password: mockBoardData.delete_password
+    });
     expect(dispatched).toContainEqual(
-      BoardsActions.createBoardSuccess(getCreatedMockBoard(mockBoardData.name))
+      BoardsActions.createboardSuccess(
+        getCreatedMockBoard(mockBoardData.name, mockBoardData.delete_password)
+      )
+    );
+  });
+  it('should fail to update board name', async () => {
+    const mockBoardData = {
+      // delete_password prop as is real password
+      date: new Date().toISOString(),
+      name: 'ADD BOARD TEST',
+      _id: uuidv1(),
+      delete_password: 'abcd123'
+    };
+
+    const getUpdatedNameMockBoard = ({
+      board_id,
+      board_name,
+      delete_password
+    }: updateNameArgs) => ({
+      created_on: mockBoardData.date,
+      name: board_name,
+      threads: [],
+      updated_on: mockBoardData.date,
+      _id: board_id,
+      delete_password,
+      loading: {
+        update_name: false
+      }
+    });
+
+    (Api.boards.updateName as jest.Mock).mockImplementation(
+      ({ board_id, board_name, delete_password }) => {
+        if (mockBoardData.delete_password === delete_password) {
+          return Promise.resolve({
+            data: {
+              board: getUpdatedNameMockBoard({
+                board_id,
+                board_name,
+                delete_password
+              })
+            }
+          }) as Promise<AxiosResponse<any>>;
+        } else {
+          console.log('wrong delete_password ', delete_password);
+          console.log(
+            'wrong delete_password ',
+            delete_password !== mockBoardData.delete_password
+          );
+          return Promise.reject(
+            new AxiosResponseErrorType('Invalid Password')
+          ) as Promise<AxiosResponse<any>>;
+        }
+      }
+    );
+
+    const dispatched = await recordSaga(
+      boardsSagas.updateName as Saga,
+      BoardsActions.updateName({
+        board_id: mockBoardData._id,
+        board_name: mockBoardData.name,
+        delete_password: 'wrongPassowrd'
+      })
+    );
+
+    expect(Api.boards.updateName).toHaveBeenCalledWith({
+      board_id: mockBoardData._id,
+      board_name: mockBoardData.name,
+      delete_password: 'wrongPassowrd'
+    });
+    expect(dispatched).toContainEqual(
+      BoardsActions.updateNameSuccess(
+        getUpdatedNameMockBoard({
+          board_id: mockBoardData._id,
+          board_name: mockBoardData.name,
+          delete_password: mockBoardData.delete_password
+        })
+      )
+    );
+  });
+  it('should update board name', async () => {
+    const mockBoardData = {
+      // delete_password prop as is real password
+      date: new Date().toISOString(),
+      name: 'ADD BOARD TEST',
+      _id: uuidv1(),
+      delete_password: 'abcd123'
+    };
+
+    const getUpdatedNameMockBoard = ({
+      board_id,
+      board_name,
+      delete_password
+    }: updateNameArgs) => ({
+      created_on: mockBoardData.date,
+      name: board_name,
+      threads: [],
+      updated_on: mockBoardData.date,
+      _id: board_id,
+      delete_password,
+      loading: {
+        update_name: false
+      }
+    });
+
+    (Api.boards.updateName as jest.Mock).mockImplementation(
+      ({ board_id, board_name, delete_password }) => {
+        if (mockBoardData.delete_password === delete_password) {
+          return Promise.resolve({
+            data: {
+              board: getUpdatedNameMockBoard({
+                board_id,
+                board_name,
+                delete_password
+              })
+            }
+          }) as Promise<AxiosResponse<any>>;
+        } else {
+          return Promise.reject(
+            new AxiosResponseErrorType('Invalid Password')
+          ) as Promise<AxiosResponse<any>>;
+        }
+      }
+    );
+
+    const dispatched = await recordSaga(
+      boardsSagas.updateName as Saga,
+      BoardsActions.updateName({
+        board_id: mockBoardData._id,
+        board_name: mockBoardData.name,
+        delete_password: mockBoardData.delete_password
+      })
+    );
+
+    expect(Api.boards.updateName).toHaveBeenCalledWith({
+      board_id: mockBoardData._id,
+      board_name: mockBoardData.name,
+      delete_password: mockBoardData.delete_password
+    });
+    expect(dispatched).toContainEqual(
+      BoardsActions.updateNameSuccess(
+        getUpdatedNameMockBoard({
+          board_id: mockBoardData._id,
+          board_name: mockBoardData.name,
+          delete_password: mockBoardData.delete_password
+        })
+      )
     );
   });
   it('should fail to create board', async () => {
-    const mockBoardName = 'REJECT CREATE BOARD TEST';
+    const mockBoardData = {
+      name: 'REJECT CREATE BOARD TEST',
+      delete_password: 'abcd123'
+    };
     const errorText = 'Something went wrong';
     const errorResponse = new AxiosResponseErrorType(errorText);
     (Api.boards.createBoard as jest.Mock).mockImplementation(
@@ -74,10 +238,16 @@ describe.only('Boards Sagas', () => {
 
     const dispatched = await recordSaga(
       boardsSagas.createBoard as Saga,
-      BoardsActions.createBoard(mockBoardName)
+      BoardsActions.createBoard(
+        mockBoardData.name,
+        mockBoardData.delete_password
+      )
     );
 
-    expect(Api.boards.createBoard).toHaveBeenCalledWith(mockBoardName);
+    expect(Api.boards.createBoard).toHaveBeenCalledWith({
+      name: mockBoardData.name,
+      delete_password: mockBoardData.delete_password
+    });
     expect(dispatched).toContainEqual(
       BoardsActions.createBoardFailure(errorResponse.response.data)
     );
@@ -93,7 +263,10 @@ describe.only('Boards Sagas', () => {
       name: mockBoardData.name,
       threads: [],
       updated_on: mockBoardData.date,
-      _id
+      _id,
+      loading: {
+        update_name: false
+      }
     });
     const mockResponseData = { board: getFetchedMockBoard(mockBoardData._id) };
     (Api.boards.fetchBoard as jest.Mock).mockImplementation(

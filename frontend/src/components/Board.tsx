@@ -26,6 +26,8 @@ import { AppState } from '../store';
 import { Link } from 'react-router-dom';
 import { getTimeDate } from './utils';
 import { ThreadsState } from '../store/threads/reducers';
+import EditBoardNameInput from './EditBoardNameInput';
+import { boardInitLoading } from '../store/boards/reducers';
 
 interface LocationState {
   board_id: string;
@@ -38,7 +40,10 @@ interface BoardProps extends RouteComponentProps<LocationState> {
 }
 
 interface BoardDispatchProps {
-  createThread: ({ delete_password, text, board_id }: createThreadArgs) => void;
+  createThread: (
+    { delete_password, text, board_id }: createThreadArgs,
+    callBack: () => void
+  ) => void;
   fetchBoard: (board_id: string) => void;
 }
 
@@ -49,6 +54,7 @@ interface BoardState {
   [name: string]: string | boolean | BoardType;
   loading: boolean;
   board: BoardType;
+  isEditing: boolean;
 }
 
 class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
@@ -57,17 +63,32 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
     thread_text: '',
     thread_delete_password: '',
     loading: false,
+    isEditing: false,
     board: {
       created_on: '',
       name: '',
       threads: [],
       updated_on: '',
-      _id: ''
+      _id: '',
+      loading: boardInitLoading
     }
   };
   constructor(props: BoardProps & BoardDispatchProps) {
     super(props);
     this.state = this.initState;
+  }
+  static getDerivedStateFromProps(
+    { boards, match }: BoardProps & BoardDispatchProps,
+    _state: BoardState
+  ) {
+    const { board_id } = match.params;
+    const board = boards.boards[board_id];
+    if (board) {
+      return {
+        board
+      };
+    }
+    return null;
   }
   componentDidMount() {
     const { location, match, boards } = this.props;
@@ -85,7 +106,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
       }
     }
   }
-  toggle = () => {
+  toggleModal = () => {
     this.setState(state => ({
       modal: !state.modal
     }));
@@ -95,61 +116,66 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
     const { thread_text, thread_delete_password } = this.state;
     const {
       location: { state },
-      threads,
       match: { params }
     } = this.props;
     const board_id = state ? state.board_id : params.board_id;
     if (thread_text && thread_delete_password) {
-      await this.props.createThread({
-        text: thread_text,
-        delete_password: thread_delete_password,
-        board_id
-      });
+      await this.props.createThread(
+        {
+          text: thread_text,
+          delete_password: thread_delete_password,
+          board_id
+        },
+        this.toggleModal
+      );
     }
   };
-  componentDidUpdate({
-    threads: { loading: prevThreadsLoading },
-    boards: { loading: prevBoardsLoading }
-  }: BoardProps) {
-    const {
-      threads: { loading: threadsLoadingState, error: threadsErrorState },
-      boards: {
-        loading: boardsLoadingState,
-        error: boardsErrorState,
-        boards: boardsState
-      },
-      match: {
-        params: { board_id }
-      }
-    } = this.props;
-    if (
-      prevThreadsLoading.createThread &&
-      !threadsLoadingState.createThread &&
-      !threadsErrorState.createThread
-    ) {
-      const board = boardsState[board_id];
-      this.setState({ ...this.initState, board });
-    }
-    if (
-      prevBoardsLoading.fetchBoard &&
-      !boardsLoadingState.fetchBoard &&
-      !boardsErrorState.fetchBoard
-    ) {
-      const board = boardsState[board_id];
-      this.setState({ board });
-    }
-  }
+  // componentDidUpdate({
+  //   threads: { loading: prevThreadsLoading },
+  //   boards: { loading: prevBoardsLoading, boards: prevBoardsProp }
+  // }: BoardProps) {
+  //   const {
+  //     threads: { loading: threadsLoadingState, error: threadsErrorState },
+  //     boards: {
+  //       loading: boardsLoadingState,
+  //       error: boardsErrorState,
+  //       boards: boardsState
+  //     },
+  //     match: {
+  //       params: { board_id }
+  //     }
+  //   } = this.props;
+  //   if (
+  //     prevThreadsLoading.createThread &&
+  //     !threadsLoadingState.createThread &&
+  //     !threadsErrorState.createThread
+  //   ) {
+  //     const board = boardsState[board_id];
+  //     this.setState({ ...this.initState, board });
+  //   }
+  //   if (
+  //     prevBoardsLoading.fetchBoard &&
+  //     !boardsLoadingState.fetchBoard &&
+  //     !boardsErrorState.fetchBoard
+  //   ) {
+  //     const board = boardsState[board_id];
+  //     this.setState({ board });
+  //   }
+  // }
   onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     this.setState({ [name]: value });
   };
+  setIsEditing = (show: boolean) => {
+    this.setState({ isEditing: show });
+  };
   render() {
     const { threads, boards } = this.props;
-    const { board } = this.state;
+    const { board, isEditing } = this.state;
     return (
       <Fragment>
-        <Modal isOpen={this.state.modal} toggle={this.toggle}>
-          <ModalHeader toggle={this.toggle}>Post New Thread</ModalHeader>
+        <Modal isOpen={this.state.modal} toggle={this.toggleModal}>
+          <ModalHeader toggle={this.toggleModal}>Post New Thread</ModalHeader>
           <div
             className={classNames(
               'loader  w-100 d-flex align-items-center justify-content-center position-absolute',
@@ -222,7 +248,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                 type='submit'>
                 Submit New Thread
               </Button>
-              <Button color='secondary' onClick={this.toggle}>
+              <Button color='secondary' onClick={this.toggleModal}>
                 Cancel
               </Button>
             </ModalFooter>
@@ -247,12 +273,41 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                   <div className='d-flex justify-content-between mb-3 align-items-center'>
                     <legend className='mb-0 w-auto'>
                       BOARD:
-                      <span className='font-weight-lighter'> {board.name}</span>
+                      <span
+                        className={classNames('font-weight-lighter', {
+                          hide: isEditing
+                        })}>
+                        {board.name}
+                      </span>
                     </legend>
-                    <Button color='primary' onClick={this.toggle}>
-                      Post New Thread
-                    </Button>
+                    <div
+                      className={classNames(
+                        'board-controllers d-flex w-25 justify-content-between',
+                        {
+                          hide: isEditing
+                        }
+                      )}>
+                      <Button
+                        color='success'
+                        onClick={() => this.setIsEditing(true)}>
+                        Edit
+                      </Button>
+                      <Button color='danger'>Delete</Button>
+                    </div>
+                    {!!isEditing && (
+                      <EditBoardNameInput
+                        board_id={board._id}
+                        setIsEditing={this.setIsEditing}
+                      />
+                    )}
                   </div>
+                  <Button
+                    className='w-50 mx-auto mb-3'
+                    color='primary'
+                    onClick={this.toggleModal}>
+                    Post New Thread
+                  </Button>
+
                   <Table hover responsive className='threads-table'>
                     <thead className='thead-light'>
                       <tr>
@@ -271,7 +326,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                         const thread = threads.threads[thId];
                         return (
                           <tr key={thread._id}>
-                            <td scope='row'>
+                            <td>
                               <Link
                                 to={{
                                   pathname: `/b/${board._id}/${thread._id}`,

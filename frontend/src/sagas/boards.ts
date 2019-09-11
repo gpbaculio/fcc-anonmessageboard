@@ -2,39 +2,55 @@ import { call, put } from 'redux-saga/effects';
 import { normalize } from 'normalizr';
 import Api from '../Api';
 import {
-  CREATE_BOARD_SUCCESS,
-  CREATE_BOARD_FAILURE,
   FETCH_BOARDS_SUCCESS,
   FETCH_BOARDS_FAILURE,
   createBoardRequest,
   fetchBoardRequest,
-  FETCH_BOARD_SUCCESS,
-  FETCH_BOARD_FAILURE
+  FETCH_BOARD_FAILURE,
+  updateNameRequest,
+  BoardType
 } from '../store/boards/types';
 import { board } from './normalizrEntities';
-import { Saga, SagaIterator } from 'redux-saga';
-import { AxiosResponse } from 'axios';
 import {
-  createBoardSuccess,
+  createboardSuccess,
   createBoardFailure,
-  fetchBoardSuccess
+  fetchBoardSuccess,
+  updateNameSuccess,
+  updateNameFailure
 } from '../store/boards/actions';
+import { boardInitLoading } from '../store/boards/reducers';
 
 export function* createBoard(action: createBoardRequest) {
   try {
     const {
       data: { board }
-    } = yield call(Api.boards.createBoard, action.payload.name);
-    yield put(createBoardSuccess(board));
+    } = yield call(Api.boards.createBoard, action.payload);
+    yield put(createboardSuccess({ ...board, loading: boardInitLoading }));
   } catch (error) {
     yield put(createBoardFailure(error.response.data));
+  }
+}
+
+export function* updateName({ payload, callBack }: updateNameRequest) {
+  try {
+    const {
+      data: { board }
+    } = yield call(Api.boards.updateName, payload);
+    yield put(updateNameSuccess(board));
+    if (callBack) callBack();
+  } catch (error) {
+    console.log('error updatename ', error);
+    yield put(updateNameFailure(error.response.data));
   }
 }
 
 export function* fetchBoard(action: fetchBoardRequest) {
   try {
     const { data } = yield call(Api.boards.fetchBoard, action.payload.board_id);
-    const { boards, threads, replies } = normalize(data, { board }).entities;
+    const { boards, threads, replies } = normalize(
+      { board: { ...data.board, loading: boardInitLoading } },
+      { board }
+    ).entities;
     yield put(fetchBoardSuccess({ boards, threads, replies }));
   } catch (error) {
     yield put({ type: FETCH_BOARD_FAILURE, payload: { error: error.message } });
@@ -44,9 +60,17 @@ export function* fetchBoard(action: fetchBoardRequest) {
 export function* fetchBoards() {
   try {
     const { data } = yield call(Api.boards.getBoards);
-    const { boards, threads, replies } = normalize(data, {
-      boards: [board]
-    }).entities;
+    const { boards, threads, replies } = normalize(
+      {
+        boards: data.boards.map((b: BoardType) => ({
+          ...b,
+          loading: boardInitLoading
+        }))
+      },
+      {
+        boards: [board]
+      }
+    ).entities;
     yield put({
       type: FETCH_BOARDS_SUCCESS,
       payload: { boards, threads, replies }
@@ -62,5 +86,6 @@ export function* fetchBoards() {
 export default {
   createBoard,
   fetchBoard,
-  fetchBoards
+  fetchBoards,
+  updateName
 };

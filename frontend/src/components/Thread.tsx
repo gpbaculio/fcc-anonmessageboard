@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import { RouteComponentProps, withRouter } from 'react-router';
 import * as H from 'history';
-import { ThreadType, ReplyType } from '../store/boards/types';
+import { ThreadType } from '../store/boards/types';
 import {
   Row,
   Col,

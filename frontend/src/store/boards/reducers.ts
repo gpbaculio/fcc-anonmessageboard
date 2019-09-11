@@ -10,7 +10,9 @@ import {
   FETCH_BOARD_REQUEST,
   FETCH_BOARD_SUCCESS,
   FETCH_BOARD_FAILURE,
-  RESET_ERROR_STATE
+  RESET_ERROR_STATE,
+  UPDATE_NAME_SUCCESS,
+  UPDATE_NAME_REQUEST
 } from './types';
 import { createThreadSuccess, CREATE_THREAD_SUCCESS } from '../threads/types';
 
@@ -28,6 +30,10 @@ const initState: BoardsState = {
   loading: initLoading,
   boards: {},
   error: initError
+};
+
+export const boardInitLoading = {
+  update_name: false
 };
 
 const boardsReducer = (
@@ -96,14 +102,51 @@ const boardsReducer = (
     case CREATE_BOARD_REQUEST: {
       return { ...state, loading: { ...state.loading, createBoard: true } };
     }
+    case UPDATE_NAME_REQUEST: {
+      const { board_id } = action.payload;
+      const board = state.boards[board_id];
+      return {
+        ...state,
+        boards: {
+          ...state.boards,
+          [board._id]: {
+            ...board,
+            loading: {
+              ...board.loading,
+              update_name: true
+            }
+          }
+        }
+      };
+    }
+    case UPDATE_NAME_SUCCESS: {
+      const board = state.boards[action.payload.board._id];
+      return {
+        ...state,
+        boards: {
+          ...state.boards,
+          [board._id]: {
+            ...board,
+            ...action.payload.board,
+            loading: {
+              ...board.loading,
+              update_name: false
+            }
+          }
+        }
+      };
+    }
     case CREATE_BOARD_SUCCESS: {
-      const { board } = action.payload;
+      const board = state.boards[action.payload.board._id];
       return {
         ...state,
         loading: { ...state.loading, createBoard: false },
         boards: {
           ...state.boards,
-          [board._id]: board
+          [board._id]: {
+            ...board,
+            ...action.payload.board
+          }
         }
       };
     }
