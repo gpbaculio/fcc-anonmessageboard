@@ -11,7 +11,8 @@ import {
   RESET_ERROR_STATE,
   UPDATE_NAME_REQUEST,
   UPDATE_NAME_SUCCESS,
-  UPDATE_NAME_FAILURE
+  UPDATE_NAME_FAILURE,
+  RESET_BOARD_ERROR
 } from './types';
 import { updateNameArgs } from '../../Api';
 
@@ -55,14 +56,22 @@ export const createBoardFailure = (error: string) => ({
   payload: { error }
 });
 
-export const updateNameFailure = (error: string) => ({
+export const updateNameFailure = (error: string, board_id: string) => ({
   type: UPDATE_NAME_FAILURE,
-  payload: { error }
+  payload: { error, board_id }
 });
 
 export const fetchBoard = (board_id: string) => ({
   type: FETCH_BOARD_REQUEST,
   payload: {
+    board_id
+  }
+});
+
+export const resetBoardError = (errorKey: string, board_id: string) => ({
+  type: RESET_BOARD_ERROR,
+  payload: {
+    errorKey,
     board_id
   }
 });

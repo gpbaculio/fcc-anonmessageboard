@@ -49,6 +49,9 @@ describe.only('Boards Sagas', () => {
       delete_password,
       loading: {
         update_name: false
+      },
+      error: {
+        update_name: ''
       }
     });
 
@@ -104,6 +107,9 @@ describe.only('Boards Sagas', () => {
       delete_password,
       loading: {
         update_name: false
+      },
+      error: {
+        update_name: ''
       }
     });
 
@@ -120,13 +126,8 @@ describe.only('Boards Sagas', () => {
             }
           }) as Promise<AxiosResponse<any>>;
         } else {
-          console.log('wrong delete_password ', delete_password);
-          console.log(
-            'wrong delete_password ',
-            delete_password !== mockBoardData.delete_password
-          );
           return Promise.reject(
-            new AxiosResponseErrorType('Invalid Password')
+            new AxiosResponseErrorType('Invalid Delete Password')
           ) as Promise<AxiosResponse<any>>;
         }
       }
@@ -140,25 +141,20 @@ describe.only('Boards Sagas', () => {
         delete_password: 'wrongPassowrd'
       })
     );
-
     expect(Api.boards.updateName).toHaveBeenCalledWith({
       board_id: mockBoardData._id,
       board_name: mockBoardData.name,
       delete_password: 'wrongPassowrd'
     });
     expect(dispatched).toContainEqual(
-      BoardsActions.updateNameSuccess(
-        getUpdatedNameMockBoard({
-          board_id: mockBoardData._id,
-          board_name: mockBoardData.name,
-          delete_password: mockBoardData.delete_password
-        })
+      BoardsActions.updateNameFailure(
+        'Invalid Delete Password',
+        mockBoardData._id
       )
     );
   });
   it('should update board name', async () => {
     const mockBoardData = {
-      // delete_password prop as is real password
       date: new Date().toISOString(),
       name: 'ADD BOARD TEST',
       _id: uuidv1(),
@@ -178,6 +174,9 @@ describe.only('Boards Sagas', () => {
       delete_password,
       loading: {
         update_name: false
+      },
+      error: {
+        update_name: ''
       }
     });
 
@@ -195,7 +194,7 @@ describe.only('Boards Sagas', () => {
           }) as Promise<AxiosResponse<any>>;
         } else {
           return Promise.reject(
-            new AxiosResponseErrorType('Invalid Password')
+            new AxiosResponseErrorType('Invalid Delete Password')
           ) as Promise<AxiosResponse<any>>;
         }
       }
@@ -230,8 +229,8 @@ describe.only('Boards Sagas', () => {
       name: 'REJECT CREATE BOARD TEST',
       delete_password: 'abcd123'
     };
-    const errorText = 'Something went wrong';
-    const errorResponse = new AxiosResponseErrorType(errorText);
+
+    const errorResponse = new AxiosResponseErrorType('Something went wrong');
     (Api.boards.createBoard as jest.Mock).mockImplementation(
       () => Promise.reject(errorResponse) as Promise<AxiosResponse<any>>
     );
@@ -266,6 +265,9 @@ describe.only('Boards Sagas', () => {
       _id,
       loading: {
         update_name: false
+      },
+      error: {
+        update_name: ''
       }
     });
     const mockResponseData = { board: getFetchedMockBoard(mockBoardData._id) };

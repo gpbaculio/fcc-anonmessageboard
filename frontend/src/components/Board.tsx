@@ -2,8 +2,12 @@ import React, { Component, Fragment } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as H from 'history';
 import classNames from 'classnames';
-import { BoardsState, BoardType } from '../store/boards/types';
-import { fetchBoard } from '../store/boards/actions';
+import {
+  BoardsState,
+  BoardType,
+  BoardErrorTypeKeys
+} from '../store/boards/types';
+import { fetchBoard, resetBoardError } from '../store/boards/actions';
 import { createThread } from '../store/threads/actions';
 import {
   Button,
@@ -18,7 +22,8 @@ import {
   Col,
   Table,
   Row,
-  Spinner
+  Spinner,
+  Alert
 } from 'reactstrap';
 import { connect } from 'react-redux';
 import { createThreadArgs } from '../Api';
@@ -27,7 +32,7 @@ import { Link } from 'react-router-dom';
 import { getTimeDate } from './utils';
 import { ThreadsState } from '../store/threads/reducers';
 import EditBoardNameInput from './EditBoardNameInput';
-import { boardInitLoading } from '../store/boards/reducers';
+import { boardInitLoading, boardInitError } from '../store/boards/reducers';
 
 interface LocationState {
   board_id: string;
@@ -45,6 +50,7 @@ interface BoardDispatchProps {
     callBack: () => void
   ) => void;
   fetchBoard: (board_id: string) => void;
+  resetBoardError: (errorKey: string, board_id: string) => void;
 }
 
 interface BoardState {
@@ -70,7 +76,8 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
       threads: [],
       updated_on: '',
       _id: '',
-      loading: boardInitLoading
+      loading: boardInitLoading,
+      error: boardInitError
     }
   };
   constructor(props: BoardProps & BoardDispatchProps) {
@@ -78,15 +85,24 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
     this.state = this.initState;
   }
   static getDerivedStateFromProps(
-    { boards, match }: BoardProps & BoardDispatchProps,
+    { boards, match, location }: BoardProps & BoardDispatchProps,
     _state: BoardState
   ) {
-    const { board_id } = match.params;
-    const board = boards.boards[board_id];
-    if (board) {
+    if (location.state) {
+      const { board_id } = location.state;
+      const board = boards.boards[board_id];
       return {
         board
       };
+    } else {
+      const { board_id } = match.params;
+      if (Object.keys(boards.boards).includes(board_id)) {
+        const { board_id } = match.params;
+        const board = boards.boards[board_id];
+        return {
+          board
+        };
+      }
     }
     return null;
   }
@@ -126,42 +142,16 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
           delete_password: thread_delete_password,
           board_id
         },
-        this.toggleModal
+        () => {
+          this.setState({
+            modal: false,
+            thread_text: '',
+            thread_delete_password: ''
+          });
+        }
       );
     }
   };
-  // componentDidUpdate({
-  //   threads: { loading: prevThreadsLoading },
-  //   boards: { loading: prevBoardsLoading, boards: prevBoardsProp }
-  // }: BoardProps) {
-  //   const {
-  //     threads: { loading: threadsLoadingState, error: threadsErrorState },
-  //     boards: {
-  //       loading: boardsLoadingState,
-  //       error: boardsErrorState,
-  //       boards: boardsState
-  //     },
-  //     match: {
-  //       params: { board_id }
-  //     }
-  //   } = this.props;
-  //   if (
-  //     prevThreadsLoading.createThread &&
-  //     !threadsLoadingState.createThread &&
-  //     !threadsErrorState.createThread
-  //   ) {
-  //     const board = boardsState[board_id];
-  //     this.setState({ ...this.initState, board });
-  //   }
-  //   if (
-  //     prevBoardsLoading.fetchBoard &&
-  //     !boardsLoadingState.fetchBoard &&
-  //     !boardsErrorState.fetchBoard
-  //   ) {
-  //     const board = boardsState[board_id];
-  //     this.setState({ board });
-  //   }
-  // }
   onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     this.setState({ [name]: value });
@@ -170,7 +160,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
     this.setState({ isEditing: show });
   };
   render() {
-    const { threads, boards } = this.props;
+    const { threads, boards, resetBoardError } = this.props;
     const { board, isEditing } = this.state;
     return (
       <Fragment>
@@ -218,6 +208,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                     id='thread_text'
                     placeholder='Text'
                     autoComplete='off'
+                    autoFill='off'
                     required
                     value={this.state.thread_text}
                   />
@@ -257,6 +248,20 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
         <div className='board-container d-flex justify-content-center align-items-center'>
           <Row>
             <Col>
+              {Object.keys(board.error).map((k: string, i) => {
+                const errorMsg = board.error[k as BoardErrorTypeKeys];
+                return (
+                  <Alert
+                    key={`${i}-${k}`}
+                    color='danger'
+                    isOpen={Boolean(errorMsg)}
+                    toggle={() =>
+                      resetBoardError(k as BoardErrorTypeKeys, board._id)
+                    }>
+                    {errorMsg}
+                  </Alert>
+                );
+              })}
               <div className='table-threads'>
                 <div
                   className={classNames(
@@ -359,7 +364,8 @@ const mapStateToProps = ({ threads, boards }: AppState) => ({
 
 const mapDispatchToProps = {
   createThread,
-  fetchBoard
+  fetchBoard,
+  resetBoardError
 };
 
 export default connect(

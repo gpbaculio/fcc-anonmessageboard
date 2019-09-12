@@ -12,7 +12,9 @@ import {
   FETCH_BOARD_FAILURE,
   RESET_ERROR_STATE,
   UPDATE_NAME_SUCCESS,
-  UPDATE_NAME_REQUEST
+  UPDATE_NAME_REQUEST,
+  UPDATE_NAME_FAILURE,
+  RESET_BOARD_ERROR
 } from './types';
 import { createThreadSuccess, CREATE_THREAD_SUCCESS } from '../threads/types';
 
@@ -34,6 +36,10 @@ const initState: BoardsState = {
 
 export const boardInitLoading = {
   update_name: false
+};
+
+export const boardInitError = {
+  update_name: ''
 };
 
 const boardsReducer = (
@@ -131,6 +137,44 @@ const boardsReducer = (
             loading: {
               ...board.loading,
               update_name: false
+            }
+          }
+        }
+      };
+    }
+    case UPDATE_NAME_FAILURE: {
+      const { error, board_id } = action.payload;
+      const board = state.boards[board_id];
+      return {
+        ...state,
+        boards: {
+          ...state.boards,
+          [board_id]: {
+            ...board,
+            loading: {
+              ...board.loading,
+              update_name: false
+            },
+            error: {
+              ...board.error,
+              update_name: error
+            }
+          }
+        }
+      };
+    }
+    case RESET_BOARD_ERROR: {
+      const { board_id, errorKey } = action.payload;
+      const board = state.boards[board_id];
+      return {
+        ...state,
+        boards: {
+          ...state.boards,
+          [board._id]: {
+            ...board,
+            error: {
+              ...board.error,
+              [errorKey]: ''
             }
           }
         }

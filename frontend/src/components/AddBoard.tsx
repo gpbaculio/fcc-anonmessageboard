@@ -56,6 +56,7 @@ class AddBoard extends Component<
           onChange={this.onChange}
           className='mr-2'
           placeholder='Board Name'
+          autoComplete='off'
         />
         <Input
           className='mr-2'
@@ -64,6 +65,7 @@ class AddBoard extends Component<
           name='delete_password'
           value={delete_password}
           onChange={this.onChange}
+          autoComplete='off'
         />
         <Button type='submit'>Submit</Button>
       </Form>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Form, Button } from 'reactstrap';
+import { Input, Form, Button, Spinner } from 'reactstrap';
 import { connect } from 'react-redux';
 import { updateName } from '../store/boards/actions';
 import { updateNameArgs } from '../Api';
@@ -38,21 +38,28 @@ class EditBoardNameInput extends Component<
     const { name, value } = e.target;
     this.setState({ [name]: value });
   };
-  componentDidUpdate({ boards: prevPropsBoards }: EditBoardNameInputProps) {
-    const { board_id, boards: boardsProp } = this.props;
-    if (
-      prevPropsBoards.boards[board_id].loading.update_name && // loaded
-      boardsProp.boards[board_id].loading.update_name
-    ) {
-      const board = boardsProp.boards[board_id];
-      this.setState({ board_name: board.name });
-    }
-  }
+  // componentDidUpdate({ boards: prevPropsBoards }: EditBoardNameInputProps) {
+  //   const { board_id, boards: boardsProp } = this.props;
+  //   if (
+  //     prevPropsBoards.boards[board_id].loading.update_name && // loaded
+  //     boardsProp.boards[board_id].loading.update_name
+  //   ) {
+  //     const board = boardsProp.boards[board_id];
+  //     this.setState({ board_name: board.name });
+  //   }
+  // }
   onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const { board_name, delete_password } = this.state;
-    const { board_id, updateName, setIsEditing } = this.props;
-    if (board_name.trim() && delete_password) {
+    const { delete_password } = this.state;
+    const board_name = this.state.board_name.trim();
+    const {
+      board_id,
+      updateName,
+      setIsEditing,
+      boards: { boards }
+    } = this.props;
+    const boardName = boards[board_id].name;
+    if (board_name && boardName !== board_name && delete_password) {
       updateName({ board_id, board_name, delete_password }, () => {
         this.setState({ delete_password: '' });
         setIsEditing(false);
@@ -61,6 +68,11 @@ class EditBoardNameInput extends Component<
   };
   render() {
     const { board_name, deletePassword } = this.state;
+    const {
+      boards: { boards },
+      board_id
+    } = this.props;
+    const load = boards[board_id].loading.update_name;
     return (
       <Form onSubmit={this.onSubmit} className='ml-2 flex-1 d-flex'>
         <Input
@@ -80,7 +92,12 @@ class EditBoardNameInput extends Component<
           className='mr-2'
           required
         />
-        <Button color='primary' className='mr-2' type='submit'>
+        <Button
+          disabled={load}
+          color='primary'
+          className='mr-2 d-inline-flex align-items-center'
+          type='submit'>
+          {load && <Spinner size='sm' color='light' className='mr-2' />}
           Submit
         </Button>
         <Button

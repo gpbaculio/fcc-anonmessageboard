@@ -11,6 +11,7 @@ export const RESET_ERROR_STATE = 'RESET_ERROR_STATE';
 export const UPDATE_NAME_REQUEST = 'UPDATE_NAME_REQUEST';
 export const UPDATE_NAME_SUCCESS = 'UPDATE_NAME_SUCCESS';
 export const UPDATE_NAME_FAILURE = 'UPDATE_NAME_FAILURE';
+export const RESET_BOARD_ERROR = 'RESET_BOARD_ERROR';
 
 export interface ReplyType {
   _id: string;
@@ -31,6 +32,10 @@ export interface ThreadType {
 export interface BoardLoadingType {
   update_name: boolean;
 }
+export interface BoardErrorType {
+  update_name: string;
+}
+export type BoardErrorTypeKeys = 'update_name';
 
 export interface BoardType {
   created_on: string;
@@ -39,6 +44,7 @@ export interface BoardType {
   updated_on: string;
   _id: string;
   loading: BoardLoadingType;
+  error: BoardErrorType;
 }
 
 export interface BoardsLoadingType {
@@ -114,18 +120,29 @@ export interface fetchBoardRequest {
     board_id: string;
   };
 }
-
+export interface resetBoardErrorType {
+  type: typeof RESET_BOARD_ERROR;
+  payload: {
+    errorKey: string;
+    board_id: string;
+  };
+}
 export interface boardsfailureTypes {
   type:
     | typeof FETCH_BOARDS_FAILURE
     | typeof CREATE_BOARD_FAILURE
-    | typeof FETCH_BOARD_FAILURE
-    | typeof UPDATE_NAME_FAILURE;
+    | typeof FETCH_BOARD_FAILURE;
   payload: {
     error: string;
   };
 }
-
+interface boardUpdateNameFailureType {
+  type: typeof UPDATE_NAME_FAILURE;
+  payload: {
+    error: string;
+    board_id: string;
+  };
+}
 export interface resetErrorState {
   type: typeof RESET_ERROR_STATE;
 }
@@ -138,4 +155,6 @@ export type BoardsActionTypes =
   | fetchBoardsRequest
   | fetchBoardsSuccess
   | resetErrorState
-  | updateNameRequest;
+  | updateNameRequest
+  | boardUpdateNameFailureType
+  | resetBoardErrorType;

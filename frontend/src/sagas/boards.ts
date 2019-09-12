@@ -18,14 +18,20 @@ import {
   updateNameSuccess,
   updateNameFailure
 } from '../store/boards/actions';
-import { boardInitLoading } from '../store/boards/reducers';
+import { boardInitLoading, boardInitError } from '../store/boards/reducers';
 
 export function* createBoard(action: createBoardRequest) {
   try {
     const {
       data: { board }
     } = yield call(Api.boards.createBoard, action.payload);
-    yield put(createboardSuccess({ ...board, loading: boardInitLoading }));
+    yield put(
+      createboardSuccess({
+        ...board,
+        loading: boardInitLoading,
+        error: boardInitError
+      })
+    );
   } catch (error) {
     yield put(createBoardFailure(error.response.data));
   }
@@ -39,8 +45,7 @@ export function* updateName({ payload, callBack }: updateNameRequest) {
     yield put(updateNameSuccess(board));
     if (callBack) callBack();
   } catch (error) {
-    console.log('error updatename ', error);
-    yield put(updateNameFailure(error.response.data));
+    yield put(updateNameFailure(error.response.data, payload.board_id));
   }
 }
 
@@ -48,7 +53,13 @@ export function* fetchBoard(action: fetchBoardRequest) {
   try {
     const { data } = yield call(Api.boards.fetchBoard, action.payload.board_id);
     const { boards, threads, replies } = normalize(
-      { board: { ...data.board, loading: boardInitLoading } },
+      {
+        board: {
+          ...data.board,
+          loading: boardInitLoading,
+          error: boardInitError
+        }
+      },
       { board }
     ).entities;
     yield put(fetchBoardSuccess({ boards, threads, replies }));
@@ -64,7 +75,8 @@ export function* fetchBoards() {
       {
         boards: data.boards.map((b: BoardType) => ({
           ...b,
-          loading: boardInitLoading
+          loading: boardInitLoading,
+          error: boardInitError
         }))
       },
       {
