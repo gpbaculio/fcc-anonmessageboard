@@ -10,13 +10,14 @@ import {
 } from '../store/threads/types';
 import { thread } from './normalizrEntities';
 import { normalize } from 'normalizr';
+import { createThreadSuccess } from '../store/threads/actions';
 
 export function* createThread({ payload, callBack }: createThreadRequest) {
   try {
     const {
       data: { thread }
     } = yield call(Api.threads.createThread, payload);
-    yield put({ type: CREATE_THREAD_SUCCESS, payload: { thread } });
+    yield put(createThreadSuccess(thread));
     callBack();
   } catch (error) {
     yield put({

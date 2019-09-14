@@ -208,7 +208,6 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                     id='thread_text'
                     placeholder='Text'
                     autoComplete='off'
-                    autoFill='off'
                     required
                     value={this.state.thread_text}
                   />
