@@ -1,14 +1,14 @@
 jest.mock('../Api');
-import Api, { createThreadArgs } from '../Api';
-import * as threadsSagas from '../sagas/threads';
-import * as threadsActions from '../store/threads/actions';
+import Api, { createThreadArgs, createReplyArgs } from '../Api';
+import * as repliesSagas from '../sagas/replies';
+import * as repliesActions from '../store/replies/actions';
 import uuidv1 from 'uuid/v1';
 import { BoardLoadingType, BoardErrorType } from '../store/boards/types';
 import { recordSaga } from './utils';
 import { AxiosResponse } from 'axios';
 import { Saga } from 'redux-saga';
 
-describe.only('Boards Sagas', () => {
+describe.only('Replies Sagas', () => {
   class AxiosResponseErrorType extends Error {
     response: {
       data: string;
@@ -21,14 +21,14 @@ describe.only('Boards Sagas', () => {
     }
   }
 
-  type ThreadsSagasKeys = 'createThread' | 'getThread';
+  type RepliesSagasKeys = 'createReply';
 
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
   Object.keys(Api.boards).forEach((k: string) => {
-    Api.threads[k as ThreadsSagasKeys] = jest.fn();
+    Api.replies[k as RepliesSagasKeys] = jest.fn();
   });
 
   class Board {
@@ -85,10 +85,38 @@ describe.only('Boards Sagas', () => {
     genUuidV1 = () => uuidv1();
     now = () => new Date().toISOString();
   }
+  class Reply {
+    created_on: string;
+    delete_password: string;
+    reported: boolean;
+    text: string;
+    thread_id: string;
+    updated_on: string;
+    _id: string;
+    constructor(params: {
+      thread_id: string;
+      text?: string;
+      delete_password?: string;
+    }) {
+      this.delete_password = params.delete_password || this.genUuidV1();
+      this.reported = false;
+      this.text = params.text || 'REPLY TEXT TEST';
+      this.thread_id = params.thread_id;
+      this.created_on = this.now();
+      this.updated_on = this.now();
+      this._id = this.genUuidV1();
+    }
+    genUuidV1 = () => uuidv1();
+    now = () => new Date().toISOString();
+  }
 
-  it('should create thread on board', async () => {
+  it('should create reply on thread', async () => {
     const createMockThreadArgs = {
       text: 'CREATE MOCK THREAD TEXT',
+      delete_password: uuidv1()
+    };
+    const createMockReplyArgs = {
+      text: 'CREATE MOCK REPLY TEXT',
       delete_password: uuidv1()
     };
     const mockBoard = new Board();
@@ -99,31 +127,43 @@ describe.only('Boards Sagas', () => {
     });
     // add thread id
     mockBoard.threads = [...mockBoard.threads, mockThread._id];
-    (Api.threads.createThread as jest.Mock).mockImplementation(
-      (_createBoardArgs: createThreadArgs) =>
+
+    const mockReply = new Reply({
+      thread_id: mockThread._id,
+      text: createMockReplyArgs.text,
+      delete_password: createMockReplyArgs.delete_password
+    });
+    // add reply id
+    mockThread.replies = [...mockThread.replies, mockReply._id];
+
+    (Api.replies.createReply as jest.Mock).mockImplementation(
+      (_params: createReplyArgs) =>
         Promise.resolve({
           data: {
-            thread: mockThread
+            reply: mockReply
           }
         }) as Promise<AxiosResponse<any>>
     );
+
     const dispatched = await recordSaga(
-      threadsSagas.createThread as Saga,
-      threadsActions.createThread({
+      repliesSagas.createReply as Saga,
+      repliesActions.createReply({
         board_id: mockBoard._id,
-        ...createMockThreadArgs
+        thread_id: mockThread._id,
+        ...createMockReplyArgs
       })
     );
-    expect(Api.threads.createThread).toHaveBeenCalledWith({
+    expect(Api.replies.createReply).toHaveBeenCalledWith({
       board_id: mockBoard._id,
-      ...createMockThreadArgs
+      thread_id: mockThread._id,
+      ...createMockReplyArgs
     });
     expect(dispatched).toContainEqual(
-      threadsActions.createThreadSuccess(mockThread)
+      repliesActions.createReplySuccess(mockReply)
     );
     // created thread id property should be on board threads array
-    expect(mockBoard.threads).toContain(mockThread._id);
-    // created thread board_id property should reference if of its board
-    expect(mockThread.board_id).toEqual(mockBoard._id);
+    expect(mockThread.replies).toContain(mockReply._id);
+    // // created thread board_id property should reference if of its board
+    expect(mockReply.thread_id).toEqual(mockThread._id);
   });
 });

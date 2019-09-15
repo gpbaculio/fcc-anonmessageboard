@@ -58,6 +58,7 @@ export default class BoardsController {
         }
       },
       (error, board) => {
+        console.log('board ', board);
         if (error) res.status(400).send(error);
         res.status(200).json({ board });
       }

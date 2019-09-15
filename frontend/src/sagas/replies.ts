@@ -5,17 +5,18 @@ import {
   CREATE_REPLY_SUCCESS
 } from '../store/replies/types';
 import Api from '../Api';
+import {
+  createReplySuccess,
+  createReplyFailure
+} from '../store/replies/actions';
 
 export function* createReply(action: createReplyRequest) {
   try {
     const {
       data: { reply }
     } = yield call(Api.replies.createReply, action.payload);
-    yield put({ type: CREATE_REPLY_SUCCESS, payload: { reply } });
+    yield put(createReplySuccess(reply));
   } catch (error) {
-    yield put({
-      type: CREATE_REPLY_FAILURE,
-      payload: { error: error.message }
-    });
+    yield put(createReplyFailure(error.response.data));
   }
 }

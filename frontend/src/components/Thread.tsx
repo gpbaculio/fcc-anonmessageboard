@@ -11,7 +11,8 @@ import {
   Form,
   FormGroup,
   Label,
-  Spinner
+  Spinner,
+  Container
 } from 'reactstrap';
 import { connect } from 'react-redux';
 import { AppState } from '../store';
@@ -127,117 +128,121 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
     const { replies, threads } = this.props;
     const { thread } = this.state;
     return (
-      <Row>
-        <Col>
-          <div className='table-threads mx-auto my-5 d-flex flex-column text-center'>
-            <div
-              className={classNames(
-                'loader w-100 d-flex align-items-center justify-content-center position-absolute',
-                { hide: !threads.loading.getThread }
-              )}>
-              <Spinner color='info' className='mr-2' />
-              <strong>Fetching Thread...</strong>
-            </div>
-            <div
-              className={classNames(
-                'thread w-100 mx-auto d-flex flex-column text-center',
-                {
-                  'fade-load': threads.loading.getThread
-                }
-              )}>
-              <div className='thread-title-container d-flex p-3 align-items-center justify-content-between'>
-                <legend className='mb-0 w-auto'>
-                  THREAD:
-                  <span className='font-weight-lighter'> {thread.text}</span>
-                </legend>
-                <span>{getTimeDate(thread.created_on)}</span>
+      <Container>
+        <Row>
+          <Col>
+            <div className='table-threads mt-5 mx-auto d-flex flex-column text-center'>
+              <div
+                className={classNames(
+                  'loader w-100 d-flex align-items-center justify-content-center position-absolute',
+                  { hide: !threads.loading.getThread }
+                )}>
+                <Spinner color='info' className='mr-2' />
+                <strong>Fetching Thread...</strong>
               </div>
-              <div className='replies-container'>
-                <legend className='text-center reply-title mb-0 py-1'>
-                  Reply on Thread
-                </legend>
-
-                <div className='reply-form-container position-relative'>
-                  <div
-                    className={classNames(
-                      'loader  w-100 d-flex align-items-center justify-content-center position-absolute',
-                      { hide: !replies.loading.createReply }
-                    )}>
-                    <Spinner color='info' className='mr-2' />
-                    <strong>Processing...</strong>
-                  </div>
-                  <Form
-                    className={classNames('p-3', {
-                      'fade-load': replies.loading.createReply
-                    })}
-                    onSubmit={this.onSubmit}>
-                    <FormGroup>
-                      <Label for='thread_id'>Thread Id</Label>
-                      <Col>
-                        <Input
-                          type='text'
-                          name='thread_id'
-                          id='thread_id'
-                          placeholder='Thread Id'
-                          autoComplete='off'
-                          required
-                          disabled
-                          value={thread._id}
-                        />
-                      </Col>
-                    </FormGroup>
-                    <FormGroup>
-                      <Label for='reply_text'>Text</Label>
-                      <Col>
-                        <Input
-                          type='text'
-                          name='reply_text'
-                          id='reply_text'
-                          placeholder='Text'
-                          autoComplete='off'
-                          required
-                          onChange={this.onChange}
-                        />
-                      </Col>
-                    </FormGroup>
-                    <FormGroup>
-                      <Label for='reply_delete_password'>Delete Password</Label>
-                      <Col>
-                        <Input
-                          type='password'
-                          name='reply_delete_password'
-                          id='reply_delete_password'
-                          placeholder='Delete Password'
-                          autoComplete='off'
-                          required
-                          onChange={this.onChange}
-                        />
-                      </Col>
-                    </FormGroup>
-                    <Button
-                      disabled={replies.loading.createReply}
-                      color='primary'
-                      type='submit'>
-                      Submit Reply
-                    </Button>
-                  </Form>
+              <div
+                className={classNames(
+                  'thread w-100 mx-auto d-flex flex-column text-center',
+                  {
+                    'fade-load': threads.loading.getThread
+                  }
+                )}>
+                <div className='thread-title-container d-flex p-3 align-items-center justify-content-between'>
+                  <legend className='mb-0 w-auto'>
+                    THREAD:
+                    <span className='font-weight-lighter'> {thread.text}</span>
+                  </legend>
+                  <span>{getTimeDate(thread.created_on)}</span>
                 </div>
-                {thread.replies.map(rId => {
-                  const reply = replies.replies[rId];
-                  return (
+                <div className='replies-container'>
+                  <legend className='text-center reply-title mb-0 py-1'>
+                    Reply on Thread
+                  </legend>
+
+                  <div className='reply-form-container position-relative'>
                     <div
-                      key={reply._id}
-                      className='reply-container my-3 d-flex justify-content-between'>
-                      <span>{reply.text}</span>
-                      <span>{timeDifferenceForDate(reply.created_on)}</span>
+                      className={classNames(
+                        'loader  w-100 d-flex align-items-center justify-content-center position-absolute',
+                        { hide: !replies.loading.createReply }
+                      )}>
+                      <Spinner color='info' className='mr-2' />
+                      <strong>Processing...</strong>
                     </div>
-                  );
-                })}
+                    <Form
+                      className={classNames('p-3', {
+                        'fade-load': replies.loading.createReply
+                      })}
+                      onSubmit={this.onSubmit}>
+                      <FormGroup>
+                        <Label for='thread_id'>Thread Id</Label>
+                        <Col>
+                          <Input
+                            type='text'
+                            name='thread_id'
+                            id='thread_id'
+                            placeholder='Thread Id'
+                            autoComplete='off'
+                            required
+                            disabled
+                            value={thread._id}
+                          />
+                        </Col>
+                      </FormGroup>
+                      <FormGroup>
+                        <Label for='reply_text'>Text</Label>
+                        <Col>
+                          <Input
+                            type='text'
+                            name='reply_text'
+                            id='reply_text'
+                            placeholder='Text'
+                            autoComplete='off'
+                            required
+                            onChange={this.onChange}
+                          />
+                        </Col>
+                      </FormGroup>
+                      <FormGroup>
+                        <Label for='reply_delete_password'>
+                          Delete Password
+                        </Label>
+                        <Col>
+                          <Input
+                            type='password'
+                            name='reply_delete_password'
+                            id='reply_delete_password'
+                            placeholder='Delete Password'
+                            autoComplete='off'
+                            required
+                            onChange={this.onChange}
+                          />
+                        </Col>
+                      </FormGroup>
+                      <Button
+                        disabled={replies.loading.createReply}
+                        color='primary'
+                        type='submit'>
+                        Submit Reply
+                      </Button>
+                    </Form>
+                  </div>
+                  {thread.replies.map(rId => {
+                    const reply = replies.replies[rId];
+                    return (
+                      <div
+                        key={reply._id}
+                        className='reply-container my-3 d-flex justify-content-between'>
+                        <span>{reply.text}</span>
+                        <span>{timeDifferenceForDate(reply.created_on)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-        </Col>
-      </Row>
+          </Col>
+        </Row>
+      </Container>
     );
   }
 }

@@ -305,12 +305,12 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                       />
                     )}
                   </div>
-                  <Button
-                    className='w-50 mx-auto mb-3'
-                    color='primary'
-                    onClick={this.toggleModal}>
-                    Post New Thread
-                  </Button>
+                  <div className='w-100 mb-2 d-flex justify-content-between align-items-end'>
+                    <h5>Threads</h5>
+                    <Button color='primary' onClick={this.toggleModal}>
+                      Post New Thread
+                    </Button>
+                  </div>
 
                   <Table hover responsive className='threads-table'>
                     <thead className='thead-light'>
