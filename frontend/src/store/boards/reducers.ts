@@ -28,7 +28,7 @@ const initLoading = {
   fetchBoards: false,
   fetchBoard: false
 };
-const initState: BoardsState = {
+export const boardsInitState: BoardsState = {
   loading: initLoading,
   boards: {},
   error: initError
@@ -43,7 +43,7 @@ export const boardInitError = {
 };
 
 const boardsReducer = (
-  state = initState,
+  state = boardsInitState,
   action: BoardsActionTypes | createThreadSuccess
 ) => {
   switch (action.type) {
@@ -181,7 +181,7 @@ const boardsReducer = (
       };
     }
     case CREATE_BOARD_SUCCESS: {
-      const board = state.boards[action.payload.board._id];
+      const board = action.payload.board;
       return {
         ...state,
         loading: { ...state.loading, createBoard: false },

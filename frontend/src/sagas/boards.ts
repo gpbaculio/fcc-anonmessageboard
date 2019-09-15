@@ -25,6 +25,7 @@ export function* createBoard(action: createBoardRequest) {
     const {
       data: { board }
     } = yield call(Api.boards.createBoard, action.payload);
+
     yield put(
       createboardSuccess({
         ...board,

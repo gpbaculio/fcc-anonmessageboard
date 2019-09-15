@@ -22,14 +22,14 @@ export interface RepliesState {
   };
 }
 
-const initState: RepliesState = {
+export const repliesInitState: RepliesState = {
   replies: {},
   loading: { createReply: false },
   error: { createReply: '' }
 };
 
 const repliesReducer = (
-  state = initState,
+  state = repliesInitState,
   action: RepliesActionTypes | fetchBoardsSuccess | getThreadSuccess
 ) => {
   switch (action.type) {

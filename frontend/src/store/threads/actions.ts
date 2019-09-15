@@ -1,4 +1,8 @@
-import { CREATE_THREAD_REQUEST, GET_THREAD_REQUEST } from './types';
+import {
+  CREATE_THREAD_REQUEST,
+  GET_THREAD_REQUEST,
+  CREATE_THREAD_SUCCESS
+} from './types';
 import { createThreadArgs } from '../../Api';
 import { CREATE_BOARD_SUCCESS, ThreadType } from '../boards/types';
 
@@ -17,6 +21,6 @@ export const getThread = (thread_id: string) => ({
 });
 
 export const createThreadSuccess = (thread: ThreadType) => ({
-  type: CREATE_BOARD_SUCCESS,
+  type: CREATE_THREAD_SUCCESS,
   payload: { thread }
 });

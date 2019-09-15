@@ -11,6 +11,6 @@ export const recordSaga = async (saga: Saga<any>, initialAction: AnyAction) => {
     saga,
     initialAction
   ).toPromise;
-
+  console.log('initialAction ', initialAction);
   return dispatched;
 };

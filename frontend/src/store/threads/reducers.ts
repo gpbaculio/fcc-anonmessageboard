@@ -26,14 +26,14 @@ export interface ThreadsState {
     getThread: string;
   };
 }
-const initState: ThreadsState = {
+export const threadsInitState: ThreadsState = {
   threads: {},
   loading: { createThread: false, getThread: false },
   error: { createThread: '', getThread: '' }
 };
 
-const boardsReducer = (
-  state = initState,
+const repliesReducer = (
+  state = threadsInitState,
   action: ThreadsActionTypes | fetchBoardsSuccess | createReplySuccess
 ) => {
   switch (action.type) {
@@ -130,4 +130,4 @@ const boardsReducer = (
   }
 };
 
-export default boardsReducer;
+export default repliesReducer;
