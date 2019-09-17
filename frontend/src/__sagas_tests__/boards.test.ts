@@ -30,7 +30,7 @@ import {
 import { AxiosResponse } from 'axios';
 import { combineReducers } from 'redux';
 
-class BoardTypeResponse {
+export class BoardTypeResponse {
   created_on: string;
   name: string;
   threads: string[];
@@ -74,7 +74,12 @@ describe.only('Boards Sagas', () => {
       // dispatch initial action it wants to test
       createBoard('CREATE BOARD TEST', 'abcd123')
     )
-      .withReducer(boardsReducer)
+      .withReducer(
+        // mimic reducer form
+        combineReducers({
+          boards: boardsReducer
+        })
+      )
       // Mock the response from API
       .provide({
         call: (effect, next) => {
@@ -95,11 +100,11 @@ describe.only('Boards Sagas', () => {
       )
       .silentRun();
     // load should be false
-    expect(storeState.loading.createBoard).toEqual(false);
+    expect(storeState.boards.loading.createBoard).toEqual(false);
     // id of board on boards property
-    expect(storeState.boards).toHaveProperty(mockBoard._id);
+    expect(storeState.boards.boards).toHaveProperty(mockBoard._id);
     // loading and error prop is not on axios response since we use it for UI effects
-    expect(storeState.boards[mockBoard._id]).toEqual({
+    expect(storeState.boards.boards[mockBoard._id]).toEqual({
       ...mockBoard,
       loading: boardInitLoading,
       error: boardInitError
@@ -125,6 +130,7 @@ describe.only('Boards Sagas', () => {
       updateName(updateNameArgs)
     )
       .withReducer(
+        // mimic reducer form
         combineReducers({
           boards: boardsReducer
         }),
@@ -178,8 +184,5 @@ describe.only('Boards Sagas', () => {
       loading: boardInitLoading,
       error: boardInitError
     });
-  });
-  it('should add thread on board', async () => {
-    // continue here
   });
 });

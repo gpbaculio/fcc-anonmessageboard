@@ -134,7 +134,7 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
             <div className='table-threads mt-5 mx-auto d-flex flex-column text-center'>
               <div
                 className={classNames(
-                  'loader w-100 d-flex align-items-center justify-content-center position-absolute',
+                  'loader w--100 d-flex align-items-center justify-content-center position-absolute',
                   { hide: !threads.loading.getThread }
                 )}>
                 <Spinner color='info' className='mr-2' />
