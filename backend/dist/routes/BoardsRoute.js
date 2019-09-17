@@ -19,7 +19,8 @@ class BoardsRoute {
             app
                 .route('/api/board/:board_id')
                 .get(this.boardsController.getBoard)
-                .post(this.boardsController.updateBoardName);
+                .post(this.boardsController.updateBoardName)
+                .delete(this.boardsController.deleteBoard);
         };
     }
 }

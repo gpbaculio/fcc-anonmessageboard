@@ -1,4 +1,8 @@
-import { CREATE_REPLY_REQUEST, CREATE_REPLY_FAILURE } from './types';
+import {
+  CREATE_REPLY_REQUEST,
+  CREATE_REPLY_FAILURE,
+  CREATE_REPLY_SUCCESS
+} from './types';
 import { createReplyArgs } from '../../Api';
 import { ReplyType, CREATE_BOARD_SUCCESS } from '../boards/types';
 
@@ -13,7 +17,7 @@ export const createReply = ({
 });
 
 export const createReplySuccess = (reply: ReplyType) => ({
-  type: CREATE_BOARD_SUCCESS,
+  type: CREATE_REPLY_SUCCESS,
   payload: { reply }
 });
 

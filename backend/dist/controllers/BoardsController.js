@@ -9,8 +9,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Board_1 = require("../models/Board");
+const Thread_1 = require("../models/Thread");
+const Reply_1 = require("../models/Reply");
+const mongoose = require("mongoose");
 class BoardsController {
     constructor() {
+        this.deleteBoard = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { board_id } = req.params;
+            console.log('board_id ', board_id);
+            yield Board_1.default.findOneAndRemove({ _id: board_id }, function (error, deletedBoard) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error)
+                        res.status(400).send(error);
+                    yield Thread_1.default.deleteMany({
+                        board_id: deletedBoard._id
+                    }, function (error) {
+                        return __awaiter(this, void 0, void 0, function* () {
+                            if (error)
+                                res.status(400).send(error);
+                            const deletedBoardThreadIds = deletedBoard.threads.map(th => mongoose.Types.ObjectId(th.id));
+                            yield Reply_1.default.deleteMany({
+                                thread_id: { $in: deletedBoardThreadIds }
+                            }, function (error) {
+                                return __awaiter(this, void 0, void 0, function* () {
+                                    if (error)
+                                        res.status(400).send(error);
+                                    res.send('success');
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
         this.createBoard = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { name, delete_password } = req.body;
             yield Board_1.default.findOne({ name }, (error, board) => __awaiter(this, void 0, void 0, function* () {
@@ -34,12 +65,10 @@ class BoardsController {
         this.updateBoardName = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { board_name, delete_password } = req.body;
             const { board_id } = req.params;
-            console.log('updateBoardName 1');
             yield Board_1.default.findById(board_id, function (error, board) {
                 return __awaiter(this, void 0, void 0, function* () {
                     if (error)
                         res.status(400).send(error);
-                    console.log('updateBoardName 2');
                     const correctPassword = yield board.authenticate(delete_password);
                     if (!correctPassword)
                         res.status(400).send('Incorrect Delete Password');
@@ -48,7 +77,6 @@ class BoardsController {
                         board.save(function (error) {
                             if (error)
                                 res.status(400).send(error);
-                            console.log('updateBoardName 3');
                             const parseBoard = board.toObject();
                             delete parseBoard['delete_password'];
                             res.status(200).json({ board: parseBoard });
@@ -71,7 +99,6 @@ class BoardsController {
                     }
                 }
             }, (error, board) => {
-                console.log('board ', board);
                 if (error)
                     res.status(400).send(error);
                 res.status(200).json({ board });

@@ -1,8 +1,40 @@
 import { Request, Response } from 'express';
 import Board from '../models/Board';
-import { ThreadDocument } from 'models/Thread';
+import Thread, { ThreadDocument } from '../models/Thread';
+import Reply from '../models/Reply';
+import * as mongoose from 'mongoose';
 
 export default class BoardsController {
+  public deleteBoard = async (req: Request, res: Response) => {
+    const { board_id } = req.params;
+    console.log('board_id ', board_id);
+    await Board.findOneAndRemove({ _id: board_id }, async function(
+      error,
+      deletedBoard
+    ) {
+      if (error) res.status(400).send(error);
+      await Thread.deleteMany(
+        {
+          board_id: deletedBoard._id
+        },
+        async function(error) {
+          if (error) res.status(400).send(error);
+          const deletedBoardThreadIds = deletedBoard.threads.map(th =>
+            mongoose.Types.ObjectId(th.id)
+          );
+          await Reply.deleteMany(
+            {
+              thread_id: { $in: deletedBoardThreadIds }
+            },
+            async function(error) {
+              if (error) res.status(400).send(error);
+              res.send('success');
+            }
+          );
+        }
+      );
+    });
+  };
   public createBoard = async (req: Request, res: Response) => {
     const { name, delete_password } = req.body;
     await Board.findOne({ name }, async (error, board) => {
@@ -22,17 +54,14 @@ export default class BoardsController {
   public updateBoardName = async (req: Request, res: Response) => {
     const { board_name, delete_password } = req.body;
     const { board_id } = req.params;
-    console.log('updateBoardName 1');
     await Board.findById(board_id, async function(error, board) {
       if (error) res.status(400).send(error);
-      console.log('updateBoardName 2');
       const correctPassword = await board.authenticate(delete_password);
       if (!correctPassword) res.status(400).send('Incorrect Delete Password');
       else {
         board.name = board_name;
         board.save(function(error) {
           if (error) res.status(400).send(error);
-          console.log('updateBoardName 3');
           const parseBoard = board.toObject();
           delete parseBoard['delete_password'];
           res.status(200).json({ board: parseBoard });
@@ -58,7 +87,6 @@ export default class BoardsController {
         }
       },
       (error, board) => {
-        console.log('board ', board);
         if (error) res.status(400).send(error);
         res.status(200).json({ board });
       }

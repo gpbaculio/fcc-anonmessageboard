@@ -2,7 +2,7 @@ import { expectSaga, SagaType } from 'redux-saga-test-plan';
 import uuidv1 from 'uuid/v1';
 
 import Api, { createBoardArgs, createThreadArgs } from '../Api';
-import * as threadsSagas from '../sagas/threads';
+import * as repliesSagas from '../sagas/replies';
 import boardsReducer, {
   boardInitLoading,
   boardInitError,
@@ -13,37 +13,38 @@ import threadsReducer, { threadsInitState } from '../store/threads/reducers';
 import { combineReducers } from 'redux';
 import { createThread, createThreadSuccess } from '../store/threads/actions';
 import { BoardTypeResponse } from './boards.test';
+import { ThreadTypeResponse } from './threads.test';
+import repliesReducer, { repliesInitState } from '../store/replies/reducers';
+import { createReply, createReplySuccess } from '../store/replies/actions';
 
-export class ThreadTypeResponse {
-  board_id: string;
-  bumped_on: string;
+export class ReplyTypeResponse {
   created_on: string;
-  replies: string[];
+  delete_password: string;
   reported: boolean;
   text: string;
+  thread_id: string;
   updated_on: string;
   _id: string;
 
   constructor(params: {
-    text?: string;
     delete_password?: string;
-    board_id: string;
+    text?: string;
+    thread_id: string;
   }) {
     const genId = uuidv1();
     const genDelPass = uuidv1();
     const dateNow = new Date().toISOString();
-    this.board_id = params.board_id;
-    this.bumped_on = dateNow;
     this.created_on = dateNow;
-    this.replies = [];
+    this.delete_password = params.delete_password || genDelPass;
     this.reported = false;
-    this.text = params.text || 'CREATE BOARD TEST';
+    this.text = params.text || 'CREATE REPLY TEST';
+    this.thread_id = params.thread_id;
     this.updated_on = dateNow;
     this._id = genId;
   }
 }
-describe.only('Threads Sagas', () => {
-  it('should create thread on board', async () => {
+describe.only('Replies Sagas', () => {
+  it('should create reply on thread', async () => {
     const createBoardArgs: createBoardArgs = {
       name: 'CREATE BOARD TEST',
       delete_password: 'abcd123'
@@ -54,18 +55,26 @@ describe.only('Threads Sagas', () => {
       text: 'CREATE THREAD TEST',
       delete_password: uuidv1()
     };
+    //create thread to be owned by board
     const mockThread = new ThreadTypeResponse(createThreadArgs);
+    const createReplyArgs = {
+      delete_password: uuidv1(),
+      text: 'CREATE REPLY TEXT',
+      thread_id: mockThread._id
+    };
+    const mockReply = new ReplyTypeResponse(createReplyArgs);
     const { storeState } = await expectSaga(
-      threadsSagas.createThread as SagaType,
+      repliesSagas.createReply as SagaType,
       // dispatch initial action it wants to test
       // with the mockBoard since we have it on initial state of this test
-      createThread(createThreadArgs)
+      createReply({ board_id: mockBoard._id, ...createReplyArgs })
     )
       .withReducer(
         // mimic reducer form
         combineReducers({
           boards: boardsReducer,
-          threads: threadsReducer
+          threads: threadsReducer,
+          replies: repliesReducer
         }),
         // initial state of boards
         {
@@ -77,38 +86,46 @@ describe.only('Threads Sagas', () => {
               ...boardsInitState.boards,
               [mockBoard._id]: {
                 ...mockBoard,
+                // add as is thread is on board
+                threads: [...mockBoard.threads, mockThread._id],
                 loading: boardInitLoading,
                 error: boardInitError
               }
             }
           },
-          threads: threadsInitState
+          threads: {
+            ...threadsInitState,
+            threads: {
+              ...threadsInitState.threads,
+              // initial thread where we test for reply to be added
+              [mockThread._id]: mockThread
+            }
+          },
+          replies: repliesInitState
         }
       )
-      // Mock the response from API
       .provide({
         call: (effect, next) => {
           // Check for the API call to return fake value
-          if (effect.fn === Api.threads.createThread) {
-            return { data: { thread: mockThread } };
+          if (effect.fn === Api.replies.createReply) {
+            return { data: { reply: mockReply } };
           }
           // Allow Redux Saga to handle other `call` effects
           return next();
         }
       })
-      .put(createThreadSuccess(mockThread))
-      .silentRun();
+      .put(createReplySuccess(mockReply))
+      .run();
 
-    // expect board on state to include thread id of thread created
-    expect(storeState.boards.boards[mockBoard._id].threads).toContainEqual(
-      mockThread._id
+    // expect thread with thread_id from created reply to contain reply id
+    expect(storeState.threads.threads[mockThread._id].replies).toContainEqual(
+      mockReply._id
     );
-
     // load should be false
-    expect(storeState.threads.loading.createThread).toEqual(false);
-    // id of thread should be on threads property
-    expect(storeState.threads.threads).toHaveProperty(mockThread._id);
-    // check thread on threads
-    expect(storeState.threads.threads[mockThread._id]).toEqual(mockThread);
+    expect(storeState.replies.loading.createReply).toEqual(false);
+    // id of created reply should be on replies property
+    expect(storeState.replies.replies).toHaveProperty(mockReply._id);
+    // check created reply on replies
+    expect(storeState.replies.replies[mockReply._id]).toEqual(mockReply);
   });
 });

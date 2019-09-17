@@ -1,7 +1,4 @@
-import { call, put, take } from 'redux-saga/effects';
 import { expectSaga, SagaType, RunResult } from 'redux-saga-test-plan';
-import * as matchers from 'redux-saga-test-plan/matchers';
-import { throwError } from 'redux-saga-test-plan/providers';
 import uuidv1 from 'uuid/v1';
 
 import Api, { createBoardArgs, updateNameArgs } from '../Api';
@@ -12,22 +9,13 @@ import boardsReducer, {
   boardsInitState
 } from '../store/boards/reducers';
 
-import threadsReducer, { threadsInitState } from '../store/threads/reducers';
-import repliesReducer, { repliesInitState } from '../store/replies/reducers';
-
-import {
-  BoardLoadingType,
-  BoardErrorType,
-  CREATE_BOARD_REQUEST,
-  BoardsState
-} from '../store/boards/types';
+import { BoardLoadingType, BoardErrorType } from '../store/boards/types';
 import {
   createboardSuccess,
   createBoard,
   updateName,
   updateNameSuccess
 } from '../store/boards/actions';
-import { AxiosResponse } from 'axios';
 import { combineReducers } from 'redux';
 
 export class BoardTypeResponse {
@@ -62,6 +50,7 @@ export class BoardTypeResponse {
     };
   }
 }
+
 describe.only('Boards Sagas', () => {
   it('should create board', async () => {
     const createBoardArgs: createBoardArgs = {

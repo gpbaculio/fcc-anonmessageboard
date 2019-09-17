@@ -26,6 +26,7 @@ export default {
       axios.post('/api/boards', { name, delete_password }),
     getBoards: () => axios.get('/api/boards'),
     fetchBoard: (board_id: string) => axios.get(`/api/board/${board_id}`),
+    deleteBoard: (board_id: string) => axios.delete(`/api/board/${board_id}`),
     updateName: ({ board_id, board_name, delete_password }: updateNameArgs) =>
       axios.post(`/api/board/${board_id}`, { board_name, delete_password })
   },

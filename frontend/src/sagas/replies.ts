@@ -15,8 +15,10 @@ export function* createReply(action: createReplyRequest) {
     const {
       data: { reply }
     } = yield call(Api.replies.createReply, action.payload);
+    console.log('reply ', reply);
     yield put(createReplySuccess(reply));
   } catch (error) {
+    console.log('error ', error);
     yield put(createReplyFailure(error.response.data));
   }
 }
