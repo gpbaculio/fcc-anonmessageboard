@@ -28,7 +28,7 @@ export default class BoardsController {
             },
             async function(error) {
               if (error) res.status(400).send(error);
-              res.send('success');
+              res.json({ deletedBoard });
             }
           );
         }

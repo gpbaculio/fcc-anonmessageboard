@@ -12,7 +12,9 @@ import {
   UPDATE_NAME_REQUEST,
   UPDATE_NAME_SUCCESS,
   UPDATE_NAME_FAILURE,
-  RESET_BOARD_ERROR
+  RESET_BOARD_ERROR,
+  DELETE_BOARD_REQUEST,
+  DELETE_BOARD_FAILURE
 } from './types';
 import { updateNameArgs } from '../../Api';
 
@@ -101,4 +103,26 @@ export const fetchBoardSuccess = ({
 
 export const fetchBoards = () => ({
   type: FETCH_BOARDS_REQUEST
+});
+
+export const deleteBoard = (board_id: string) => ({
+  type: DELETE_BOARD_REQUEST,
+  payload: {
+    board_id
+  }
+});
+
+export const deleteBoardSuccess = (deleted_board: BoardType) => ({
+  type: DELETE_BOARD_REQUEST,
+  payload: {
+    deleted_board
+  }
+});
+
+export const deleteBoardFailure = (error: string, board_id: string) => ({
+  type: DELETE_BOARD_FAILURE,
+  payload: {
+    error,
+    board_id
+  }
 });

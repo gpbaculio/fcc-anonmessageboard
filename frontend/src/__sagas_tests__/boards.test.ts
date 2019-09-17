@@ -43,10 +43,12 @@ export class BoardTypeResponse {
     this._id = params._id || genId;
     this.delete_password = params.delete_password || genDelPass;
     this.loading = {
-      update_name: false
+      update_name: false,
+      delete_board: false
     };
     this.error = {
-      update_name: ''
+      update_name: '',
+      delete_board: ''
     };
   }
 }

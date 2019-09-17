@@ -34,7 +34,7 @@ class BoardsController {
                                 return __awaiter(this, void 0, void 0, function* () {
                                     if (error)
                                         res.status(400).send(error);
-                                    res.send('success');
+                                    res.json({ deletedBoard });
                                 });
                             });
                         });

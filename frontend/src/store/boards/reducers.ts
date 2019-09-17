@@ -14,7 +14,10 @@ import {
   UPDATE_NAME_SUCCESS,
   UPDATE_NAME_REQUEST,
   UPDATE_NAME_FAILURE,
-  RESET_BOARD_ERROR
+  RESET_BOARD_ERROR,
+  DELETE_BOARD_REQUEST,
+  DELETE_BOARD_SUCCESS,
+  DELETE_BOARD_FAILURE
 } from './types';
 import { createThreadSuccess, CREATE_THREAD_SUCCESS } from '../threads/types';
 
@@ -23,11 +26,13 @@ const initError = {
   fetchBoards: '',
   fetchBoard: ''
 };
+
 const initLoading = {
   createBoard: false,
   fetchBoards: false,
   fetchBoard: false
 };
+
 export const boardsInitState: BoardsState = {
   loading: initLoading,
   boards: {},
@@ -35,11 +40,13 @@ export const boardsInitState: BoardsState = {
 };
 
 export const boardInitLoading = {
-  update_name: false
+  update_name: false,
+  delete_board: false
 };
 
 export const boardInitError = {
-  update_name: ''
+  update_name: '',
+  delete_board: ''
 };
 
 const boardsReducer = (
@@ -47,6 +54,48 @@ const boardsReducer = (
   action: BoardsActionTypes | createThreadSuccess
 ) => {
   switch (action.type) {
+    case DELETE_BOARD_REQUEST: {
+      const { board_id } = action.payload;
+      const board = state.boards[board_id];
+      return {
+        ...state,
+        boards: {
+          [board._id]: {
+            ...board,
+            loading: {
+              ...board.loading,
+              delete_board: true
+            }
+          }
+        }
+      };
+    }
+    case DELETE_BOARD_SUCCESS: {
+      const { deleted_board } = action.payload;
+      // deconstruct deleted_board
+      const { [deleted_board._id]: removedBoard, ...boards } = state.boards;
+      return {
+        ...state,
+        boards: { ...boards }
+      };
+    }
+    case DELETE_BOARD_FAILURE: {
+      const { board_id, error } = action.payload;
+      const board = state.boards[board_id];
+      return {
+        ...state,
+        boards: {
+          ...state.boards,
+          [board._id]: {
+            ...board,
+            error: {
+              ...board.error,
+              delete_board: error
+            }
+          }
+        }
+      };
+    }
     case RESET_ERROR_STATE: {
       return {
         ...state,

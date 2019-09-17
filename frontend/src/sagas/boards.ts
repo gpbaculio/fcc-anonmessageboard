@@ -8,17 +8,32 @@ import {
   fetchBoardRequest,
   FETCH_BOARD_FAILURE,
   updateNameRequest,
-  BoardType
+  BoardType,
+  deleteBoardRequestType
 } from '../store/boards/types';
 import { board } from './normalizrEntities';
-import {
-  createboardSuccess,
-  createBoardFailure,
-  fetchBoardSuccess,
-  updateNameSuccess,
-  updateNameFailure
-} from '../store/boards/actions';
+
+import * as boardActions from '../store/boards/actions';
 import { boardInitLoading, boardInitError } from '../store/boards/reducers';
+
+export function* deleteBoard(action: deleteBoardRequestType) {
+  try {
+    const {
+      data: { deletedBoard }
+    } = yield call(Api.boards.deleteBoard, action.payload.board_id);
+    //https://stackoverflow.com/a/33792502/5288560
+    // you do not need to delete other data related to the board,
+    // such as its threads and replies on its thread
+    yield put(boardActions.deleteBoardSuccess(deletedBoard));
+  } catch (error) {
+    yield put(
+      boardActions.deleteBoardFailure(
+        error.response.data,
+        action.payload.board_id
+      )
+    );
+  }
+}
 
 export function* createBoard(action: createBoardRequest) {
   try {
@@ -27,14 +42,14 @@ export function* createBoard(action: createBoardRequest) {
     } = yield call(Api.boards.createBoard, action.payload);
 
     yield put(
-      createboardSuccess({
+      boardActions.createboardSuccess({
         ...board,
         loading: boardInitLoading,
         error: boardInitError
       })
     );
   } catch (error) {
-    yield put(createBoardFailure(error.response.data));
+    yield put(boardActions.createBoardFailure(error.response.data));
   }
 }
 
@@ -43,10 +58,12 @@ export function* updateName({ payload, callBack }: updateNameRequest) {
     const {
       data: { board }
     } = yield call(Api.boards.updateName, payload);
-    yield put(updateNameSuccess(board));
+    yield put(boardActions.updateNameSuccess(board));
     if (callBack) callBack();
   } catch (error) {
-    yield put(updateNameFailure(error.response.data, payload.board_id));
+    yield put(
+      boardActions.updateNameFailure(error.response.data, payload.board_id)
+    );
   }
 }
 
@@ -63,7 +80,7 @@ export function* fetchBoard(action: fetchBoardRequest) {
       },
       { board }
     ).entities;
-    yield put(fetchBoardSuccess({ boards, threads, replies }));
+    yield put(boardActions.fetchBoardSuccess({ boards, threads, replies }));
   } catch (error) {
     yield put({ type: FETCH_BOARD_FAILURE, payload: { error: error.message } });
   }
