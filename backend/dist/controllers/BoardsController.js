@@ -16,29 +16,37 @@ class BoardsController {
     constructor() {
         this.deleteBoard = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { board_id } = req.params;
-            console.log('board_id ', board_id);
             yield Board_1.default.findOneAndRemove({ _id: board_id }, function (error, deletedBoard) {
                 return __awaiter(this, void 0, void 0, function* () {
                     if (error)
                         res.status(400).send(error);
-                    yield Thread_1.default.deleteMany({
-                        board_id: deletedBoard._id
-                    }, function (error) {
-                        return __awaiter(this, void 0, void 0, function* () {
-                            if (error)
-                                res.status(400).send(error);
-                            const deletedBoardThreadIds = deletedBoard.threads.map(th => mongoose.Types.ObjectId(th.id));
-                            yield Reply_1.default.deleteMany({
-                                thread_id: { $in: deletedBoardThreadIds }
-                            }, function (error) {
-                                return __awaiter(this, void 0, void 0, function* () {
-                                    if (error)
-                                        res.status(400).send(error);
+                    // check if board have threads then delete it all
+                    if (deletedBoard.threads.length) {
+                        const deletedBoardThreadIds = deletedBoard.threads.map(th => mongoose.Types.ObjectId(th.id));
+                        yield Thread_1.default.deleteMany({
+                            board_id: deletedBoard._id
+                        }, function (error) {
+                            return __awaiter(this, void 0, void 0, function* () {
+                                if (error)
+                                    res.status(400).send(error);
+                                else {
+                                    // check if board have threads
+                                    yield Reply_1.default.deleteMany({
+                                        thread_id: { $in: deletedBoardThreadIds }
+                                    }, function (error) {
+                                        return __awaiter(this, void 0, void 0, function* () {
+                                            if (error)
+                                                res.status(400).send(error);
+                                            res.json({ deletedBoard });
+                                        });
+                                    });
                                     res.json({ deletedBoard });
-                                });
+                                }
                             });
                         });
-                    });
+                    }
+                    else
+                        res.json({ deletedBoard });
                 });
             });
         });

@@ -14,7 +14,8 @@ import {
   UPDATE_NAME_FAILURE,
   RESET_BOARD_ERROR,
   DELETE_BOARD_REQUEST,
-  DELETE_BOARD_FAILURE
+  DELETE_BOARD_FAILURE,
+  DELETE_BOARD_SUCCESS
 } from './types';
 import { updateNameArgs } from '../../Api';
 
@@ -105,15 +106,16 @@ export const fetchBoards = () => ({
   type: FETCH_BOARDS_REQUEST
 });
 
-export const deleteBoard = (board_id: string) => ({
+export const deleteBoard = (board_id: string, callBack?: () => void) => ({
   type: DELETE_BOARD_REQUEST,
   payload: {
-    board_id
+    board_id,
+    callBack
   }
 });
 
 export const deleteBoardSuccess = (deleted_board: BoardType) => ({
-  type: DELETE_BOARD_REQUEST,
+  type: DELETE_BOARD_SUCCESS,
   payload: {
     deleted_board
   }

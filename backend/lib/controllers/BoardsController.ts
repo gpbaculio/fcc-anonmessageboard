@@ -7,32 +7,38 @@ import * as mongoose from 'mongoose';
 export default class BoardsController {
   public deleteBoard = async (req: Request, res: Response) => {
     const { board_id } = req.params;
-    console.log('board_id ', board_id);
     await Board.findOneAndRemove({ _id: board_id }, async function(
       error,
       deletedBoard
     ) {
       if (error) res.status(400).send(error);
-      await Thread.deleteMany(
-        {
-          board_id: deletedBoard._id
-        },
-        async function(error) {
-          if (error) res.status(400).send(error);
-          const deletedBoardThreadIds = deletedBoard.threads.map(th =>
-            mongoose.Types.ObjectId(th.id)
-          );
-          await Reply.deleteMany(
-            {
-              thread_id: { $in: deletedBoardThreadIds }
-            },
-            async function(error) {
-              if (error) res.status(400).send(error);
+      // check if board have threads then delete it all
+      if (deletedBoard.threads.length) {
+        const deletedBoardThreadIds = deletedBoard.threads.map(th =>
+          mongoose.Types.ObjectId(th.id)
+        );
+        await Thread.deleteMany(
+          {
+            board_id: deletedBoard._id
+          },
+          async function(error) {
+            if (error) res.status(400).send(error);
+            else {
+              // check if board have threads
+              await Reply.deleteMany(
+                {
+                  thread_id: { $in: deletedBoardThreadIds }
+                },
+                async function(error) {
+                  if (error) res.status(400).send(error);
+                  res.json({ deletedBoard });
+                }
+              );
               res.json({ deletedBoard });
             }
-          );
-        }
-      );
+          }
+        );
+      } else res.json({ deletedBoard });
     });
   };
   public createBoard = async (req: Request, res: Response) => {

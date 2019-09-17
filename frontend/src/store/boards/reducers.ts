@@ -56,6 +56,7 @@ const boardsReducer = (
   switch (action.type) {
     case DELETE_BOARD_REQUEST: {
       const { board_id } = action.payload;
+      console.log('deleteBoard action', action);
       const board = state.boards[board_id];
       return {
         ...state,
@@ -73,6 +74,8 @@ const boardsReducer = (
     case DELETE_BOARD_SUCCESS: {
       const { deleted_board } = action.payload;
       // deconstruct deleted_board
+      console.log('delete success');
+      console.log('deleted_board ', deleted_board);
       const { [deleted_board._id]: removedBoard, ...boards } = state.boards;
       return {
         ...state,

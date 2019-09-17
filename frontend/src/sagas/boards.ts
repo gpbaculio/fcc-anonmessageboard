@@ -16,22 +16,22 @@ import { board } from './normalizrEntities';
 import * as boardActions from '../store/boards/actions';
 import { boardInitLoading, boardInitError } from '../store/boards/reducers';
 
-export function* deleteBoard(action: deleteBoardRequestType) {
+export function* deleteBoard({
+  payload: { board_id, callBack }
+}: deleteBoardRequestType) {
   try {
     const {
       data: { deletedBoard }
-    } = yield call(Api.boards.deleteBoard, action.payload.board_id);
+    } = yield call(Api.boards.deleteBoard, board_id);
+    console.log('deletedBoard ', deletedBoard);
+    // redirect before cleaning state
+    if (callBack) callBack();
     //https://stackoverflow.com/a/33792502/5288560
     // you do not need to delete other data related to the board,
     // such as its threads and replies on its thread
     yield put(boardActions.deleteBoardSuccess(deletedBoard));
   } catch (error) {
-    yield put(
-      boardActions.deleteBoardFailure(
-        error.response.data,
-        action.payload.board_id
-      )
-    );
+    yield put(boardActions.deleteBoardFailure(error.response.data, board_id));
   }
 }
 

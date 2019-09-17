@@ -7,8 +7,8 @@ import {
   BoardType,
   BoardErrorTypeKeys
 } from '../store/boards/types';
-import { fetchBoard, resetBoardError } from '../store/boards/actions';
-import { createThread } from '../store/threads/actions';
+import * as boardsActions from '../store/boards/actions';
+import * as threadsActions from '../store/threads/actions';
 import {
   Button,
   Modal,
@@ -44,6 +44,8 @@ interface BoardProps extends RouteComponentProps<LocationState> {
   boards: BoardsState;
 }
 
+type BoardLoadingKesys = 'delete_board' | 'update_name';
+
 interface BoardDispatchProps {
   createThread: (
     { delete_password, text, board_id }: createThreadArgs,
@@ -51,10 +53,12 @@ interface BoardDispatchProps {
   ) => void;
   fetchBoard: (board_id: string) => void;
   resetBoardError: (errorKey: string, board_id: string) => void;
+  deleteBoard: (board_id: string, callBack: () => void) => void;
 }
 
 interface BoardState {
-  modal: boolean;
+  postNewModal: boolean;
+  deleteModal: boolean;
   thread_text: string;
   thread_delete_password: string;
   [name: string]: string | boolean | BoardType;
@@ -65,8 +69,9 @@ interface BoardState {
 
 class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
   private initState = {
-    modal: false,
+    postNewModal: false,
     thread_text: '',
+    deleteModal: false,
     thread_delete_password: '',
     loading: false,
     isEditing: false,
@@ -122,9 +127,9 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
       }
     }
   }
-  toggleModal = () => {
+  toggleModal = (type: string) => {
     this.setState(state => ({
-      modal: !state.modal
+      [type]: !state[type]
     }));
   };
   onSubmit = async (e: React.FormEvent) => {
@@ -144,7 +149,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
         },
         () => {
           this.setState({
-            modal: false,
+            postNewModal: false,
             thread_text: '',
             thread_delete_password: ''
           });
@@ -164,8 +169,42 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
     const { board, isEditing } = this.state;
     return (
       <Fragment>
-        <Modal isOpen={this.state.modal} toggle={this.toggleModal}>
-          <ModalHeader toggle={this.toggleModal}>Post New Thread</ModalHeader>
+        <Modal
+          isOpen={this.state.deleteModal}
+          toggle={() => this.toggleModal('deleteModal')}>
+          <ModalHeader toggle={() => this.toggleModal('deleteModal')}>
+            Confirm Delete Board
+          </ModalHeader>
+          <ModalBody
+            className={classNames({
+              'fade-load': board.loading.delete_board
+            })}>
+            Are you sure you want to delete <strong>{`${board.name}`}</strong>?
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color='danger'
+              disabled={board.loading.delete_board}
+              onClick={() =>
+                this.props.deleteBoard(board._id, () => {
+                  this.props.history.push('/');
+                })
+              }>
+              Delete
+            </Button>
+            <Button
+              color='secondary'
+              onClick={() => this.toggleModal('deleteModal')}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Modal>
+        <Modal
+          isOpen={this.state.postNewModal}
+          toggle={() => this.toggleModal('postNewModal')}>
+          <ModalHeader toggle={() => this.toggleModal('postNewModal')}>
+            Post New Thread
+          </ModalHeader>
           <div
             className={classNames(
               'loader  w-100 d-flex align-items-center justify-content-center position-absolute',
@@ -238,7 +277,9 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                 type='submit'>
                 Submit New Thread
               </Button>
-              <Button color='secondary' onClick={this.toggleModal}>
+              <Button
+                color='secondary'
+                onClick={() => this.toggleModal('postNewModal')}>
                 Cancel
               </Button>
             </ModalFooter>
@@ -296,7 +337,11 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                         onClick={() => this.setIsEditing(true)}>
                         Edit
                       </Button>
-                      <Button color='danger'>Delete</Button>
+                      <Button
+                        color='danger'
+                        onClick={() => this.toggleModal('deleteModal')}>
+                        Delete
+                      </Button>
                     </div>
                     {!!isEditing && (
                       <EditBoardNameInput
@@ -307,11 +352,12 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                   </div>
                   <div className='w-100 mb-2 d-flex justify-content-between align-items-end'>
                     <h5>Threads</h5>
-                    <Button color='primary' onClick={this.toggleModal}>
+                    <Button
+                      color='primary'
+                      onClick={() => this.toggleModal('postNewModal')}>
                       Post New Thread
                     </Button>
                   </div>
-
                   <Table hover responsive className='threads-table'>
                     <thead className='thead-light'>
                       <tr>
@@ -362,9 +408,10 @@ const mapStateToProps = ({ threads, boards }: AppState) => ({
 });
 
 const mapDispatchToProps = {
-  createThread,
-  fetchBoard,
-  resetBoardError
+  createThread: threadsActions.createThread,
+  fetchBoard: boardsActions.fetchBoard,
+  resetBoardError: boardsActions.resetBoardError,
+  deleteBoard: boardsActions.deleteBoard
 };
 
 export default connect(
