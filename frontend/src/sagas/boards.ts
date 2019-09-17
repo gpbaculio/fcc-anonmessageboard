@@ -17,13 +17,12 @@ import * as boardActions from '../store/boards/actions';
 import { boardInitLoading, boardInitError } from '../store/boards/reducers';
 
 export function* deleteBoard({
-  payload: { board_id, callBack }
+  payload: { board_id, callBack, delete_password }
 }: deleteBoardRequestType) {
   try {
     const {
       data: { deletedBoard }
-    } = yield call(Api.boards.deleteBoard, board_id);
-    console.log('deletedBoard ', deletedBoard);
+    } = yield call(Api.boards.deleteBoard, { board_id, delete_password });
     // redirect before cleaning state
     if (callBack) callBack();
     //https://stackoverflow.com/a/33792502/5288560

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { deleteBoardArgs } from './store/boards/actions';
 
 export interface createThreadArgs {
   text: string;
@@ -26,7 +27,8 @@ export default {
       axios.post('/api/boards', { name, delete_password }),
     getBoards: () => axios.get('/api/boards'),
     fetchBoard: (board_id: string) => axios.get(`/api/board/${board_id}`),
-    deleteBoard: (board_id: string) => axios.delete(`/api/board/${board_id}`),
+    deleteBoard: ({ board_id, delete_password }: deleteBoardArgs) =>
+      axios.delete(`/api/board/${board_id}`, { data: { delete_password } }),
     updateName: ({ board_id, board_name, delete_password }: updateNameArgs) =>
       axios.post(`/api/board/${board_id}`, { board_name, delete_password })
   },

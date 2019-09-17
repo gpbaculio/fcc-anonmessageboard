@@ -44,8 +44,6 @@ interface BoardProps extends RouteComponentProps<LocationState> {
   boards: BoardsState;
 }
 
-type BoardLoadingKesys = 'delete_board' | 'update_name';
-
 interface BoardDispatchProps {
   createThread: (
     { delete_password, text, board_id }: createThreadArgs,
@@ -53,10 +51,15 @@ interface BoardDispatchProps {
   ) => void;
   fetchBoard: (board_id: string) => void;
   resetBoardError: (errorKey: string, board_id: string) => void;
-  deleteBoard: (board_id: string, callBack: () => void) => void;
+  deleteBoard: ({
+    board_id,
+    delete_password,
+    callBack
+  }: boardsActions.deleteBoardArgs) => void;
 }
 
 interface BoardState {
+  board_delete_password: string;
   postNewModal: boolean;
   deleteModal: boolean;
   thread_text: string;
@@ -69,6 +72,7 @@ interface BoardState {
 
 class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
   private initState = {
+    board_delete_password: '',
     postNewModal: false,
     thread_text: '',
     deleteModal: false,
@@ -132,7 +136,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
       [type]: !state[type]
     }));
   };
-  onSubmit = async (e: React.FormEvent) => {
+  onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { thread_text, thread_delete_password } = this.state;
     const {
@@ -141,7 +145,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
     } = this.props;
     const board_id = state ? state.board_id : params.board_id;
     if (thread_text && thread_delete_password) {
-      await this.props.createThread(
+      this.props.createThread(
         {
           text: thread_text,
           delete_password: thread_delete_password,
@@ -173,21 +177,42 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
           isOpen={this.state.deleteModal}
           toggle={() => this.toggleModal('deleteModal')}>
           <ModalHeader toggle={() => this.toggleModal('deleteModal')}>
-            Confirm Delete Board
+            Delete Board
           </ModalHeader>
           <ModalBody
             className={classNames({
               'fade-load': board.loading.delete_board
             })}>
             Are you sure you want to delete <strong>{`${board.name}`}</strong>?
+            <FormGroup row className='mt-3'>
+              <Label for='board_delete_password' sm={4}>
+                Delete Password
+              </Label>
+              <Col>
+                <Input
+                  onChange={this.onChange}
+                  type='password'
+                  name='board_delete_password'
+                  id='board_delete_password'
+                  placeholder='Delete Password'
+                  autoComplete='off'
+                  required
+                  value={this.state.board_delete_password}
+                />
+              </Col>
+            </FormGroup>
           </ModalBody>
           <ModalFooter>
             <Button
               color='danger'
               disabled={board.loading.delete_board}
               onClick={() =>
-                this.props.deleteBoard(board._id, () => {
-                  this.props.history.push('/');
+                this.props.deleteBoard({
+                  board_id: board._id,
+                  delete_password: this.state.board_delete_password,
+                  callBack: () => {
+                    this.props.history.push('/');
+                  }
                 })
               }>
               Delete

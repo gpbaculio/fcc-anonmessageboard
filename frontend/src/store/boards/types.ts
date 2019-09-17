@@ -28,6 +28,7 @@ export interface deleteBoardRequestType {
   payload: {
     board_id: string;
     callBack?: () => void;
+    delete_password: string;
   };
 }
 

@@ -106,11 +106,21 @@ export const fetchBoards = () => ({
   type: FETCH_BOARDS_REQUEST
 });
 
-export const deleteBoard = (board_id: string, callBack?: () => void) => ({
+export interface deleteBoardArgs {
+  board_id: string;
+  delete_password: string;
+  callBack?: () => void;
+}
+export const deleteBoard = ({
+  board_id,
+  delete_password,
+  callBack
+}: deleteBoardArgs) => ({
   type: DELETE_BOARD_REQUEST,
   payload: {
     board_id,
-    callBack
+    callBack,
+    delete_password
   }
 });
 
