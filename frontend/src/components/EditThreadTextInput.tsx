@@ -21,8 +21,8 @@ interface EditThreadTextInputDispatchProps {
 
 interface EditThreadTextInputState {
   [state_key: string]: string;
-  threadText: string;
-  deletePassword: string;
+  thread_text: string;
+  delete_password: string;
 }
 
 class EditThreadTextInput extends Component<
@@ -35,8 +35,8 @@ class EditThreadTextInput extends Component<
     super(props);
     const { threads, threadId } = props;
     this.state = {
-      threadText: threads.threads[threadId].text,
-      deletePassword: ''
+      thread_text: threads.threads[threadId].text,
+      delete_password: ''
     };
   }
   onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +46,7 @@ class EditThreadTextInput extends Component<
   onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { delete_password } = this.state;
-    const threadText = this.state.threadText.trim();
+    const thread_text = this.state.thread_text.trim();
     const {
       threadId,
       updateThreadText,
@@ -54,8 +54,8 @@ class EditThreadTextInput extends Component<
       threads: { threads }
     } = this.props;
     // thread_text is text from state
-    const thread_text = threads[threadId].text;
-    if (threadText && thread_text !== threadText && delete_password) {
+    const threadText = threads[threadId].text;
+    if (thread_text && threadText !== thread_text && delete_password) {
       updateThreadText(
         { thread_id: threadId, text: threadText, delete_password },
         () => {
@@ -66,19 +66,18 @@ class EditThreadTextInput extends Component<
     }
   };
   render() {
-    const { board_name, deletePassword } = this.state;
+    const { thread_text, delete_password } = this.state;
     const {
       threads: { threads },
       threadId
     } = this.props;
     const thread = threads[threadId];
-    console.log('thread', thread);
     return (
       <Form onSubmit={this.onSubmit} className='ml-2 flex-1 d-flex'>
         <Input
           onChange={this.onChange}
-          name='board_name'
-          value={board_name}
+          name='thread_text'
+          value={thread_text}
           type='text'
           className='mr-2'
           required
@@ -87,7 +86,7 @@ class EditThreadTextInput extends Component<
           placeholder='Delete Password'
           onChange={this.onChange}
           name='delete_password'
-          value={deletePassword}
+          value={delete_password}
           type='password'
           className='mr-2'
           required

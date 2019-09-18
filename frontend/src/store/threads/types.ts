@@ -13,7 +13,7 @@ export const UPDATE_THREAD_TEXT_REQUEST = 'UPDATE_THREAD_TEXT_REQUEST';
 export const UPDATE_THREAD_TEXT_SUCCESS = 'UPDATE_THREAD_TEXT_SUCCESS';
 export const UPDATE_THREAD_TEXT_FAILURE = 'UPDATE_THREAD_TEXT_FAILURE';
 
-export interface updateThreadNameRequest {
+export interface updateThreadTextRequest {
   type: typeof UPDATE_THREAD_TEXT_REQUEST;
   payload: updateThreadTextArgsType;
 }
@@ -59,7 +59,7 @@ export interface getThreadSuccess {
 }
 
 export type ThreadsActionTypes =
-  | updateThreadNameRequest
+  | updateThreadTextRequest
   | getThreadRequest
   | getThreadSuccess
   | createThreadRequest

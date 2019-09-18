@@ -12,6 +12,11 @@ import { thread } from './normalizrEntities';
 import { normalize } from 'normalizr';
 import { createThreadSuccess } from '../store/threads/actions';
 import { threadInitLoading } from '../store/threads/reducers';
+import { UPDATE_THREAD_TEXT_SUCCESS } from '../store/threads/types';
+import {
+  updateThreadTextRequest,
+  UPDATE_THREAD_TEXT_FAILURE
+} from '../store/threads/types';
 
 export function* createThread({ payload, callBack }: createThreadRequest) {
   try {
@@ -43,6 +48,27 @@ export function* getThread(action: getThreadRequest) {
     yield put({
       type: GET_THREAD_FAILURE,
       payload: { error: error.message }
+    });
+  }
+}
+
+export function* updateThread(action: updateThreadTextRequest) {
+  try {
+    const { data } = yield call(Api.threads.updateThreadText, action.payload);
+    const { replies, threads } = normalize(data, { thread }).entities;
+    yield put({
+      type: UPDATE_THREAD_TEXT_SUCCESS,
+      payload: {
+        thread: threads[action.payload.thread_id],
+        replies
+      }
+    });
+  } catch (error) {
+    yield put({
+      type: UPDATE_THREAD_TEXT_FAILURE,
+      payload: {
+        error: error.message
+      }
     });
   }
 }
