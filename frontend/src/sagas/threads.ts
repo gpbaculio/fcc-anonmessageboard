@@ -11,13 +11,14 @@ import {
 import { thread } from './normalizrEntities';
 import { normalize } from 'normalizr';
 import { createThreadSuccess } from '../store/threads/actions';
+import { threadInitLoading } from '../store/threads/reducers';
 
 export function* createThread({ payload, callBack }: createThreadRequest) {
   try {
     const {
       data: { thread }
     } = yield call(Api.threads.createThread, payload);
-    yield put(createThreadSuccess(thread));
+    yield put(createThreadSuccess({ ...thread, loading: threadInitLoading }));
     callBack();
   } catch (error) {
     yield put({

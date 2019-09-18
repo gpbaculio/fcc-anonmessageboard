@@ -14,6 +14,8 @@ import {
   GET_THREAD_FAILURE
 } from './types';
 import { createReplySuccess, CREATE_REPLY_SUCCESS } from '../replies/types';
+import { UPDATE_THREAD_TEXT_REQUEST } from './types';
+import { updateName } from '../boards/actions';
 
 export interface ThreadsState {
   threads: { [_id: string]: ThreadType };
@@ -26,10 +28,19 @@ export interface ThreadsState {
     getThread: string;
   };
 }
+
 export const threadsInitState: ThreadsState = {
   threads: {},
   loading: { createThread: false, getThread: false },
   error: { createThread: '', getThread: '' }
+};
+
+export const threadInitLoading = {
+  update_text: false
+};
+
+export const threadInitError = {
+  update_text: ''
 };
 
 const repliesReducer = (
@@ -37,6 +48,23 @@ const repliesReducer = (
   action: ThreadsActionTypes | fetchBoardsSuccess | createReplySuccess
 ) => {
   switch (action.type) {
+    case UPDATE_THREAD_TEXT_REQUEST: {
+      const { thread_id } = action.payload;
+      const thread = state.threads[thread_id];
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            loading: {
+              ...thread.loading,
+              update_text: true
+            }
+          }
+        }
+      };
+    }
     case GET_THREAD_REQUEST: {
       return {
         ...state,
@@ -56,7 +84,7 @@ const repliesReducer = (
         },
         threads: {
           ...state.threads,
-          [thread._id]: thread
+          [thread._id]: { ...thread, loading: threadInitLoading }
         }
       };
     }
@@ -90,9 +118,15 @@ const repliesReducer = (
       };
     }
     case FETCH_BOARDS_SUCCESS: {
+      const threads = Object.fromEntries(
+        Object.entries(action.payload.threads).map(([k, v]) => [
+          k,
+          { ...v, loading: threadInitLoading }
+        ])
+      );
       return {
         ...state,
-        threads: { ...state.threads, ...action.payload.threads }
+        threads: { ...state.threads, ...threads }
       };
     }
     case CREATE_THREAD_REQUEST: {

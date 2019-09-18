@@ -10,6 +10,9 @@ interface EditBoardNameInputProps {
   setIsEditing: (show: boolean) => void;
   board_id: string;
   boards: BoardsState;
+}
+
+interface EditBoardNameInputDispatchProps {
   updateName: (
     { board_id, board_name, delete_password }: updateNameArgs,
     callBack: () => void
@@ -17,16 +20,18 @@ interface EditBoardNameInputProps {
 }
 
 interface EditBoardNameInputState {
+  [state_key: string]: string;
   board_name: string;
-  [key: string]: string;
   delete_password: string;
 }
 
 class EditBoardNameInput extends Component<
-  EditBoardNameInputProps,
+  EditBoardNameInputProps & EditBoardNameInputDispatchProps,
   EditBoardNameInputState
 > {
-  constructor(props: EditBoardNameInputProps) {
+  constructor(
+    props: EditBoardNameInputProps & EditBoardNameInputDispatchProps
+  ) {
     super(props);
 
     this.state = {
@@ -38,16 +43,6 @@ class EditBoardNameInput extends Component<
     const { name, value } = e.target;
     this.setState({ [name]: value });
   };
-  // componentDidUpdate({ boards: prevPropsBoards }: EditBoardNameInputProps) {
-  //   const { board_id, boards: boardsProp } = this.props;
-  //   if (
-  //     prevPropsBoards.boards[board_id].loading.update_name && // loaded
-  //     boardsProp.boards[board_id].loading.update_name
-  //   ) {
-  //     const board = boardsProp.boards[board_id];
-  //     this.setState({ board_name: board.name });
-  //   }
-  // }
   onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { delete_password } = this.state;

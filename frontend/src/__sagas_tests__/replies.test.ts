@@ -11,7 +11,6 @@ import boardsReducer, {
 
 import threadsReducer, { threadsInitState } from '../store/threads/reducers';
 import { combineReducers } from 'redux';
-import { createThread, createThreadSuccess } from '../store/threads/actions';
 import { BoardTypeResponse } from './boards.test';
 import { ThreadTypeResponse } from './threads.test';
 import repliesReducer, { repliesInitState } from '../store/replies/reducers';

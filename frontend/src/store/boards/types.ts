@@ -32,6 +32,13 @@ export interface deleteBoardRequestType {
   };
 }
 
+export interface ThreadLoadingType {
+  update_text: boolean;
+}
+export interface ThreadErrorType {
+  update_text: string;
+}
+
 export interface ThreadType {
   _id: string;
   text: string;
@@ -39,6 +46,8 @@ export interface ThreadType {
   replies: string[];
   bumped_on: string;
   board_id: string;
+  loading: ThreadLoadingType;
+  error: ThreadErrorType;
 }
 
 export interface BoardLoadingType {

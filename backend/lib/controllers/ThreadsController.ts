@@ -3,6 +3,25 @@ import Board from '../models/Board';
 import Thread from '../models/Thread';
 
 export default class ThreadsController {
+  public updateThreadName = async (req: Request, res: Response) => {
+    const { thread_text, delete_password } = req.body;
+    const { thread_id } = req.params;
+    await Thread.findById(thread_id, async function(error, thread) {
+      if (error) res.status(400).send(error);
+      // check if correct password
+      const correctPassword = await thread.authenticate(delete_password);
+      if (!correctPassword) res.status(400).send('Incorrect Delete Password');
+      else {
+        thread.text = thread_text;
+        thread.save(function(error) {
+          if (error) res.status(400).send(error);
+          const parseThread = thread.toObject();
+          delete parseThread['delete_password'];
+          res.status(200).json({ thread: parseThread });
+        });
+      }
+    });
+  };
   public createThread = async function(req: Request, res: Response) {
     const { board_id } = req.params;
     const { text, delete_password } = req.body;

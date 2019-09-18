@@ -53,6 +53,10 @@
   z-index: 1;
 }
 
+.board-header {
+  background-color: #f7f7f7;
+}
+
 .reply-container {
   background-color: #F2F3F5;
   padding: .5rem;

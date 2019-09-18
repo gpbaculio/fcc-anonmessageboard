@@ -310,7 +310,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
             </ModalFooter>
           </Form>
         </Modal>
-        <div className='board-container d-flex justify-content-center align-items-center'>
+        <div className='d-flex justify-content-center align-items-center'>
           <Row>
             <Col>
               {Object.keys(board.error).map((k: string, i) => {
@@ -327,6 +327,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                   </Alert>
                 );
               })}
+              <h2 className='text-center my-5'>BOARD</h2>
               <div className='table-threads'>
                 <div
                   className={classNames(
@@ -336,45 +337,46 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                   <Spinner color='info' className='mr-2' />
                   <strong>Fetching Board...</strong>
                 </div>
+                <div className='p-3 board-header d-flex justify-content-between mb-3 align-items-center'>
+                  <legend className='mb-0 w-auto'>
+                    <span
+                      className={classNames('font-weight-lighter', {
+                        hide: isEditing
+                      })}>
+                      {board.name}
+                    </span>
+                  </legend>
+                  <div
+                    className={classNames(
+                      'board-controllers d-flex w-25 justify-content-between',
+                      {
+                        hide: isEditing
+                      }
+                    )}>
+                    <Button
+                      color='success'
+                      onClick={() => this.setIsEditing(true)}>
+                      Edit
+                    </Button>
+                    <Button
+                      color='danger'
+                      onClick={() => this.toggleModal('deleteModal')}>
+                      Delete
+                    </Button>
+                  </div>
+                  {!!isEditing && (
+                    // recommended: https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key
+                    <EditBoardNameInput
+                      key={board._id}
+                      board_id={board._id}
+                      setIsEditing={this.setIsEditing}
+                    />
+                  )}
+                </div>
                 <div
                   className={classNames('p-3 d-flex flex-column text-center', {
                     'fade-load': boards.loading.fetchBoard
                   })}>
-                  <div className='d-flex justify-content-between mb-3 align-items-center'>
-                    <legend className='mb-0 w-auto'>
-                      BOARD:
-                      <span
-                        className={classNames('font-weight-lighter', {
-                          hide: isEditing
-                        })}>
-                        {board.name}
-                      </span>
-                    </legend>
-                    <div
-                      className={classNames(
-                        'board-controllers d-flex w-25 justify-content-between',
-                        {
-                          hide: isEditing
-                        }
-                      )}>
-                      <Button
-                        color='success'
-                        onClick={() => this.setIsEditing(true)}>
-                        Edit
-                      </Button>
-                      <Button
-                        color='danger'
-                        onClick={() => this.toggleModal('deleteModal')}>
-                        Delete
-                      </Button>
-                    </div>
-                    {!!isEditing && (
-                      <EditBoardNameInput
-                        board_id={board._id}
-                        setIsEditing={this.setIsEditing}
-                      />
-                    )}
-                  </div>
                   <div className='w-100 mb-2 d-flex justify-content-between align-items-end'>
                     <h5>Threads</h5>
                     <Button

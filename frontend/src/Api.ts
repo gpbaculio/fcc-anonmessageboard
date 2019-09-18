@@ -20,7 +20,11 @@ export interface updateNameArgs {
   board_name: string;
   delete_password: string;
 }
-
+export interface updateThreadTextArgsType {
+  text: string;
+  delete_password: string;
+  thread_id: string;
+}
 export default {
   boards: {
     createBoard: ({ name, delete_password }: createBoardArgs) =>
@@ -35,6 +39,13 @@ export default {
   threads: {
     createThread: ({ text, delete_password, board_id }: createThreadArgs) => {
       return axios.post(`/api/threads/${board_id}`, { text, delete_password });
+    },
+    updateThreadText: ({
+      text,
+      delete_password,
+      thread_id
+    }: updateThreadTextArgsType) => {
+      return axios.post(`/api/thread/${thread_id}`, { text, delete_password });
     },
     getThread: (thread_id: string) => axios.get(`/api/thread/${thread_id}`)
   },

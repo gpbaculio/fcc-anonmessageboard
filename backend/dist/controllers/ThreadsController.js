@@ -12,6 +12,30 @@ const Board_1 = require("../models/Board");
 const Thread_1 = require("../models/Thread");
 class ThreadsController {
     constructor() {
+        this.updateThreadName = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { thread_text, delete_password } = req.body;
+            const { thread_id } = req.params;
+            yield Thread_1.default.findById(thread_id, function (error, thread) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error)
+                        res.status(400).send(error);
+                    // check if correct password
+                    const correctPassword = yield thread.authenticate(delete_password);
+                    if (!correctPassword)
+                        res.status(400).send('Incorrect Delete Password');
+                    else {
+                        thread.text = thread_text;
+                        thread.save(function (error) {
+                            if (error)
+                                res.status(400).send(error);
+                            const parseThread = thread.toObject();
+                            delete parseThread['delete_password'];
+                            res.status(200).json({ thread: parseThread });
+                        });
+                    }
+                });
+            });
+        });
         this.createThread = function (req, res) {
             return __awaiter(this, void 0, void 0, function* () {
                 const { board_id } = req.params;
