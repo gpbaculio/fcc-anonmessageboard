@@ -14,7 +14,10 @@ import {
   GET_THREAD_FAILURE
 } from './types';
 import { createReplySuccess, CREATE_REPLY_SUCCESS } from '../replies/types';
-import { UPDATE_THREAD_TEXT_REQUEST } from './types';
+import {
+  UPDATE_THREAD_TEXT_REQUEST,
+  UPDATE_THREAD_TEXT_SUCCESS
+} from './types';
 import { updateName } from '../boards/actions';
 
 export interface ThreadsState {
@@ -36,11 +39,13 @@ export const threadsInitState: ThreadsState = {
 };
 
 export const threadInitLoading = {
-  update_text: false
+  update_text: false,
+  delete_thread: false
 };
 
 export const threadInitError = {
-  update_text: ''
+  update_text: '',
+  delete_thread: ''
 };
 
 const repliesReducer = (
@@ -49,7 +54,7 @@ const repliesReducer = (
 ) => {
   switch (action.type) {
     case UPDATE_THREAD_TEXT_REQUEST: {
-      const { thread_id } = action.payload;
+      const { thread_id } = action.payload.updateThreadTextArgs;
       const thread = state.threads[thread_id];
       return {
         ...state,
@@ -62,6 +67,16 @@ const repliesReducer = (
               update_text: true
             }
           }
+        }
+      };
+    }
+    case UPDATE_THREAD_TEXT_SUCCESS: {
+      const thread = { ...action.payload.thread, loading: threadInitLoading };
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: thread
         }
       };
     }

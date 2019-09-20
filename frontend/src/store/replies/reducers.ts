@@ -10,7 +10,11 @@ import {
   CREATE_REPLY_REQUEST,
   CREATE_REPLY_FAILURE
 } from './types';
-import { getThreadSuccess, GET_THREAD_SUCCESS } from '../threads/types';
+import {
+  getThreadSuccess,
+  GET_THREAD_SUCCESS,
+  UPDATE_THREAD_TEXT_SUCCESS
+} from '../threads/types';
 
 export interface RepliesState {
   replies: { [_id: string]: ReplyType };
@@ -34,7 +38,6 @@ const repliesReducer = (
 ) => {
   switch (action.type) {
     case GET_THREAD_SUCCESS: {
-      console.log('action replies', action);
       return {
         ...state,
         replies: {
@@ -43,6 +46,15 @@ const repliesReducer = (
         }
       };
     }
+    case UPDATE_THREAD_TEXT_SUCCESS:
+      const { replies } = action.payload;
+      return {
+        ...state,
+        replies: {
+          ...state.replies,
+          ...replies
+        }
+      };
     case CREATE_REPLY_REQUEST: {
       return {
         ...state,

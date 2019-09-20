@@ -10,7 +10,11 @@ import {
 } from '../store/threads/types';
 import { thread } from './normalizrEntities';
 import { normalize } from 'normalizr';
-import { createThreadSuccess } from '../store/threads/actions';
+import {
+  createThreadSuccess,
+  updateThreadTextSuccess,
+  updateThreadTextFailure
+} from '../store/threads/actions';
 import { threadInitLoading } from '../store/threads/reducers';
 import { UPDATE_THREAD_TEXT_SUCCESS } from '../store/threads/types';
 import {
@@ -52,23 +56,21 @@ export function* getThread(action: getThreadRequest) {
   }
 }
 
-export function* updateThread(action: updateThreadTextRequest) {
+export function* updateThread({ payload }: updateThreadTextRequest) {
   try {
-    const { data } = yield call(Api.threads.updateThreadText, action.payload);
+    const { data } = yield call(
+      Api.threads.updateThreadText,
+      payload.updateThreadTextArgs
+    );
     const { replies, threads } = normalize(data, { thread }).entities;
-    yield put({
-      type: UPDATE_THREAD_TEXT_SUCCESS,
-      payload: {
-        thread: threads[action.payload.thread_id],
+    if (payload.callBack) payload.callBack();
+    yield put(
+      updateThreadTextSuccess({
+        thread: threads[payload.updateThreadTextArgs.thread_id],
         replies
-      }
-    });
+      })
+    );
   } catch (error) {
-    yield put({
-      type: UPDATE_THREAD_TEXT_FAILURE,
-      payload: {
-        error: error.message
-      }
-    });
+    yield put(updateThreadTextFailure(error.message));
   }
 }

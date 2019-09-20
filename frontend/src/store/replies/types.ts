@@ -1,4 +1,5 @@
 import { ReplyType } from '../boards/types';
+import { updateThreadTextSuccessType } from '../threads/types';
 
 export const CREATE_REPLY_REQUEST = 'CREATE_REPLY_REQUEST';
 export const CREATE_REPLY_SUCCESS = 'CREATE_REPLY_SUCCESS';
@@ -27,6 +28,7 @@ export interface createReplyFailure {
 }
 
 export type RepliesActionTypes =
+  | updateThreadTextSuccessType
   | createReplyRequest
   | createReplySuccess
   | createReplyFailure;

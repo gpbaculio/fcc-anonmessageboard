@@ -10,10 +10,49 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Board_1 = require("../models/Board");
 const Thread_1 = require("../models/Thread");
+const Reply_1 = require("../models/Reply");
 class ThreadsController {
     constructor() {
+        this.deleteThread = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { thread_id } = req.params;
+            const { delete_password } = req.body;
+            yield Thread_1.default.findById(thread_id, function (error, thread) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error)
+                        res.status(400).send(error);
+                    // check if password is correct
+                    const correctPassword = yield thread.authenticate(delete_password);
+                    if (correctPassword) {
+                        yield Thread_1.default.findOneAndRemove({ _id: thread_id }, function (error, deletedThread) {
+                            return __awaiter(this, void 0, void 0, function* () {
+                                if (error)
+                                    res.status(400).send(error);
+                                // if thread has replies
+                                if (deletedThread.replies.length) {
+                                    // delete all replies
+                                    yield Reply_1.default.deleteMany({
+                                        thread_id: deletedThread._id
+                                    }, function (error) {
+                                        return __awaiter(this, void 0, void 0, function* () {
+                                            if (error)
+                                                res.status(400).send(error);
+                                            else
+                                                res.json({ deletedThread });
+                                        });
+                                    });
+                                }
+                                else
+                                    res.json({ deletedThread });
+                            });
+                        });
+                    }
+                    else
+                        res.status(400).send('Incorrect Delete Password');
+                });
+            });
+        });
         this.updateThreadName = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { thread_text, delete_password } = req.body;
+            const { text, delete_password } = req.body;
             const { thread_id } = req.params;
             yield Thread_1.default.findById(thread_id, function (error, thread) {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -24,7 +63,7 @@ class ThreadsController {
                     if (!correctPassword)
                         res.status(400).send('Incorrect Delete Password');
                     else {
-                        thread.text = thread_text;
+                        thread.text = text;
                         thread.save(function (error) {
                             if (error)
                                 res.status(400).send(error);
@@ -73,25 +112,6 @@ class ThreadsController {
                     res.status(200).json({ threads });
             });
         });
-        this.deleteThread = function (req, res) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const { board_id } = req.params;
-                const { thread_id, delete_password } = req.body;
-                yield Thread_1.default.findOne({ boardId: board_id, _id: thread_id }, (error, thread) => __awaiter(this, void 0, void 0, function* () {
-                    if (error)
-                        res.status(400).send(error);
-                    const correctPassword = yield thread.authenticate(delete_password);
-                    if (!correctPassword)
-                        res.status(400).send('incorrect password');
-                    else
-                        yield Thread_1.default.findOneAndRemove({ _id: thread._id }, (error, thread) => {
-                            if (error)
-                                res.status(400).send(error);
-                            res.status(200).send('success');
-                        });
-                }));
-            });
-        };
         this.getThread = function (req, res) {
             return __awaiter(this, void 0, void 0, function* () {
                 const { thread_id } = req.params;

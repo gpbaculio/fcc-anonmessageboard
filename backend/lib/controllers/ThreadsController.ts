@@ -1,10 +1,41 @@
 import { Request, Response } from 'express';
 import Board from '../models/Board';
 import Thread from '../models/Thread';
+import Reply from '../models/Reply';
 
 export default class ThreadsController {
+  public deleteThread = async (req: Request, res: Response) => {
+    const { thread_id } = req.params;
+    const { delete_password } = req.body;
+    await Thread.findById(thread_id, async function(error, thread) {
+      if (error) res.status(400).send(error);
+      // check if password is correct
+      const correctPassword = await thread.authenticate(delete_password);
+      if (correctPassword) {
+        await Thread.findOneAndRemove({ _id: thread_id }, async function(
+          error,
+          deletedThread
+        ) {
+          if (error) res.status(400).send(error);
+          // if thread has replies
+          if (deletedThread.replies.length) {
+            // delete all replies
+            await Reply.deleteMany(
+              {
+                thread_id: deletedThread._id
+              },
+              async function(error) {
+                if (error) res.status(400).send(error);
+                else res.json({ deletedThread });
+              }
+            );
+          } else res.json({ deletedThread });
+        });
+      } else res.status(400).send('Incorrect Delete Password');
+    });
+  };
   public updateThreadName = async (req: Request, res: Response) => {
-    const { thread_text, delete_password } = req.body;
+    const { text, delete_password } = req.body;
     const { thread_id } = req.params;
     await Thread.findById(thread_id, async function(error, thread) {
       if (error) res.status(400).send(error);
@@ -12,7 +43,7 @@ export default class ThreadsController {
       const correctPassword = await thread.authenticate(delete_password);
       if (!correctPassword) res.status(400).send('Incorrect Delete Password');
       else {
-        thread.text = thread_text;
+        thread.text = text;
         thread.save(function(error) {
           if (error) res.status(400).send(error);
           const parseThread = thread.toObject();
@@ -53,26 +84,6 @@ export default class ThreadsController {
       (error, threads) => {
         if (error) res.status(400).send(error);
         else res.status(200).json({ threads });
-      }
-    );
-  };
-  public deleteThread = async function(req: Request, res: Response) {
-    const { board_id } = req.params;
-    const { thread_id, delete_password } = req.body;
-    await Thread.findOne(
-      { boardId: board_id, _id: thread_id },
-      async (error, thread) => {
-        if (error) res.status(400).send(error);
-        const correctPassword = await thread.authenticate(delete_password);
-        if (!correctPassword) res.status(400).send('incorrect password');
-        else
-          await Thread.findOneAndRemove(
-            { _id: thread._id },
-            (error, thread) => {
-              if (error) res.status(400).send(error);
-              res.status(200).send('success');
-            }
-          );
       }
     );
   };

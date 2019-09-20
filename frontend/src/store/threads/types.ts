@@ -13,11 +13,27 @@ export const UPDATE_THREAD_TEXT_REQUEST = 'UPDATE_THREAD_TEXT_REQUEST';
 export const UPDATE_THREAD_TEXT_SUCCESS = 'UPDATE_THREAD_TEXT_SUCCESS';
 export const UPDATE_THREAD_TEXT_FAILURE = 'UPDATE_THREAD_TEXT_FAILURE';
 
+export const DELETE_THREAD_REQUEST = 'DELETE_THREAD_REQUEST';
+export const DELETE_THREAD_SUCCESS = 'DELETE_THREAD_SUCCESS';
+export const DELETE_THREAD_FAILURE = 'DELETE_THREAD_FAILURE';
+
 export interface updateThreadTextRequest {
   type: typeof UPDATE_THREAD_TEXT_REQUEST;
-  payload: updateThreadTextArgsType;
+  payload: {
+    updateThreadTextArgs: updateThreadTextArgsType;
+    callBack?: () => void;
+  };
 }
-
+export interface updateThreadTextSuccessArgsType {
+  thread: ThreadType;
+  replies: {
+    [_id: string]: ReplyType;
+  };
+}
+export interface updateThreadTextSuccessType {
+  type: typeof UPDATE_THREAD_TEXT_SUCCESS;
+  payload: updateThreadTextSuccessArgsType;
+}
 export interface createThreadRequest {
   type: typeof CREATE_THREAD_REQUEST;
   payload: {
@@ -36,7 +52,10 @@ export interface createThreadSuccess {
 }
 
 interface threadsFailureTypes {
-  type: typeof CREATE_THREAD_FAILURE | typeof GET_THREAD_FAILURE;
+  type:
+    | typeof CREATE_THREAD_FAILURE
+    | typeof GET_THREAD_FAILURE
+    | typeof UPDATE_THREAD_TEXT_FAILURE;
   payload: {
     error: string;
   };
@@ -60,6 +79,7 @@ export interface getThreadSuccess {
 
 export type ThreadsActionTypes =
   | updateThreadTextRequest
+  | updateThreadTextSuccessType
   | getThreadRequest
   | getThreadSuccess
   | createThreadRequest

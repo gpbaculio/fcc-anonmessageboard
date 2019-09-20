@@ -57,7 +57,7 @@ class EditThreadTextInput extends Component<
     const threadText = threads[threadId].text;
     if (thread_text && threadText !== thread_text && delete_password) {
       updateThreadText(
-        { thread_id: threadId, text: threadText, delete_password },
+        { thread_id: threadId, text: thread_text, delete_password },
         () => {
           this.setState({ delete_password: '' });
           setIsEditing(false);
