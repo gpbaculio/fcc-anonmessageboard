@@ -24,22 +24,34 @@ export interface updateThreadTextRequest {
     callBack?: () => void;
   };
 }
+
 export interface updateThreadTextSuccessArgsType {
   thread: ThreadType;
   replies: {
     [_id: string]: ReplyType;
   };
 }
+
 export interface updateThreadTextSuccessType {
   type: typeof UPDATE_THREAD_TEXT_SUCCESS;
   payload: updateThreadTextSuccessArgsType;
 }
+
 export interface createThreadRequest {
   type: typeof CREATE_THREAD_REQUEST;
   payload: {
     text: string;
     delete_password: string;
     board_id: string;
+  };
+  callBack: () => void;
+}
+
+export interface deleteThreadRequestType {
+  type: typeof DELETE_THREAD_REQUEST;
+  payload: {
+    delete_password: string;
+    thread_id: string;
   };
   callBack: () => void;
 }
@@ -55,7 +67,8 @@ interface threadsFailureTypes {
   type:
     | typeof CREATE_THREAD_FAILURE
     | typeof GET_THREAD_FAILURE
-    | typeof UPDATE_THREAD_TEXT_FAILURE;
+    | typeof UPDATE_THREAD_TEXT_FAILURE
+    | typeof DELETE_THREAD_FAILURE;
   payload: {
     error: string;
   };
@@ -77,7 +90,15 @@ export interface getThreadSuccess {
   };
 }
 
+export interface deleteThreadSuccessType {
+  type: typeof DELETE_THREAD_SUCCESS;
+  payload: {
+    deletedThread: ThreadType;
+  };
+}
+
 export type ThreadsActionTypes =
+  | deleteThreadSuccessType
   | updateThreadTextRequest
   | updateThreadTextSuccessType
   | getThreadRequest

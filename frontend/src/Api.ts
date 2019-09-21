@@ -10,6 +10,7 @@ export interface createThreadArgs {
 export interface createReplyArgs extends createThreadArgs {
   thread_id: string;
 }
+
 export interface createBoardArgs {
   name: string;
   delete_password: string;
@@ -20,15 +21,18 @@ export interface updateNameArgs {
   board_name: string;
   delete_password: string;
 }
+
 export interface updateThreadTextArgsType {
   text: string;
   delete_password: string;
   thread_id: string;
 }
+
 export interface deleteThreadArgsType {
   delete_password: string;
   thread_id: string;
 }
+
 export default {
   boards: {
     createBoard: ({ name, delete_password }: createBoardArgs) =>

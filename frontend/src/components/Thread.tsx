@@ -12,7 +12,11 @@ import {
   FormGroup,
   Label,
   Spinner,
-  Container
+  Container,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
 } from 'reactstrap';
 import { connect } from 'react-redux';
 import { AppState } from '../store';
@@ -138,6 +142,57 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
     const { thread, isEditing } = this.state;
     return (
       <Container>
+        <Modal
+          isOpen={this.state.deleteModal}
+          toggle={() => this.toggleModal('deleteModal')}>
+          <ModalHeader toggle={() => this.toggleModal('deleteModal')}>
+            Delete Board
+          </ModalHeader>
+          <ModalBody
+            className={classNames({
+              'fade-load': board.loading.delete_board
+            })}>
+            Are you sure you want to delete <strong>{`${board.name}`}</strong>?
+            <FormGroup row className='mt-3'>
+              <Label for='board_delete_password' sm={4}>
+                Delete Password
+              </Label>
+              <Col>
+                <Input
+                  onChange={this.onChange}
+                  type='password'
+                  name='board_delete_password'
+                  id='board_delete_password'
+                  placeholder='Delete Password'
+                  autoComplete='off'
+                  required
+                  value={this.state.board_delete_password}
+                />
+              </Col>
+            </FormGroup>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color='danger'
+              disabled={board.loading.delete_board}
+              onClick={() =>
+                this.props.deleteBoard({
+                  board_id: board._id,
+                  delete_password: this.state.board_delete_password,
+                  callBack: () => {
+                    this.props.history.push('/');
+                  }
+                })
+              }>
+              Delete
+            </Button>
+            <Button
+              color='secondary'
+              onClick={() => this.toggleModal('deleteModal')}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Modal>
         <Row>
           <Col>
             <h2 className='text-center my-5'>THREAD</h2>

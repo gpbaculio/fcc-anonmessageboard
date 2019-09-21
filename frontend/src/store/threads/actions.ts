@@ -2,15 +2,33 @@ import {
   CREATE_THREAD_REQUEST,
   GET_THREAD_REQUEST,
   CREATE_THREAD_SUCCESS,
-  UPDATE_THREAD_TEXT_REQUEST
+  UPDATE_THREAD_TEXT_REQUEST,
+  DELETE_THREAD_REQUEST
 } from './types';
-import { createThreadArgs, updateThreadTextArgsType } from '../../Api';
+import {
+  createThreadArgs,
+  updateThreadTextArgsType,
+  deleteThreadArgsType
+} from '../../Api';
 import { ThreadType, ReplyType } from '../boards/types';
-import { updateThreadTextSuccessArgsType } from './types';
+import { DELETE_THREAD_FAILURE } from './types';
+import {
+  updateThreadTextSuccessArgsType,
+  DELETE_THREAD_SUCCESS
+} from './types';
 import {
   UPDATE_THREAD_TEXT_SUCCESS,
   UPDATE_THREAD_TEXT_FAILURE
 } from './types';
+
+export const deleteThreadRequest = (
+  { thread_id, delete_password }: deleteThreadArgsType,
+  callBack?: () => void
+) => ({
+  type: DELETE_THREAD_REQUEST,
+  payload: { thread_id, delete_password },
+  callBack
+});
 
 export const createThread = (
   { board_id, text, delete_password }: createThreadArgs,
@@ -59,6 +77,20 @@ export const updateThreadTextSuccess = ({
 
 export const updateThreadTextFailure = (error: string) => ({
   type: UPDATE_THREAD_TEXT_FAILURE,
+  payload: {
+    error
+  }
+});
+
+export const deleteThreadSuccess = (deletedThread: ThreadType) => ({
+  type: DELETE_THREAD_SUCCESS,
+  payload: {
+    deletedThread
+  }
+});
+
+export const deleteThreadFailure = (error: string) => ({
+  type: DELETE_THREAD_FAILURE,
   payload: {
     error
   }

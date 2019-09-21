@@ -2,25 +2,18 @@ import { call, put } from 'redux-saga/effects';
 import Api from '../Api';
 import {
   createThreadRequest,
-  CREATE_THREAD_SUCCESS,
   CREATE_THREAD_FAILURE,
   getThreadRequest,
   GET_THREAD_FAILURE,
-  GET_THREAD_SUCCESS
+  GET_THREAD_SUCCESS,
+  deleteThreadRequestType
 } from '../store/threads/types';
+import * as ThreadsActions from '../store/threads/actions';
 import { thread } from './normalizrEntities';
 import { normalize } from 'normalizr';
-import {
-  createThreadSuccess,
-  updateThreadTextSuccess,
-  updateThreadTextFailure
-} from '../store/threads/actions';
+import { createThreadSuccess } from '../store/threads/actions';
 import { threadInitLoading } from '../store/threads/reducers';
-import { UPDATE_THREAD_TEXT_SUCCESS } from '../store/threads/types';
-import {
-  updateThreadTextRequest,
-  UPDATE_THREAD_TEXT_FAILURE
-} from '../store/threads/types';
+import { updateThreadTextRequest } from '../store/threads/types';
 
 export function* createThread({ payload, callBack }: createThreadRequest) {
   try {
@@ -65,12 +58,27 @@ export function* updateThread({ payload }: updateThreadTextRequest) {
     const { replies, threads } = normalize(data, { thread }).entities;
     if (payload.callBack) payload.callBack();
     yield put(
-      updateThreadTextSuccess({
+      ThreadsActions.updateThreadTextSuccess({
         thread: threads[payload.updateThreadTextArgs.thread_id],
         replies
       })
     );
   } catch (error) {
-    yield put(updateThreadTextFailure(error.message));
+    yield put(ThreadsActions.updateThreadTextFailure(error.message));
+  }
+}
+export function* deleteThreadSaga({
+  payload,
+  callBack
+}: deleteThreadRequestType) {
+  try {
+    const {
+      data: { deletedThread }
+    } = yield call(Api.threads.deleteThread, payload);
+
+    if (callBack) callBack();
+    yield put(ThreadsActions.deleteThreadSuccess(deletedThread));
+  } catch (error) {
+    yield put(ThreadsActions.deleteThreadFailure(error.message));
   }
 }
