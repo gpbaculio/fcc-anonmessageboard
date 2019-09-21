@@ -1,3 +1,4 @@
+import { deleteThreadSuccessType } from '../threads/types';
 export const FETCH_BOARD_REQUEST = 'FETCH_BOARD_REQUEST';
 export const FETCH_BOARD_SUCCESS = 'FETCH_BOARD_SUCCESS';
 export const FETCH_BOARD_FAILURE = 'FETCH_BOARD_FAILURE';
@@ -192,6 +193,7 @@ export interface deleteBoardFailure {
 }
 
 export type BoardsActionTypes =
+  | deleteThreadSuccessType
   | deleteBoardSuccess
   | deleteBoardFailure
   | deleteBoardRequestType

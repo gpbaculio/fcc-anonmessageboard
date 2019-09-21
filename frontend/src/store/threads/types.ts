@@ -67,10 +67,17 @@ interface threadsFailureTypes {
   type:
     | typeof CREATE_THREAD_FAILURE
     | typeof GET_THREAD_FAILURE
-    | typeof UPDATE_THREAD_TEXT_FAILURE
-    | typeof DELETE_THREAD_FAILURE;
+    | typeof UPDATE_THREAD_TEXT_FAILURE;
   payload: {
     error: string;
+  };
+}
+
+interface threadFailureType {
+  type: typeof DELETE_THREAD_FAILURE;
+  payload: {
+    error: string;
+    thread_id: string;
   };
 }
 
@@ -98,6 +105,8 @@ export interface deleteThreadSuccessType {
 }
 
 export type ThreadsActionTypes =
+  | threadFailureType
+  | deleteThreadRequestType
   | deleteThreadSuccessType
   | updateThreadTextRequest
   | updateThreadTextSuccessType

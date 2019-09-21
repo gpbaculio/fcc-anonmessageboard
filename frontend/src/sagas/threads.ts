@@ -1,4 +1,4 @@
-import { call, put } from 'redux-saga/effects';
+import { call, put, delay } from 'redux-saga/effects';
 import Api from '../Api';
 import {
   createThreadRequest,
@@ -67,16 +67,15 @@ export function* updateThread({ payload }: updateThreadTextRequest) {
     yield put(ThreadsActions.updateThreadTextFailure(error.message));
   }
 }
-export function* deleteThreadSaga({
-  payload,
-  callBack
-}: deleteThreadRequestType) {
+export function* deleteThreadSaga(action: deleteThreadRequestType) {
   try {
     const {
       data: { deletedThread }
-    } = yield call(Api.threads.deleteThread, payload);
+    } = yield call(Api.threads.deleteThread, action.payload);
 
-    if (callBack) callBack();
+    if (action.callBack) {
+      action.callBack();
+    }
     yield put(ThreadsActions.deleteThreadSuccess(deletedThread));
   } catch (error) {
     yield put(ThreadsActions.deleteThreadFailure(error.message));

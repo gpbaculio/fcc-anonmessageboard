@@ -19,6 +19,11 @@ import {
   UPDATE_THREAD_TEXT_SUCCESS
 } from './types';
 import { updateName } from '../boards/actions';
+import {
+  DELETE_THREAD_REQUEST,
+  DELETE_THREAD_SUCCESS,
+  DELETE_THREAD_FAILURE
+} from './types';
 
 export interface ThreadsState {
   threads: { [_id: string]: ThreadType };
@@ -53,6 +58,52 @@ const repliesReducer = (
   action: ThreadsActionTypes | fetchBoardsSuccess | createReplySuccess
 ) => {
   switch (action.type) {
+    case DELETE_THREAD_REQUEST: {
+      const thread = state.threads[action.payload.thread_id];
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            loading: {
+              ...thread.loading,
+              delete_thread: true
+            }
+          }
+        }
+      };
+    }
+    case DELETE_THREAD_SUCCESS: {
+      const { deletedThread } = action.payload;
+      // deconstruct deleted Thread
+      const { [deletedThread._id]: removedThread, ...threads } = state.threads;
+      return {
+        ...state,
+        threads: { ...threads }
+      };
+    }
+    case DELETE_THREAD_FAILURE: {
+      const { thread_id, error } = action.payload;
+      const thread = state.threads[thread_id];
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            loading: {
+              ...thread.loading,
+              delete_thread: false
+            },
+            error: {
+              ...thread.error,
+              delete_thread: error
+            }
+          }
+        }
+      };
+    }
     case UPDATE_THREAD_TEXT_REQUEST: {
       const { thread_id } = action.payload.updateThreadTextArgs;
       const thread = state.threads[thread_id];
@@ -127,9 +178,15 @@ const repliesReducer = (
       };
     }
     case FETCH_BOARD_SUCCESS: {
+      const threads = Object.fromEntries(
+        Object.entries(action.payload.threads).map(([k, v]) => [
+          k,
+          { ...v, loading: threadInitLoading }
+        ])
+      );
       return {
         ...state,
-        threads: { ...state.threads, ...action.payload.threads }
+        threads: { ...state.threads, ...threads }
       };
     }
     case FETCH_BOARDS_SUCCESS: {

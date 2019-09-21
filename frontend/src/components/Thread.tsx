@@ -23,7 +23,8 @@ import { AppState } from '../store';
 import { createReply } from '../store/replies/actions';
 import { getThread } from '../store/threads/actions';
 import { timeDifferenceForDate, getTimeDate } from './utils';
-import { createReplyArgs } from '../Api';
+import { createReplyArgs, deleteThreadArgsType } from '../Api';
+import * as ThreadsActions from '../store/threads/actions';
 import { RepliesState } from '../store/replies/reducers';
 import {
   ThreadsState,
@@ -31,6 +32,7 @@ import {
   threadInitError
 } from '../store/threads/reducers';
 import EditThreadTextInput from './EditThreadTextInput';
+import { thread } from '../sagas/normalizrEntities';
 
 interface ThreadProps extends RouteComponentProps<{ thread_id: string }> {
   location: H.Location;
@@ -46,9 +48,15 @@ interface ThreadDispatchProps {
     thread_id
   }: createReplyArgs) => void;
   getThread: (thread_id: string) => void;
+  deleteThread: (
+    { thread_id, delete_password }: deleteThreadArgsType,
+    callBack: () => void
+  ) => void;
 }
 
 interface ThreadState {
+  thread_delete_password: string;
+  deleteModal: boolean;
   isEditing: boolean;
   reply_text: string;
   reply_delete_password: string;
@@ -58,8 +66,10 @@ interface ThreadState {
 
 class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
   private initState = {
+    deleteModal: false,
     isEditing: false,
     reply_text: '',
+    thread_delete_password: '',
     reply_delete_password: '',
     thread: {
       _id: '',
@@ -81,18 +91,16 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
   }
   componentDidMount() {
     const { location, match, threads } = this.props;
-    if (location.state) {
-      const { thread_id } = location.state;
-      const thread = threads.threads[thread_id];
+    const { thread_id } = match.params;
+    // check thread id by location from Link or params from Route
+    const thread =
+      threads.threads[
+        location.state ? location.state.thread_id : match.params.thread_id
+      ];
+    if (thread) {
       this.setState({ thread });
     } else {
-      const { thread_id } = match.params;
-      if (Object.keys(threads.threads).includes(thread_id)) {
-        const thread = threads.threads[thread_id];
-        this.setState({ thread });
-      } else {
-        this.props.getThread(thread_id);
-      }
+      this.props.getThread(thread_id);
     }
   }
   onSubmit = (e: React.FormEvent) => {
@@ -118,28 +126,28 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
     { threads, match, location }: ThreadProps & ThreadDispatchProps,
     _state: ThreadState
   ) {
-    if (location.state) {
-      const { thread_id } = location.state;
-      const thread = threads.threads[thread_id];
+    // check thread id by location from Link or params from Route
+    const thread =
+      threads.threads[
+        location.state ? location.state.thread_id : match.params.thread_id
+      ];
+    if (thread) {
       return {
         thread
       };
-    } else {
-      const { thread_id } = match.params;
-      if (Object.keys(threads.threads).includes(thread_id)) {
-        const { thread_id } = match.params;
-        const thread = threads.threads[thread_id];
-        return {
-          thread
-        };
-      }
     }
+
     return null;
   }
-
+  toggleModal = (type: string) => {
+    this.setState(state => ({
+      [type]: !state[type]
+    }));
+  };
   render() {
     const { replies, threads } = this.props;
     const { thread, isEditing } = this.state;
+    console.log('THREAD ', this.state.thread.loading.delete_thread);
     return (
       <Container>
         <Modal
@@ -150,9 +158,9 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
           </ModalHeader>
           <ModalBody
             className={classNames({
-              'fade-load': board.loading.delete_board
+              'fade-load': thread.loading.delete_thread
             })}>
-            Are you sure you want to delete <strong>{`${board.name}`}</strong>?
+            Are you sure you want to delete <strong>{`${thread.text}`}</strong>?
             <FormGroup row className='mt-3'>
               <Label for='board_delete_password' sm={4}>
                 Delete Password
@@ -161,12 +169,12 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
                 <Input
                   onChange={this.onChange}
                   type='password'
-                  name='board_delete_password'
-                  id='board_delete_password'
+                  name='thread_delete_password'
+                  id='thread_delete_password'
                   placeholder='Delete Password'
                   autoComplete='off'
                   required
-                  value={this.state.board_delete_password}
+                  value={this.state.thread_delete_password}
                 />
               </Col>
             </FormGroup>
@@ -174,16 +182,20 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
           <ModalFooter>
             <Button
               color='danger'
-              disabled={board.loading.delete_board}
-              onClick={() =>
-                this.props.deleteBoard({
-                  board_id: board._id,
-                  delete_password: this.state.board_delete_password,
-                  callBack: () => {
-                    this.props.history.push('/');
+              disabled={thread.loading.delete_thread}
+              onClick={() => {
+                console.log(' del thread');
+                this.props.deleteThread(
+                  {
+                    thread_id: thread._id,
+                    delete_password: this.state.thread_delete_password
+                  },
+                  () => {
+                    console.log(' GO BACK');
+                    this.props.history.push(`/b/${thread.board_id}`);
                   }
-                })
-              }>
+                );
+              }}>
               Delete
             </Button>
             <Button
@@ -233,7 +245,11 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
                       onClick={() => this.setIsEditing(true)}>
                       Edit
                     </Button>
-                    <Button color='danger'>Delete</Button>
+                    <Button
+                      color='danger'
+                      onClick={() => this.toggleModal('deleteModal')}>
+                      Delete
+                    </Button>
                   </div>
                   {!!isEditing && (
                     // recommended: https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key
@@ -343,7 +359,8 @@ const mapStateToProps = ({ threads, replies }: AppState) => ({
 
 const mapDispatchToProps = {
   createReply,
-  getThread
+  getThread,
+  deleteThread: ThreadsActions.deleteThreadRequest
 };
 
 export default connect(

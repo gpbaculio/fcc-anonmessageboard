@@ -19,7 +19,11 @@ import {
   DELETE_BOARD_SUCCESS,
   DELETE_BOARD_FAILURE
 } from './types';
-import { createThreadSuccess, CREATE_THREAD_SUCCESS } from '../threads/types';
+import {
+  createThreadSuccess,
+  CREATE_THREAD_SUCCESS,
+  DELETE_THREAD_SUCCESS
+} from '../threads/types';
 
 const initError = {
   createBoard: '',
@@ -54,6 +58,21 @@ const boardsReducer = (
   action: BoardsActionTypes | createThreadSuccess
 ) => {
   switch (action.type) {
+    case DELETE_THREAD_SUCCESS: {
+      const { deletedThread } = action.payload;
+      const board = state.boards[deletedThread.board_id];
+      return {
+        ...state,
+        boards: {
+          ...state.boards,
+          [board._id]: {
+            ...board,
+            // remove deleted thread id
+            threads: board.threads.filter(thId => thId !== deletedThread._id)
+          }
+        }
+      };
+    }
     case DELETE_BOARD_REQUEST: {
       const { board_id } = action.payload;
       const board = state.boards[board_id];

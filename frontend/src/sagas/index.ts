@@ -14,11 +14,14 @@ import * as boardsSagas from './boards';
 import * as threadsSagas from './threads';
 import { CREATE_REPLY_REQUEST } from '../store/replies/types';
 import * as repliesSagas from './replies';
-import { UPDATE_THREAD_TEXT_REQUEST } from '../store/threads/types';
+import {
+  UPDATE_THREAD_TEXT_REQUEST,
+  DELETE_THREAD_REQUEST
+} from '../store/threads/types';
 
 // use them in parallel
 export default function* rootSaga() {
-  // test updateThread tomorrow
+  yield takeEvery(DELETE_THREAD_REQUEST, threadsSagas.deleteThreadSaga);
   yield takeEvery(UPDATE_THREAD_TEXT_REQUEST, threadsSagas.updateThread);
   yield takeEvery(FETCH_BOARD_REQUEST, boardsSagas.fetchBoard);
   yield takeEvery(CREATE_BOARD_REQUEST, boardsSagas.createBoard);
