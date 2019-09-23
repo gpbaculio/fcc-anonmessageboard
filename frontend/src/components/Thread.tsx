@@ -23,9 +23,9 @@ import { AppState } from '../store';
 import { createReply } from '../store/replies/actions';
 import { getThread } from '../store/threads/actions';
 import { timeDifferenceForDate, getTimeDate } from './utils';
-import { createReplyArgs, deleteThreadArgsType } from '../Api';
+import { createReplyArgsType, deleteThreadArgsType } from '../Api';
 import * as ThreadsActions from '../store/threads/actions';
-import { RepliesState } from '../store/replies/reducers';
+import { RepliesState } from '../store/replies/types';
 import {
   ThreadsState,
   threadInitLoading,
@@ -33,6 +33,7 @@ import {
 } from '../store/threads/reducers';
 import EditThreadTextInput from './EditThreadTextInput';
 import { thread } from '../sagas/normalizrEntities';
+import Reply from './Reply';
 
 interface ThreadProps extends RouteComponentProps<{ thread_id: string }> {
   location: H.Location;
@@ -46,7 +47,7 @@ interface ThreadDispatchProps {
     text,
     board_id,
     thread_id
-  }: createReplyArgs) => void;
+  }: createReplyArgsType) => void;
   getThread: (thread_id: string) => void;
   deleteThread: (
     { thread_id, delete_password }: deleteThreadArgsType,
@@ -332,15 +333,8 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
                     </Form>
                   </div>
                   {thread.replies.map(rId => {
-                    const reply = replies.replies[rId];
-                    return (
-                      <div
-                        key={reply._id}
-                        className='reply-container my-3 d-flex justify-content-between'>
-                        <span>{reply.text}</span>
-                        <span>{timeDifferenceForDate(reply.created_on)}</span>
-                      </div>
-                    );
+                    // uses normalizr
+                    return <Reply key={rId} reply_id={rId} />;
                   })}
                 </div>
               </div>

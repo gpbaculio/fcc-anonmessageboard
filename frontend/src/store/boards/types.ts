@@ -17,11 +17,21 @@ export const DELETE_BOARD_REQUEST = 'DELETE_BOARD_REQUEST';
 export const DELETE_BOARD_SUCCESS = 'DELETE_BOARD_SUCCESS';
 export const DELETE_BOARD_FAILURE = 'DELETE_BOARD_FAILURE';
 
+export interface ReplyLoadingType {
+  update_text: boolean;
+  delete_reply: boolean;
+}
+export interface ReplyErrorType {
+  update_text: string;
+  delete_reply: string;
+}
 export interface ReplyType {
   _id: string;
   text: string;
   created_on: string;
   thread_id: string;
+  loading: ReplyLoadingType;
+  error: ReplyErrorType;
 }
 
 export interface deleteBoardRequestType {

@@ -12,7 +12,10 @@ import {
 } from '../store/threads/types';
 import * as boardsSagas from './boards';
 import * as threadsSagas from './threads';
-import { CREATE_REPLY_REQUEST } from '../store/replies/types';
+import {
+  CREATE_REPLY_REQUEST,
+  UPDATE_REPLY_TEXT_REQUEST
+} from '../store/replies/types';
 import * as repliesSagas from './replies';
 import {
   UPDATE_THREAD_TEXT_REQUEST,
@@ -21,6 +24,7 @@ import {
 
 // use them in parallel
 export default function* rootSaga() {
+  yield takeEvery(UPDATE_REPLY_TEXT_REQUEST, repliesSagas.updateReplyText);
   yield takeEvery(DELETE_THREAD_REQUEST, threadsSagas.deleteThreadSaga);
   yield takeEvery(UPDATE_THREAD_TEXT_REQUEST, threadsSagas.updateThread);
   yield takeEvery(FETCH_BOARD_REQUEST, boardsSagas.fetchBoard);

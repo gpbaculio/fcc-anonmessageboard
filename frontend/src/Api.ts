@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { deleteBoardArgs } from './store/boards/actions';
 
-export interface createThreadArgs {
+export interface createThreadArgsType {
   text: string;
   delete_password: string;
   board_id: string;
 }
 
-export interface createReplyArgs extends createThreadArgs {
+export interface createReplyArgsType extends createThreadArgsType {
   thread_id: string;
 }
 
@@ -33,6 +33,12 @@ export interface deleteThreadArgsType {
   thread_id: string;
 }
 
+export interface updateReplyTextParamsType {
+  reply_id: string;
+  text: string;
+  delete_password: string;
+}
+
 export default {
   boards: {
     createBoard: ({ name, delete_password }: createBoardArgs) =>
@@ -50,7 +56,11 @@ export default {
         data: { delete_password }
       });
     },
-    createThread: ({ text, delete_password, board_id }: createThreadArgs) => {
+    createThread: ({
+      text,
+      delete_password,
+      board_id
+    }: createThreadArgsType) => {
       return axios.post(`/api/threads/${board_id}`, { text, delete_password });
     },
     updateThreadText: ({
@@ -68,12 +78,19 @@ export default {
       delete_password,
       thread_id,
       board_id
-    }: createReplyArgs) => {
+    }: createReplyArgsType) => {
       return axios.post(`/api/replies/${board_id}`, {
         text,
         delete_password,
         thread_id
       });
+    },
+    updateReplyText: ({
+      reply_id,
+      text,
+      delete_password
+    }: updateReplyTextParamsType) => {
+      return axios.post(`/api/reply/${reply_id}`, { text, delete_password });
     }
   }
 };

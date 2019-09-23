@@ -26,7 +26,7 @@ import {
   Alert
 } from 'reactstrap';
 import { connect } from 'react-redux';
-import { createThreadArgs } from '../Api';
+import { createThreadArgsType } from '../Api';
 import { AppState } from '../store';
 import { Link } from 'react-router-dom';
 import { getTimeDate } from './utils';
@@ -46,7 +46,7 @@ interface BoardProps extends RouteComponentProps<LocationState> {
 
 interface BoardDispatchProps {
   createThread: (
-    { delete_password, text, board_id }: createThreadArgs,
+    { delete_password, text, board_id }: createThreadArgsType,
     callBack: () => void
   ) => void;
   fetchBoard: (board_id: string) => void;

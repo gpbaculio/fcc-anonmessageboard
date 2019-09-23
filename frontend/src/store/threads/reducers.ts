@@ -181,7 +181,7 @@ const repliesReducer = (
       const threads = Object.fromEntries(
         Object.entries(action.payload.threads).map(([k, v]) => [
           k,
-          { ...v, loading: threadInitLoading }
+          { ...v, loading: threadInitLoading, error: threadInitError }
         ])
       );
       return {
@@ -193,7 +193,7 @@ const repliesReducer = (
       const threads = Object.fromEntries(
         Object.entries(action.payload.threads).map(([k, v]) => [
           k,
-          { ...v, loading: threadInitLoading }
+          { ...v, loading: threadInitLoading, error: threadInitError }
         ])
       );
       return {

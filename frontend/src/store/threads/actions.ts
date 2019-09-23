@@ -6,7 +6,7 @@ import {
   DELETE_THREAD_REQUEST
 } from './types';
 import {
-  createThreadArgs,
+  createThreadArgsType,
   updateThreadTextArgsType,
   deleteThreadArgsType
 } from '../../Api';
@@ -31,7 +31,7 @@ export const deleteThreadRequest = (
 });
 
 export const createThread = (
-  { board_id, text, delete_password }: createThreadArgs,
+  { board_id, text, delete_password }: createThreadArgsType,
   callBack?: () => void
 ) => ({
   type: CREATE_THREAD_REQUEST,
