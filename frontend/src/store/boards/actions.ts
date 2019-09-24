@@ -78,6 +78,7 @@ export const resetBoardError = (errorKey: string, board_id: string) => ({
     board_id
   }
 });
+
 export interface fetchBoardsSuccessArgs {
   boards: {
     [_id: string]: BoardType;

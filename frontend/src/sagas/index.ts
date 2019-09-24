@@ -17,6 +17,7 @@ import {
   UPDATE_REPLY_TEXT_REQUEST
 } from '../store/replies/types';
 import * as repliesSagas from './replies';
+import { DELETE_REPLY_REQUEST } from '../store/replies/types';
 import {
   UPDATE_THREAD_TEXT_REQUEST,
   DELETE_THREAD_REQUEST
@@ -24,6 +25,7 @@ import {
 
 // use them in parallel
 export default function* rootSaga() {
+  yield takeEvery(DELETE_REPLY_REQUEST, repliesSagas.deleteReply);
   yield takeEvery(UPDATE_REPLY_TEXT_REQUEST, repliesSagas.updateReplyText);
   yield takeEvery(DELETE_THREAD_REQUEST, threadsSagas.deleteThreadSaga);
   yield takeEvery(UPDATE_THREAD_TEXT_REQUEST, threadsSagas.updateThread);

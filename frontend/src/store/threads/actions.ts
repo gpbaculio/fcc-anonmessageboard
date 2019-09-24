@@ -11,7 +11,7 @@ import {
   deleteThreadArgsType
 } from '../../Api';
 import { ThreadType, ReplyType } from '../boards/types';
-import { DELETE_THREAD_FAILURE } from './types';
+import { DELETE_THREAD_FAILURE, RESET_THREAD_ERROR } from './types';
 import {
   updateThreadTextSuccessArgsType,
   DELETE_THREAD_SUCCESS
@@ -75,9 +75,10 @@ export const updateThreadTextSuccess = ({
   }
 });
 
-export const updateThreadTextFailure = (error: string) => ({
+export const updateThreadTextFailure = (error: string, thread_id: string) => ({
   type: UPDATE_THREAD_TEXT_FAILURE,
   payload: {
+    thread_id,
     error
   }
 });
@@ -93,5 +94,13 @@ export const deleteThreadFailure = (error: string) => ({
   type: DELETE_THREAD_FAILURE,
   payload: {
     error
+  }
+});
+
+export const resetThreadError = (errorKey: string, thread_id: string) => ({
+  type: RESET_THREAD_ERROR,
+  payload: {
+    errorKey,
+    thread_id
   }
 });

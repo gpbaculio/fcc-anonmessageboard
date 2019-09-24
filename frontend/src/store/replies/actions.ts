@@ -4,8 +4,18 @@ import {
   CREATE_REPLY_SUCCESS,
   UPDATE_REPLY_TEXT_SUCCESS
 } from './types';
-import { createReplyArgsType, updateReplyTextParamsType } from '../../Api';
+import {
+  createReplyArgsType,
+  updateReplyTextParamsType,
+  deleteReplyParamsType
+} from '../../Api';
 import { ReplyType, CREATE_BOARD_SUCCESS } from '../boards/types';
+import { DELETE_REPLY_FAILURE } from './types';
+import {
+  RESET_REPLY_ERROR,
+  DELETE_REPLY_REQUEST,
+  DELETE_REPLY_SUCCESS
+} from './types';
 import {
   UPDATE_REPLY_TEXT_FAILURE,
   updateReplyTextRequestType,
@@ -46,7 +56,38 @@ export const updateReplyTextSuccess = (reply: ReplyType) => ({
   payload: { reply }
 });
 
-export const updateReplyTextFailure = (error: string) => ({
+export const updateReplyTextFailure = (error: string, reply_id: string) => ({
   type: UPDATE_REPLY_TEXT_FAILURE,
-  payload: { error }
+  payload: { error, reply_id }
+});
+
+export const resetReplyError = (errorKey: string, reply_id: string) => ({
+  type: RESET_REPLY_ERROR,
+  payload: {
+    errorKey,
+    reply_id
+  }
+});
+
+export const deleteReplyRequest = ({
+  reply_id,
+  delete_password
+}: deleteReplyParamsType) => ({
+  type: DELETE_REPLY_REQUEST,
+  payload: { reply_id, delete_password }
+});
+
+export const deleteReplySuccess = (deletedReply: ReplyType) => ({
+  type: DELETE_REPLY_SUCCESS,
+  payload: {
+    deletedReply
+  }
+});
+
+export const deleteReplyFailure = (error: string, reply_id: string) => ({
+  type: DELETE_REPLY_FAILURE,
+  payload: {
+    error,
+    reply_id
+  }
 });

@@ -1,7 +1,13 @@
 import {
+  DELETE_REPLY_REQUEST,
+  DELETE_REPLY_SUCCESS,
+  DELETE_REPLY_FAILURE
+} from './types';
+import {
   UPDATE_REPLY_TEXT_REQUEST,
   UPDATE_REPLY_TEXT_SUCCESS,
-  UPDATE_REPLY_TEXT_FAILURE
+  UPDATE_REPLY_TEXT_FAILURE,
+  RESET_REPLY_ERROR
 } from './types';
 import {
   FETCH_BOARDS_SUCCESS,
@@ -39,6 +45,53 @@ const repliesReducer = (
   action: RepliesActionTypes | fetchBoardsSuccess | getThreadSuccess
 ) => {
   switch (action.type) {
+    case DELETE_REPLY_REQUEST: {
+      const { reply_id } = action.payload;
+      const reply = state.replies[reply_id];
+      return {
+        ...state,
+        replies: {
+          ...state.replies,
+          [reply._id]: {
+            ...reply,
+            loading: {
+              ...reply.loading,
+              delete_reply: true
+            }
+          }
+        }
+      };
+    }
+    case DELETE_REPLY_SUCCESS: {
+      const { deletedReply } = action.payload;
+      // deconstruct deleted Thread
+      const { [deletedReply._id]: removedReply, ...replies } = state.replies;
+      return {
+        ...state,
+        replies: { ...replies }
+      };
+    }
+    case DELETE_REPLY_FAILURE: {
+      const { reply_id, error } = action.payload;
+      const reply = state.replies[reply_id];
+      return {
+        ...state,
+        replies: {
+          ...state.replies,
+          [reply._id]: {
+            ...reply,
+            loading: {
+              ...reply.loading,
+              delete_reply: false
+            },
+            error: {
+              ...reply.error,
+              delete_reply: error
+            }
+          }
+        }
+      };
+    }
     case UPDATE_REPLY_TEXT_REQUEST: {
       const { reply_id } = action.payload;
       const reply = state.replies[reply_id];
@@ -91,12 +144,37 @@ const repliesReducer = (
         }
       };
     }
-    case GET_THREAD_SUCCESS: {
+    case RESET_REPLY_ERROR: {
+      const { reply_id, errorKey } = action.payload;
+      const reply = state.replies[reply_id];
       return {
         ...state,
         replies: {
           ...state.replies,
-          ...action.payload.replies
+          [reply._id]: {
+            ...reply,
+            error: {
+              ...reply.error,
+              [errorKey]: ''
+            }
+          }
+        }
+      };
+    }
+    case GET_THREAD_SUCCESS: {
+      let replies = {};
+      if (action.payload.replies && Object.keys(action.payload.replies).length)
+        replies = Object.fromEntries(
+          Object.entries(action.payload.replies).map(([k, v]) => [
+            k,
+            { ...v, loading: replyInitLoading, error: replyInitError }
+          ])
+        );
+      return {
+        ...state,
+        replies: {
+          ...state.replies,
+          ...replies
         }
       };
     }

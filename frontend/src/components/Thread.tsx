@@ -34,6 +34,7 @@ import {
 import EditThreadTextInput from './EditThreadTextInput';
 import { thread } from '../sagas/normalizrEntities';
 import Reply from './Reply';
+import { Alert } from 'reactstrap';
 
 interface ThreadProps extends RouteComponentProps<{ thread_id: string }> {
   location: H.Location;
@@ -53,7 +54,10 @@ interface ThreadDispatchProps {
     { thread_id, delete_password }: deleteThreadArgsType,
     callBack: () => void
   ) => void;
+  resetThreadError: (errorKey: string, thread_id: string) => void;
 }
+
+type ThreadErrorTypeKeys = 'update_text' | 'delete_thread';
 
 interface ThreadState {
   thread_delete_password: string;
@@ -146,9 +150,8 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
     }));
   };
   render() {
-    const { replies, threads } = this.props;
+    const { replies, threads, resetThreadError } = this.props;
     const { thread, isEditing } = this.state;
-    console.log('THREAD ', this.state.thread.loading.delete_thread);
     return (
       <Container>
         <Modal
@@ -225,7 +228,32 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
                     'fade-load': threads.loading.getThread
                   }
                 )}>
-                <div className='thread-title-container d-flex p-3 align-items-center justify-content-between'>
+                <div
+                  className={classNames(
+                    'thread-title-container  p-3 align-items-center justify-content-between',
+                    {
+                      'flex-column': Object.keys(thread.error).some(k =>
+                        Boolean(thread.error[k as ThreadErrorTypeKeys])
+                      ),
+                      'd-flex': Object.keys(thread.error).every(
+                        k => !Boolean(thread.error[k as ThreadErrorTypeKeys])
+                      )
+                    }
+                  )}>
+                  {Object.keys(thread.error).map((k: string, i) => {
+                    const errorMsg = thread.error[k as ThreadErrorTypeKeys];
+                    return (
+                      <Alert
+                        key={`${i}-${k}`}
+                        color='danger'
+                        isOpen={Boolean(errorMsg)}
+                        toggle={() =>
+                          resetThreadError(k as ThreadErrorTypeKeys, thread._id)
+                        }>
+                        {errorMsg}
+                      </Alert>
+                    );
+                  })}
                   <legend className='mb-0 w-auto'>
                     <span
                       className={classNames('font-weight-lighter', {
@@ -354,7 +382,8 @@ const mapStateToProps = ({ threads, replies }: AppState) => ({
 const mapDispatchToProps = {
   createReply,
   getThread,
-  deleteThread: ThreadsActions.deleteThreadRequest
+  deleteThread: ThreadsActions.deleteThreadRequest,
+  resetThreadError: ThreadsActions.resetThreadError
 };
 
 export default connect(

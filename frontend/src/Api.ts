@@ -39,6 +39,11 @@ export interface updateReplyTextParamsType {
   delete_password: string;
 }
 
+export interface deleteReplyParamsType {
+  reply_id: string;
+  delete_password: string;
+}
+
 export default {
   boards: {
     createBoard: ({ name, delete_password }: createBoardArgs) =>
@@ -91,6 +96,11 @@ export default {
       delete_password
     }: updateReplyTextParamsType) => {
       return axios.post(`/api/reply/${reply_id}`, { text, delete_password });
+    },
+    deleteReply: ({ reply_id, delete_password }: deleteReplyParamsType) => {
+      return axios.delete(`/api/reply/${reply_id}`, {
+        data: { delete_password }
+      });
     }
   }
 };

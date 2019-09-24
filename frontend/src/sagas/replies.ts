@@ -1,7 +1,8 @@
 import { call, put } from 'redux-saga/effects';
 import {
   createReplyRequest,
-  updateReplyTextRequestType
+  updateReplyTextRequestType,
+  deleteReplyRequestType
 } from '../store/replies/types';
 import Api from '../Api';
 import * as RepliesActions from '../store/replies/actions';
@@ -30,6 +31,24 @@ export function* updateReplyText({
     yield put(RepliesActions.updateReplyTextSuccess(reply));
     if (callBack) callBack();
   } catch (error) {
-    yield put(RepliesActions.updateReplyTextFailure(error.message));
+    yield put(
+      RepliesActions.updateReplyTextFailure(
+        error.response.data,
+        payload.reply_id
+      )
+    );
+  }
+}
+
+export function* deleteReply({ payload }: deleteReplyRequestType) {
+  try {
+    const {
+      data: { deletedReply }
+    } = yield call(Api.replies.deleteReply, payload);
+    yield put(RepliesActions.deleteReplySuccess(deletedReply));
+  } catch (error) {
+    yield put(
+      RepliesActions.deleteReplyFailure(error.response.data, payload.reply_id)
+    );
   }
 }

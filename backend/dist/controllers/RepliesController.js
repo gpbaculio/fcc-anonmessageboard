@@ -12,6 +12,31 @@ const Reply_1 = require("../models/Reply");
 const Thread_1 = require("../models/Thread");
 class RepliesController {
     constructor() {
+        this.deleteReply = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { reply_id } = req.params;
+            const { delete_password } = req.body;
+            yield Reply_1.default.findById(reply_id, function (error, reply) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error)
+                        res.status(400).send(error);
+                    // check if password is correct
+                    const correctPassword = yield reply.authenticate(delete_password);
+                    if (correctPassword) {
+                        yield Reply_1.default.findOneAndRemove({ _id: reply_id }, function (error, deletedReply) {
+                            return __awaiter(this, void 0, void 0, function* () {
+                                if (error)
+                                    res.status(400).send(error);
+                                // a reply will always have thread
+                                else
+                                    res.json({ deletedReply });
+                            });
+                        });
+                    }
+                    else
+                        res.status(400).send('Incorrect Delete Password');
+                });
+            });
+        });
         this.createReply = function (req, res) {
             return __awaiter(this, void 0, void 0, function* () {
                 const { board_id } = req.params;

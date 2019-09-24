@@ -13,12 +13,17 @@ import {
   GET_THREAD_SUCCESS,
   GET_THREAD_FAILURE
 } from './types';
-import { createReplySuccess, CREATE_REPLY_SUCCESS } from '../replies/types';
+import {
+  createReplySuccess,
+  CREATE_REPLY_SUCCESS,
+  DELETE_REPLY_SUCCESS
+} from '../replies/types';
 import {
   UPDATE_THREAD_TEXT_REQUEST,
   UPDATE_THREAD_TEXT_SUCCESS
 } from './types';
 import { updateName } from '../boards/actions';
+import { UPDATE_THREAD_TEXT_FAILURE, RESET_THREAD_ERROR } from './types';
 import {
   DELETE_THREAD_REQUEST,
   DELETE_THREAD_SUCCESS,
@@ -58,6 +63,23 @@ const repliesReducer = (
   action: ThreadsActionTypes | fetchBoardsSuccess | createReplySuccess
 ) => {
   switch (action.type) {
+    case RESET_THREAD_ERROR: {
+      const { thread_id, errorKey } = action.payload;
+      const thread = state.threads[thread_id];
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            error: {
+              ...thread.error,
+              [errorKey]: ''
+            }
+          }
+        }
+      };
+    }
     case DELETE_THREAD_REQUEST: {
       const thread = state.threads[action.payload.thread_id];
       return {
@@ -81,6 +103,18 @@ const repliesReducer = (
       return {
         ...state,
         threads: { ...threads }
+      };
+    }
+    case DELETE_REPLY_SUCCESS: {
+      const { thread_id, _id: reply_id } = action.payload.deletedReply;
+      const thread = state.threads[thread_id];
+      return {
+        ...state,
+        [thread._id]: {
+          ...thread,
+          // remove deletedReply _id
+          replies: thread.replies.filter(r_id => r_id !== reply_id)
+        }
       };
     }
     case DELETE_THREAD_FAILURE: {
@@ -131,6 +165,27 @@ const repliesReducer = (
         }
       };
     }
+    case UPDATE_THREAD_TEXT_FAILURE: {
+      const { error, thread_id } = action.payload;
+      const thread = state.threads[thread_id];
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            loading: {
+              ...thread.loading,
+              update_text: false
+            },
+            error: {
+              ...thread.error,
+              update_text: error
+            }
+          }
+        }
+      };
+    }
     case GET_THREAD_REQUEST: {
       return {
         ...state,
@@ -150,7 +205,11 @@ const repliesReducer = (
         },
         threads: {
           ...state.threads,
-          [thread._id]: { ...thread, loading: threadInitLoading }
+          [thread._id]: {
+            ...thread,
+            loading: threadInitLoading,
+            error: threadInitError
+          }
         }
       };
     }

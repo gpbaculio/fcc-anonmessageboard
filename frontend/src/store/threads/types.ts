@@ -1,5 +1,6 @@
 import { ThreadType, ReplyType } from '../boards/types';
 import { updateThreadTextArgsType } from '../../Api';
+import { deleteReplySuccessType } from '../replies/types';
 
 export const CREATE_THREAD_REQUEST = 'CREATE_THREAD_REQUEST';
 export const CREATE_THREAD_SUCCESS = 'CREATE_THREAD_SUCCESS';
@@ -16,6 +17,16 @@ export const UPDATE_THREAD_TEXT_FAILURE = 'UPDATE_THREAD_TEXT_FAILURE';
 export const DELETE_THREAD_REQUEST = 'DELETE_THREAD_REQUEST';
 export const DELETE_THREAD_SUCCESS = 'DELETE_THREAD_SUCCESS';
 export const DELETE_THREAD_FAILURE = 'DELETE_THREAD_FAILURE';
+
+export const RESET_THREAD_ERROR = 'RESET_THREAD_ERROR';
+
+export interface resetThreadErrorType {
+  type: typeof RESET_THREAD_ERROR;
+  payload: {
+    thread_id: string;
+    errorKey: string;
+  };
+}
 
 export interface updateThreadTextRequest {
   type: typeof UPDATE_THREAD_TEXT_REQUEST;
@@ -64,10 +75,7 @@ export interface createThreadSuccess {
 }
 
 interface threadsFailureTypes {
-  type:
-    | typeof CREATE_THREAD_FAILURE
-    | typeof GET_THREAD_FAILURE
-    | typeof UPDATE_THREAD_TEXT_FAILURE;
+  type: typeof CREATE_THREAD_FAILURE | typeof GET_THREAD_FAILURE;
   payload: {
     error: string;
   };
@@ -104,10 +112,20 @@ export interface deleteThreadSuccessType {
   };
 }
 
+export interface updateThreadTextFailureType {
+  type: typeof UPDATE_THREAD_TEXT_FAILURE;
+  payload: {
+    thread_id: string;
+    error: string;
+  };
+}
 export type ThreadsActionTypes =
+  | deleteReplySuccessType
+  | resetThreadErrorType
   | threadFailureType
   | deleteThreadRequestType
   | deleteThreadSuccessType
+  | updateThreadTextFailureType
   | updateThreadTextRequest
   | updateThreadTextSuccessType
   | getThreadRequest

@@ -15,7 +15,10 @@ class ThreadsRoute {
             app
                 .route('/api/replies/:board_id')
                 .post(this.repliesController.createReply);
-            app.route('/api/reply/:reply_id', this.repliesController.updateReplyText);
+            app
+                .route('/api/reply/:reply_id')
+                .post(this.repliesController.updateReplyText)
+                .delete(this.repliesController.deleteReply);
         };
     }
 }
