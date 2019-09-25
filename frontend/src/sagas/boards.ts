@@ -10,13 +10,11 @@ import {
   updateNameRequest,
   BoardType,
   deleteBoardRequestType,
-  ThreadType
 } from '../store/boards/types';
 import { board } from './normalizrEntities';
 
 import * as boardActions from '../store/boards/actions';
 import { boardInitLoading, boardInitError } from '../store/boards/reducers';
-import { threadInitLoading } from '../store/threads/reducers';
 
 export function* deleteBoard({
   payload: { board_id, callBack, delete_password }

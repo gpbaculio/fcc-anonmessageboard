@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import { Form, Input, Button } from 'reactstrap';
+import { Form, Input, Button, Spinner } from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { createBoard } from '../store/boards/actions';
 import { connect } from 'react-redux';
-// interface HomeRouterProps {
-//   title: string;   // This one is coming from the router
-// }
-// interface HomeProps extends RouteComponentProps<HomeRouterProps> {
+import { AppState } from '../store';
+import { BoardsState } from '../store/boards/types';
+
 interface AddBoardProps extends RouteComponentProps {
-  // Add your regular properties here
+  boards: BoardsState;
 }
 
 interface AddBoardDispatchProps {
@@ -46,6 +45,7 @@ class AddBoard extends Component<
     });
   };
   render() {
+    const { boards } = this.props;
     const { text, delete_password } = this.state;
     return (
       <Form onSubmit={this.onSubmit} className='d-flex'>
@@ -67,21 +67,30 @@ class AddBoard extends Component<
           onChange={this.onChange}
           autoComplete='off'
         />
-        <Button type='submit'>Submit</Button>
+        <Button
+          className='d-flex align-items-center'
+          color='primary'
+          disabled={boards.loading.createBoard}
+          type='submit'>
+          {!!boards.loading.createBoard && (
+            <Spinner className='mr-1' size='sm' color='light' />
+          )}
+          Submit
+        </Button>
       </Form>
     );
   }
 }
 
-// const mapStateToProps = (state) => ({
-
-// })
+const mapStateToProps = ({ boards }: AppState) => ({
+  boards
+});
 
 const mapDispatchToProps = {
   createBoard
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(withRouter(AddBoard));
