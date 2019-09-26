@@ -130,10 +130,12 @@ export interface boardSuccess {
   };
 }
 
-export interface fetchBoardsRequest {
+export interface fetchBoardsRequestType {
   type: typeof FETCH_BOARDS_REQUEST;
   payload: {
-    name: string;
+    search_text?: string;
+    page: number;
+    limit: number;
   };
 }
 
@@ -211,7 +213,7 @@ export type BoardsActionTypes =
   | boardsfailureTypes
   | createBoardRequest
   | boardSuccess
-  | fetchBoardsRequest
+  | fetchBoardsRequestType
   | fetchBoardsSuccess
   | resetErrorState
   | updateNameRequest

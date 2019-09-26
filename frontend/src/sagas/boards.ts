@@ -10,6 +10,7 @@ import {
   updateNameRequest,
   BoardType,
   deleteBoardRequestType,
+  fetchBoardsRequestType
 } from '../store/boards/types';
 import { board } from './normalizrEntities';
 
@@ -85,9 +86,10 @@ export function* fetchBoard(action: fetchBoardRequest) {
   }
 }
 
-export function* fetchBoards() {
+export function* fetchBoards(action: fetchBoardsRequestType) {
   try {
-    const { data } = yield call(Api.boards.getBoards);
+    // provide page & limit for pagination
+    const { data } = yield call(Api.boards.fetchBoards, action.payload);
     const { boards, threads, replies } = normalize(
       {
         boards: data.boards.map((b: BoardType) => ({

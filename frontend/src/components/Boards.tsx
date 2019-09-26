@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
-import { fetchBoards } from '../store/boards/actions';
+import { fetchBoards, fetchBoardsParamsType } from '../store/boards/actions';
 import { AppState } from '../store';
 import {
   BoardType,
@@ -21,12 +21,12 @@ interface BoardsProps extends RouteComponentProps {
 
 interface BoardsDispatchProps {
   // Add your dispatcher properties here
-  fetchBoards: () => void;
+  fetchBoards: ({ page, limit }: fetchBoardsParamsType) => void;
 }
 
 class Boards extends Component<BoardsProps & BoardsDispatchProps> {
   componentDidMount = async () => {
-    await this.props.fetchBoards();
+    await this.props.fetchBoards({ page: 1, limit: 9 });
   };
   render() {
     const { boards } = this.props;

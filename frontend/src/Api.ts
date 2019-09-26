@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { deleteBoardArgs } from './store/boards/actions';
+import { deleteBoardArgs, fetchBoardsParamsType } from './store/boards/actions';
 
 export interface createThreadArgsType {
   text: string;
@@ -48,7 +48,10 @@ export default {
   boards: {
     createBoard: ({ name, delete_password }: createBoardArgs) =>
       axios.post('/api/boards', { name, delete_password }),
-    getBoards: () => axios.get('/api/boards'),
+    fetchBoards: ({ search_text, page, limit }: fetchBoardsParamsType) =>
+      axios.get('/api/boards', {
+        params: { ...(search_text ? { search_text } : {}), page, limit }
+      }),
     fetchBoard: (board_id: string) => axios.get(`/api/board/${board_id}`),
     deleteBoard: ({ board_id, delete_password }: deleteBoardArgs) =>
       axios.delete(`/api/board/${board_id}`, { data: { delete_password } }),

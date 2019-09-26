@@ -106,13 +106,41 @@ export default class BoardsController {
       }
     );
   };
-  public getBoards = async (_req: Request, res: Response) => {
+  public getBoards = async (req: Request, res: Response) => {
+    // async ({ page, limit, searchText, userId }) => {
+    //   const query = {}
+    //   if (searchText !== undefined) {
+    //     if (searchText === '') return []
+    //     query.title = { $regex: `${searchText}`, $options: 'i' }
+    //   }
+    //   if (userId) query.userId = userId
+    //   return Book.find(
+    //     query,
+    //     null,
+    //     { skip: parseInt(page - 1) * parseInt(limit), limit: parseInt(limit) }
+    //   ).populate({ path: 'userId', select: 'username profilePicture' })
+    //     .sort('-createdAt');
+    // }
+
+    interface BookQueryType {
+      name?: string;
+    }
+
+    const { search_text, page, limit } = req.query;
+
+    const query: BookQueryType = {};
+    if (search_text !== undefined) query.name = search_text;
+    console.log(
+      'Number(page) - 1 * Number(limit) ',
+      Number(page - 1) * Number(limit)
+    );
     await Board.find(
       {},
       null,
       {
+        skip: Number(page - 1) * Number(limit),
+        limit: Number(limit),
         sort: '-createdAt',
-        limit: 9,
         populate: {
           path: 'threads',
           model: 'Thread',

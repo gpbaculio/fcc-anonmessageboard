@@ -125,10 +125,30 @@ class BoardsController {
                 res.status(200).json({ board });
             });
         });
-        this.getBoards = (_req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.getBoards = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            // async ({ page, limit, searchText, userId }) => {
+            //   const query = {}
+            //   if (searchText !== undefined) {
+            //     if (searchText === '') return []
+            //     query.title = { $regex: `${searchText}`, $options: 'i' }
+            //   }
+            //   if (userId) query.userId = userId
+            //   return Book.find(
+            //     query,
+            //     null,
+            //     { skip: parseInt(page - 1) * parseInt(limit), limit: parseInt(limit) }
+            //   ).populate({ path: 'userId', select: 'username profilePicture' })
+            //     .sort('-createdAt');
+            // }
+            const { search_text, page, limit } = req.query;
+            const query = {};
+            if (search_text !== undefined)
+                query.name = search_text;
+            console.log('Number(page) - 1 * Number(limit) ', Number(page - 1) * Number(limit));
             yield Board_1.default.find({}, null, {
+                skip: Number(page - 1) * Number(limit),
+                limit: Number(limit),
                 sort: '-createdAt',
-                limit: 9,
                 populate: {
                     path: 'threads',
                     model: 'Thread',

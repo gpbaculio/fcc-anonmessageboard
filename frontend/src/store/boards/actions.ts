@@ -103,8 +103,18 @@ export const fetchBoardSuccess = ({
   }
 });
 
-export const fetchBoards = () => ({
-  type: FETCH_BOARDS_REQUEST
+export interface fetchBoardsParamsType {
+  page: number; // defaults = 1
+  limit: number; // default = 9
+  search_text?: string;
+}
+export const fetchBoards = ({
+  search_text,
+  page,
+  limit
+}: fetchBoardsParamsType) => ({
+  type: FETCH_BOARDS_REQUEST,
+  payload: { page, limit, search_text }
 });
 
 export interface deleteBoardArgs {
