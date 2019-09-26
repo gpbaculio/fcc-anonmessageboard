@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
 import { fetchBoards, fetchBoardsParamsType } from '../store/boards/actions';
@@ -31,33 +31,35 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
   render() {
     const { boards } = this.props;
     return (
-      <Row>
-        {boards.map(board => {
-          return (
-            <Col xs='4' key={board._id}>
-              <Card>
-                <Link
-                  to={{
-                    pathname: `/b/${board._id}`,
-                    state: { board_id: board._id }
-                  }}>
-                  <CardBody>
-                    <CardTitle className='mb-0'>
-                      <div className='d-flex justify-content-between'>
-                        <div className='d-flex flex-column'>
-                          <h6>{board.name}</h6>
-                          <small>{board.threads.length}</small>
+      <Fragment>
+        <Row>
+          {boards.map(board => {
+            return (
+              <Col xs='4' key={board._id}>
+                <Card>
+                  <Link
+                    to={{
+                      pathname: `/b/${board._id}`,
+                      state: { board_id: board._id }
+                    }}>
+                    <CardBody>
+                      <CardTitle className='mb-0'>
+                        <div className='d-flex justify-content-between'>
+                          <div className='d-flex flex-column'>
+                            <h6>{board.name}</h6>
+                            <small>{board.threads.length}</small>
+                          </div>
+                          <div>{getTimeDate(board.created_on)}</div>
                         </div>
-                        <div>{getTimeDate(board.created_on)}</div>
-                      </div>
-                    </CardTitle>
-                  </CardBody>
-                </Link>
-              </Card>
-            </Col>
-          );
-        })}
-      </Row>
+                      </CardTitle>
+                    </CardBody>
+                  </Link>
+                </Card>
+              </Col>
+            );
+          })}
+        </Row>
+      </Fragment>
     );
   }
 }

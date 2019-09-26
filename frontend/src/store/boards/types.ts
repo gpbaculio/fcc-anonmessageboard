@@ -17,6 +17,10 @@ export const DELETE_BOARD_REQUEST = 'DELETE_BOARD_REQUEST';
 export const DELETE_BOARD_SUCCESS = 'DELETE_BOARD_SUCCESS';
 export const DELETE_BOARD_FAILURE = 'DELETE_BOARD_FAILURE';
 
+export const SEARCH_BOARDS_REQUEST = 'SEARCH_BOARDS_REQUEST';
+export const SEARCH_BOARDS_SUCCESS = 'SEARCH_BOARDS_SUCCESS';
+export const SEARCH_BOARDS_FAILURE = 'SEARCH_BOARDS_FAILURE';
+
 export interface ReplyLoadingType {
   update_text: boolean;
   delete_reply: boolean;
@@ -103,6 +107,8 @@ export interface BoardsState {
   boards: {
     [_id: string]: BoardType;
   };
+  page: number;
+  search_text: string;
 }
 
 export interface createBoardRequest {
@@ -134,6 +140,7 @@ export interface fetchBoardsRequestType {
   type: typeof FETCH_BOARDS_REQUEST;
   payload: {
     search_text?: string;
+    no_pagination_search?: boolean;
     page: number;
     limit: number;
   };

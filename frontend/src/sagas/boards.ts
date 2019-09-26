@@ -86,10 +86,10 @@ export function* fetchBoard(action: fetchBoardRequest) {
   }
 }
 
-export function* fetchBoards(action: fetchBoardsRequestType) {
+export function* fetchBoards({ payload }: fetchBoardsRequestType) {
   try {
     // provide page & limit for pagination
-    const { data } = yield call(Api.boards.fetchBoards, action.payload);
+    const { data } = yield call(Api.boards.fetchBoards, payload);
     const { boards, threads, replies } = normalize(
       {
         boards: data.boards.map((b: BoardType) => ({

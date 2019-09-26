@@ -40,7 +40,9 @@ const initLoading = {
 export const boardsInitState: BoardsState = {
   loading: initLoading,
   boards: {},
-  error: initError
+  error: initError,
+  page: 1,
+  search_text: ''
 };
 
 export const boardInitLoading = {

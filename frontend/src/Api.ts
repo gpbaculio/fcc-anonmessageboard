@@ -48,10 +48,26 @@ export default {
   boards: {
     createBoard: ({ name, delete_password }: createBoardArgs) =>
       axios.post('/api/boards', { name, delete_password }),
-    fetchBoards: ({ search_text, page, limit }: fetchBoardsParamsType) =>
-      axios.get('/api/boards', {
+    boards_search_input: async ({
+      search_text,
+      no_pagination_search
+    }: fetchBoardsParamsType) => {
+      return axios.get('/api/boards', {
+        params: {
+          search_text,
+          no_pagination_search
+        }
+      });
+    },
+    fetchBoards: async ({
+      search_text,
+      page,
+      limit
+    }: fetchBoardsParamsType) => {
+      return axios.get('/api/boards', {
         params: { ...(search_text ? { search_text } : {}), page, limit }
-      }),
+      });
+    },
     fetchBoard: (board_id: string) => axios.get(`/api/board/${board_id}`),
     deleteBoard: ({ board_id, delete_password }: deleteBoardArgs) =>
       axios.delete(`/api/board/${board_id}`, { data: { delete_password } }),

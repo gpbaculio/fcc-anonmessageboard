@@ -104,10 +104,12 @@ export const fetchBoardSuccess = ({
 });
 
 export interface fetchBoardsParamsType {
-  page: number; // defaults = 1
-  limit: number; // default = 9
+  page?: number; // defaults = 1
+  limit?: number; // default = 9
   search_text?: string;
+  no_pagination_search?: boolean; // for searching input
 }
+
 export const fetchBoards = ({
   search_text,
   page,

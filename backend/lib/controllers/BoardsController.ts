@@ -106,36 +106,42 @@ export default class BoardsController {
       }
     );
   };
+  public search_boards = async function(req: Request, res: Response) {
+    const { search_text } = req.query;
+    await Board.find(
+      { name: search_text },
+      null,
+      {
+        limit: 5,
+        sort: '-createdAt',
+        populate: {
+          path: 'threads',
+          model: 'Thread',
+          select: '-delete_password -reported',
+          populate: {
+            path: 'replies',
+            model: 'Reply',
+            select: '-delete_password -reported'
+          }
+        }
+      },
+      function(error, boards) {
+        if (error) res.status(400).send(error);
+        res.status(200).json({ boards });
+      }
+    );
+  };
   public getBoards = async (req: Request, res: Response) => {
-    // async ({ page, limit, searchText, userId }) => {
-    //   const query = {}
-    //   if (searchText !== undefined) {
-    //     if (searchText === '') return []
-    //     query.title = { $regex: `${searchText}`, $options: 'i' }
-    //   }
-    //   if (userId) query.userId = userId
-    //   return Book.find(
-    //     query,
-    //     null,
-    //     { skip: parseInt(page - 1) * parseInt(limit), limit: parseInt(limit) }
-    //   ).populate({ path: 'userId', select: 'username profilePicture' })
-    //     .sort('-createdAt');
-    // }
-
     interface BookQueryType {
       name?: string;
     }
-
-    const { search_text, page, limit } = req.query;
-
+    const { search_text, page, limit, no_pagination_search } = req.query;
+    // for input searching, returning only 5
+    if (no_pagination_search) this.search_boards(req, res);
     const query: BookQueryType = {};
     if (search_text !== undefined) query.name = search_text;
-    console.log(
-      'Number(page) - 1 * Number(limit) ',
-      Number(page - 1) * Number(limit)
-    );
     await Board.find(
-      {},
+      query,
       null,
       {
         skip: Number(page - 1) * Number(limit),
