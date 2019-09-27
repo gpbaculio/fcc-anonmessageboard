@@ -1,4 +1,8 @@
-import { ThreadType, ReplyType } from '../boards/types';
+import {
+  ThreadType,
+  ReplyType,
+  AddBoardSearchResultType
+} from '../boards/types';
 import { updateThreadTextArgsType } from '../../Api';
 import { deleteReplySuccessType } from '../replies/types';
 
@@ -119,7 +123,9 @@ export interface updateThreadTextFailureType {
     error: string;
   };
 }
+
 export type ThreadsActionTypes =
+  | AddBoardSearchResultType
   | deleteReplySuccessType
   | resetThreadErrorType
   | threadFailureType

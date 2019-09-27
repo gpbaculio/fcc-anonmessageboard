@@ -100,17 +100,17 @@ export default class BoardsController {
           }
         }
       },
-      (error, board) => {
-        if (error) res.status(400).send(error);
-        res.status(200).json({ board });
+      function(error, board) {
+        if (error) return res.status(400).send(error);
+        else return res.status(200).json({ board });
       }
     );
   };
   public search_boards = async function(req: Request, res: Response) {
     const { search_text } = req.query;
     await Board.find(
-      { name: search_text },
-      null,
+      { name: { $regex: `${search_text}`, $options: 'i' } },
+      '-delete_password -reported',
       {
         limit: 5,
         sort: '-createdAt',
@@ -126,8 +126,8 @@ export default class BoardsController {
         }
       },
       function(error, boards) {
-        if (error) res.status(400).send(error);
-        res.status(200).json({ boards });
+        if (error) return res.status(400).send(error);
+        return res.status(200).json({ boards });
       }
     );
   };
@@ -137,12 +137,14 @@ export default class BoardsController {
     }
     const { search_text, page, limit, no_pagination_search } = req.query;
     // for input searching, returning only 5
-    if (no_pagination_search) this.search_boards(req, res);
+    if (no_pagination_search) {
+      return this.search_boards(req, res);
+    }
     const query: BookQueryType = {};
     if (search_text !== undefined) query.name = search_text;
     await Board.find(
       query,
-      null,
+      '-delete_password -reported',
       {
         skip: Number(page - 1) * Number(limit),
         limit: Number(limit),
@@ -158,9 +160,9 @@ export default class BoardsController {
           }
         }
       },
-      (error, boards) => {
-        if (error) res.status(400).send(error);
-        res.status(200).json({ boards });
+      function(error, boards) {
+        if (error) return res.status(400).send(error);
+        else return res.status(200).json({ boards });
       }
     );
   };

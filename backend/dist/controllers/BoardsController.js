@@ -119,33 +119,46 @@ class BoardsController {
                         select: '-delete_password -reported'
                     }
                 }
-            }, (error, board) => {
+            }, function (error, board) {
                 if (error)
-                    res.status(400).send(error);
-                res.status(200).json({ board });
+                    return res.status(400).send(error);
+                else
+                    return res.status(200).json({ board });
             });
         });
+        this.search_boards = function (req, res) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const { search_text } = req.query;
+                yield Board_1.default.find({ name: { $regex: `${search_text}`, $options: 'i' } }, '-delete_password -reported', {
+                    limit: 5,
+                    sort: '-createdAt',
+                    populate: {
+                        path: 'threads',
+                        model: 'Thread',
+                        select: '-delete_password -reported',
+                        populate: {
+                            path: 'replies',
+                            model: 'Reply',
+                            select: '-delete_password -reported'
+                        }
+                    }
+                }, function (error, boards) {
+                    if (error)
+                        return res.status(400).send(error);
+                    return res.status(200).json({ boards });
+                });
+            });
+        };
         this.getBoards = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            // async ({ page, limit, searchText, userId }) => {
-            //   const query = {}
-            //   if (searchText !== undefined) {
-            //     if (searchText === '') return []
-            //     query.title = { $regex: `${searchText}`, $options: 'i' }
-            //   }
-            //   if (userId) query.userId = userId
-            //   return Book.find(
-            //     query,
-            //     null,
-            //     { skip: parseInt(page - 1) * parseInt(limit), limit: parseInt(limit) }
-            //   ).populate({ path: 'userId', select: 'username profilePicture' })
-            //     .sort('-createdAt');
-            // }
-            const { search_text, page, limit } = req.query;
+            const { search_text, page, limit, no_pagination_search } = req.query;
+            // for input searching, returning only 5
+            if (no_pagination_search) {
+                return this.search_boards(req, res);
+            }
             const query = {};
             if (search_text !== undefined)
                 query.name = search_text;
-            console.log('Number(page) - 1 * Number(limit) ', Number(page - 1) * Number(limit));
-            yield Board_1.default.find({}, null, {
+            yield Board_1.default.find(query, '-delete_password -reported', {
                 skip: Number(page - 1) * Number(limit),
                 limit: Number(limit),
                 sort: '-createdAt',
@@ -159,10 +172,11 @@ class BoardsController {
                         select: '-delete_password -reported'
                     }
                 }
-            }, (error, boards) => {
+            }, function (error, boards) {
                 if (error)
-                    res.status(400).send(error);
-                res.status(200).json({ boards });
+                    return res.status(400).send(error);
+                else
+                    return res.status(200).json({ boards });
             });
         });
     }

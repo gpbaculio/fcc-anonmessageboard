@@ -1,3 +1,4 @@
+import { ADD_BOARD_SEARCH_RESULT } from './types';
 import {
   BoardsActionTypes,
   CREATE_BOARD_REQUEST,
@@ -60,6 +61,21 @@ const boardsReducer = (
   action: BoardsActionTypes | createThreadSuccess
 ) => {
   switch (action.type) {
+    // handle search result board to add on state to avoid unnecessary refetch
+    case ADD_BOARD_SEARCH_RESULT: {
+      const { board } = action.payload;
+      return {
+        ...state,
+        boards: {
+          ...state.boards,
+          [board._id]: {
+            ...board,
+            loading: boardInitLoading,
+            error: boardInitError
+          }
+        }
+      };
+    }
     case DELETE_THREAD_SUCCESS: {
       const { deletedThread } = action.payload;
       const board = state.boards[deletedThread.board_id];

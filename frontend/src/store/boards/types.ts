@@ -21,14 +21,31 @@ export const SEARCH_BOARDS_REQUEST = 'SEARCH_BOARDS_REQUEST';
 export const SEARCH_BOARDS_SUCCESS = 'SEARCH_BOARDS_SUCCESS';
 export const SEARCH_BOARDS_FAILURE = 'SEARCH_BOARDS_FAILURE';
 
+export const ADD_BOARD_SEARCH_RESULT = 'ADD_BOARD_SEARCH_RESULT';
+
+export interface AddBoardSearchResultType {
+  type: typeof ADD_BOARD_SEARCH_RESULT;
+  payload: {
+    board: BoardType;
+    threads: {
+      [_id: string]: ThreadType;
+    };
+    replies: {
+      [_id: string]: ReplyType;
+    };
+  };
+}
+
 export interface ReplyLoadingType {
   update_text: boolean;
   delete_reply: boolean;
 }
+
 export interface ReplyErrorType {
   update_text: string;
   delete_reply: string;
 }
+
 export interface ReplyType {
   _id: string;
   text: string;
@@ -212,6 +229,7 @@ export interface deleteBoardFailure {
 }
 
 export type BoardsActionTypes =
+  | AddBoardSearchResultType
   | deleteThreadSuccessType
   | deleteBoardSuccess
   | deleteBoardFailure

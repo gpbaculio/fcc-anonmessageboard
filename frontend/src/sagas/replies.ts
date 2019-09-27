@@ -27,7 +27,6 @@ export function* updateReplyText({
     const {
       data: { reply }
     } = yield call(Api.replies.updateReplyText, payload);
-
     yield put(RepliesActions.updateReplyTextSuccess(reply));
     if (callBack) callBack();
   } catch (error) {

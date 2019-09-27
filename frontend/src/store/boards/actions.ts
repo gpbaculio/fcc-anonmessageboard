@@ -18,6 +18,32 @@ import {
   DELETE_BOARD_SUCCESS
 } from './types';
 import { updateNameArgs } from '../../Api';
+import { ADD_BOARD_SEARCH_RESULT } from './types';
+import * as NormalizrEntities from '../../sagas/normalizrEntities';
+import { normalize } from 'normalizr';
+import { boardInitLoading, boardInitError } from './reducers';
+
+export const addBoardSearchResult = (board: BoardType) => {
+  // no need to be handled by sagas so we normalize here
+  const { boards, threads, replies } = normalize(
+    {
+      board: {
+        ...board,
+        loading: boardInitLoading,
+        error: boardInitError
+      }
+    },
+    { board: NormalizrEntities.board }
+  ).entities;
+  return {
+    type: ADD_BOARD_SEARCH_RESULT,
+    payload: {
+      board: boards[board._id],
+      threads,
+      replies
+    }
+  };
+};
 
 export const updateName = (
   { board_id, board_name, delete_password }: updateNameArgs,

@@ -1,3 +1,4 @@
+import { ADD_BOARD_SEARCH_RESULT } from '../boards/types';
 import {
   DELETE_REPLY_REQUEST,
   DELETE_REPLY_SUCCESS,
@@ -45,6 +46,27 @@ const repliesReducer = (
   action: RepliesActionTypes | fetchBoardsSuccess | getThreadSuccess
 ) => {
   switch (action.type) {
+    case ADD_BOARD_SEARCH_RESULT: {
+      let replies = {};
+      if (
+        action.payload.replies &&
+        Object.keys(action.payload.replies).length
+      ) {
+        replies = Object.fromEntries(
+          Object.entries(action.payload.replies).map(([k, v]) => [
+            k,
+            { ...v, loading: replyInitLoading, error: replyInitError }
+          ])
+        );
+      }
+      return {
+        ...state,
+        replies: {
+          ...state.replies,
+          ...replies
+        }
+      };
+    }
     case DELETE_REPLY_REQUEST: {
       const { reply_id } = action.payload;
       const reply = state.replies[reply_id];

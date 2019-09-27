@@ -1,4 +1,4 @@
-import { ReplyType } from '../boards/types';
+import { ReplyType, AddBoardSearchResultType } from '../boards/types';
 import { updateThreadTextSuccessType } from '../threads/types';
 import { updateReplyTextParamsType } from '../../Api';
 
@@ -103,6 +103,7 @@ export interface deleteReplyFailureType {
 }
 
 export type RepliesActionTypes =
+  | AddBoardSearchResultType
   | deleteReplyRequestType
   | deleteReplySuccessType
   | deleteReplyFailureType

@@ -24,6 +24,7 @@ import {
 } from './types';
 import { updateName } from '../boards/actions';
 import { UPDATE_THREAD_TEXT_FAILURE, RESET_THREAD_ERROR } from './types';
+import { ADD_BOARD_SEARCH_RESULT } from '../boards/types';
 import {
   DELETE_THREAD_REQUEST,
   DELETE_THREAD_SUCCESS,
@@ -63,6 +64,27 @@ const repliesReducer = (
   action: ThreadsActionTypes | fetchBoardsSuccess | createReplySuccess
 ) => {
   switch (action.type) {
+    case ADD_BOARD_SEARCH_RESULT: {
+      let threads = {};
+      if (
+        action.payload.threads &&
+        Object.keys(action.payload.threads).length
+      ) {
+        threads = Object.fromEntries(
+          Object.entries(action.payload.threads).map(([k, v]) => [
+            k,
+            { ...v, loading: threadInitLoading, error: threadInitError }
+          ])
+        );
+      }
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          ...threads
+        }
+      };
+    }
     case RESET_THREAD_ERROR: {
       const { thread_id, errorKey } = action.payload;
       const thread = state.threads[thread_id];
