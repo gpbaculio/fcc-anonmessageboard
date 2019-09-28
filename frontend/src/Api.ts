@@ -48,6 +48,9 @@ export default {
   boards: {
     createBoard: ({ name, delete_password }: createBoardArgs) =>
       axios.post('/api/boards', { name, delete_password }),
+    get_boards_count: () => {
+      return axios.get('/api/boards/count');
+    },
     boards_search_input: async ({
       search_text,
       no_pagination_search

@@ -107,6 +107,7 @@ export function* fetchBoards({ payload }: fetchBoardsRequestType) {
       payload: { boards, threads, replies }
     });
   } catch (error) {
+    console.log('error ', error);
     yield put({
       type: FETCH_BOARDS_FAILURE,
       payload: { error: error.message }

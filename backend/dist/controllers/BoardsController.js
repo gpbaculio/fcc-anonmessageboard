@@ -14,6 +14,16 @@ const Reply_1 = require("../models/Reply");
 const mongoose = require("mongoose");
 class BoardsController {
     constructor() {
+        this.getBoardsCount = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            yield Board_1.default.countDocuments({}, function (error, total_count) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error)
+                        return res.status(400).send(error);
+                    else
+                        return res.json({ total_count });
+                });
+            });
+        });
         this.deleteBoard = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { board_id } = req.params;
             const { delete_password } = req.body;

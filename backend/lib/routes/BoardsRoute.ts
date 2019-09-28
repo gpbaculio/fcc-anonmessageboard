@@ -22,5 +22,6 @@ export default class BoardsRoute {
       .get(this.boardsController.getBoard)
       .post(this.boardsController.updateBoardName)
       .delete(this.boardsController.deleteBoard);
+    app.route('/api/boards/count').get(this.boardsController.getBoardsCount);
   };
 }

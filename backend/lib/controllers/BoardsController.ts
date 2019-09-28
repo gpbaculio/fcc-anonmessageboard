@@ -5,6 +5,12 @@ import Reply from '../models/Reply';
 import * as mongoose from 'mongoose';
 
 export default class BoardsController {
+  public getBoardsCount = async (req: Request, res: Response) => {
+    await Board.countDocuments({}, async function(error, total_count) {
+      if (error) return res.status(400).send(error);
+      else return res.json({ total_count });
+    });
+  };
   public deleteBoard = async (req: Request, res: Response) => {
     const { board_id } = req.params;
     const { delete_password } = req.body;

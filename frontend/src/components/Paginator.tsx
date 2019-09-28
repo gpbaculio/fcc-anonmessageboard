@@ -5,16 +5,17 @@ import * as BoardsActions from '../store/boards/actions';
 import { connect } from 'react-redux';
 import { fetchBoardsParamsType } from '../store/boards/actions';
 import { BoardsState } from '../store/boards/types';
+import Api from '../Api';
 
 interface PaginatorProps {
   boards: BoardsState;
-  total_count: number;
   fetch_boards: ({ page, limit }: fetchBoardsParamsType) => void;
 }
 
 interface PaginatorState {
   active_page: number;
   count_per_page: number;
+  total_count: number;
 }
 
 class Paginator extends Component<PaginatorProps, PaginatorState> {
@@ -23,10 +24,16 @@ class Paginator extends Component<PaginatorProps, PaginatorState> {
 
     this.state = {
       active_page: 1,
-      count_per_page: 5
+      count_per_page: 9,
+      total_count: 0
     };
   }
-
+  componentDidMount = async () => {
+    const {
+      data: { total_count }
+    } = await Api.boards.get_boards_count();
+    this.setState({ total_count });
+  };
   onPageChange = async (page: number) => {
     const { fetch_boards, boards } = this.props;
     const { search_text } = boards;
@@ -42,8 +49,7 @@ class Paginator extends Component<PaginatorProps, PaginatorState> {
   };
 
   render() {
-    const { active_page, count_per_page } = this.state;
-    const { total_count } = this.props;
+    const { active_page, count_per_page, total_count } = this.state;
     return (
       <div>
         <Pagination

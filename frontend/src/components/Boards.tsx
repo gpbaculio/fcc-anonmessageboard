@@ -11,6 +11,7 @@ import {
 import { Row, Col, Card, CardBody, CardTitle } from 'reactstrap';
 import { getTimeDate } from './utils';
 import { Link } from 'react-router-dom';
+import Paginator from './Paginator';
 
 interface BoardsProps extends RouteComponentProps {
   // Add your regular properties here
@@ -59,6 +60,7 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
             );
           })}
         </Row>
+        <Paginator />
       </Fragment>
     );
   }

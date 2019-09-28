@@ -259,24 +259,36 @@ const repliesReducer = (
       };
     }
     case FETCH_BOARD_SUCCESS: {
-      const threads = Object.fromEntries(
-        Object.entries(action.payload.threads).map(([k, v]) => [
-          k,
-          { ...v, loading: threadInitLoading, error: threadInitError }
-        ])
-      );
+      let threads = {};
+      if (
+        action.payload.threads &&
+        Object.keys(action.payload.threads).length
+      ) {
+        threads = Object.fromEntries(
+          Object.entries(action.payload.threads).map(([k, v]) => [
+            k,
+            { ...v, loading: threadInitLoading, error: threadInitError }
+          ])
+        );
+      }
       return {
         ...state,
         threads: { ...state.threads, ...threads }
       };
     }
     case FETCH_BOARDS_SUCCESS: {
-      const threads = Object.fromEntries(
-        Object.entries(action.payload.threads).map(([k, v]) => [
-          k,
-          { ...v, loading: threadInitLoading, error: threadInitError }
-        ])
-      );
+      let threads = {};
+      if (
+        action.payload.threads &&
+        Object.keys(action.payload.threads).length
+      ) {
+        threads = Object.fromEntries(
+          Object.entries(action.payload.threads).map(([k, v]) => [
+            k,
+            { ...v, loading: threadInitLoading, error: threadInitError }
+          ])
+        );
+      }
       return {
         ...state,
         threads: { ...state.threads, ...threads }
