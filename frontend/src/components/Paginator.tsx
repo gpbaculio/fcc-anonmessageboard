@@ -51,15 +51,14 @@ class Paginator extends Component<PaginatorProps, PaginatorState> {
   render() {
     const { active_page, count_per_page, total_count } = this.state;
     return (
-      <div>
-        <Pagination
-          activePage={active_page}
-          itemsCountPerPage={count_per_page}
-          totalItemsCount={total_count}
-          pageRangeDisplayed={5}
-          onChange={this.onPageChange}
-        />
-      </div>
+      <Pagination
+        innerClass='pagination my-0 mx-auto'
+        activePage={active_page}
+        itemsCountPerPage={count_per_page}
+        totalItemsCount={total_count}
+        pageRangeDisplayed={3}
+        onChange={this.onPageChange}
+      />
     );
   }
 }

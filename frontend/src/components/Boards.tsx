@@ -36,7 +36,7 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
         <Row>
           {boards.map(board => {
             return (
-              <Col xs='4' key={board._id}>
+              <Col xs='12' sm='6' md='4' key={board._id} className='my-3'>
                 <Card>
                   <Link
                     to={{
@@ -45,12 +45,12 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
                     }}>
                     <CardBody>
                       <CardTitle className='mb-0'>
-                        <div className='d-flex justify-content-between'>
-                          <div className='d-flex flex-column'>
+                        <div className='d-flex flex-column'>
+                          <div className='d-flex  justify-content-between'>
                             <h6>{board.name}</h6>
-                            <small>{board.threads.length}</small>
+                            <small>Threads: {board.threads.length}</small>
                           </div>
-                          <div>{getTimeDate(board.created_on)}</div>
+                          <small>{getTimeDate(board.created_on)}</small>
                         </div>
                       </CardTitle>
                     </CardBody>
@@ -60,7 +60,6 @@ class Boards extends Component<BoardsProps & BoardsDispatchProps> {
             );
           })}
         </Row>
-        <Paginator />
       </Fragment>
     );
   }

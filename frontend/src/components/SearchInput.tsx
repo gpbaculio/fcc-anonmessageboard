@@ -64,6 +64,10 @@ class SearchInput extends Component<SearchInputProps, SearchInputState> {
       loading: false
     });
   };
+  handle_on_blur = () => {
+    console.log('onBLur');
+    this.setState({ search_text_results: [] });
+  };
   render() {
     const {
       search_text,
@@ -72,12 +76,13 @@ class SearchInput extends Component<SearchInputProps, SearchInputState> {
       loading
     } = this.state;
     return (
-      <Form className='d-flex w-50 search-form'>
-        <div className='search-input d-flex flex-column position-relative'>
+      <Form className='d-flex w-100 search-form'>
+        <div className='d-flex w-100 flex-column position-relative'>
           <Input
             autoComplete='off'
             value={search_text}
             onChange={this.handle_change}
+            onBlur={this.handle_on_blur}
             className='flex-grow-1'
             required
             type='text'
