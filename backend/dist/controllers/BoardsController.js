@@ -141,7 +141,7 @@ class BoardsController {
                 const { search_text } = req.query;
                 yield Board_1.default.find({ name: { $regex: `${search_text}`, $options: 'i' } }, '-delete_password -reported', {
                     limit: 5,
-                    sort: '-createdAt',
+                    sort: '-created_on',
                     populate: {
                         path: 'threads',
                         model: 'Thread',
@@ -171,7 +171,7 @@ class BoardsController {
             yield Board_1.default.find(query, '-delete_password -reported', {
                 skip: Number(page - 1) * Number(limit),
                 limit: Number(limit),
-                sort: '-createdAt',
+                sort: '-created_on',
                 populate: {
                     path: 'threads',
                     model: 'Thread',

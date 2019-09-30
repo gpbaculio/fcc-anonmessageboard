@@ -134,6 +134,7 @@ export interface createBoardRequest {
     name: string;
     delete_password: string;
   };
+  call_back?: () => void;
 }
 
 export interface updateNameRequest {

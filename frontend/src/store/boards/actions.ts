@@ -17,7 +17,7 @@ import {
   DELETE_BOARD_FAILURE,
   DELETE_BOARD_SUCCESS
 } from './types';
-import { updateNameArgs } from '../../Api';
+import { updateNameArgs, createBoardArgs } from '../../Api';
 import { ADD_BOARD_SEARCH_RESULT } from './types';
 import * as NormalizrEntities from '../../sagas/normalizrEntities';
 import { normalize } from 'normalizr';
@@ -58,12 +58,16 @@ export const updateName = (
   callBack
 });
 
-export const createBoard = (name: string, delete_password: string) => ({
+export const createBoard = (
+  { name, delete_password }: createBoardArgs,
+  call_back?: () => void
+) => ({
   type: CREATE_BOARD_REQUEST,
   payload: {
     name,
     delete_password
-  }
+  },
+  call_back
 });
 
 export const resetError = () => ({

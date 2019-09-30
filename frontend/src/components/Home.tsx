@@ -54,9 +54,7 @@ class Home extends Component<HomeProps & HomeDispatchProps, HomeState> {
                   <Paginator />
                 </Col>
                 <Col className='d-flex align-items-center'>
-                  <Button className='btn-block' color='primary'>
-                    Add Board
-                  </Button>
+                  <AddBoard />
                 </Col>
               </Row>
             </Col>

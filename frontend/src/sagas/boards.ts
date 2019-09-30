@@ -48,6 +48,7 @@ export function* createBoard(action: createBoardRequest) {
         error: boardInitError
       })
     );
+    if (action.call_back) action.call_back();
   } catch (error) {
     yield put(boardActions.createBoardFailure(error.response.data));
   }
