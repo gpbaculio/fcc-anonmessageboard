@@ -44,19 +44,15 @@ class Home extends Component<HomeProps & HomeDispatchProps, HomeState> {
           <strong>Loading...</strong>
         </div>
         <Container className='position-relative'>
-          <Row>
-            <Col xs='12' className='mt-4 mb-2'>
-              <Row>
-                <Col className='d-flex align-items-center w-100'>
-                  <SearchInput />
-                </Col>
-                <Col className='d-flex align-items-center'>
-                  <Paginator />
-                </Col>
-                <Col className='d-flex align-items-center'>
-                  <AddBoard />
-                </Col>
-              </Row>
+          <h2 className='mt-3 mx-auto text-center'>BOARDS</h2>
+          <Row className='mt-3 mb-2'>
+            <Col sm='4' className='d-flex align-items-center w-100'>
+              <SearchInput />
+            </Col>
+            <Col
+              sm={{ offset: 4, size: 4 }}
+              className='d-flex align-items-center'>
+              <AddBoard />
             </Col>
           </Row>
           <Alert
@@ -75,6 +71,7 @@ class Home extends Component<HomeProps & HomeDispatchProps, HomeState> {
               <Boards />
             </Col>
           </Row>
+          <Paginator />
         </Container>
       </Fragment>
     );

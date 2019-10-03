@@ -25,7 +25,10 @@ class App extends Component {
           <Route
             exact
             path='/b/:board_id/:thread_id'
-            render={renderProps => <Thread {...renderProps} />}
+            render={renderProps => {
+              console.log('renderProps ', renderProps);
+              return <Thread {...renderProps} />;
+            }}
           />
         </Switch>
       </Fragment>

@@ -1,7 +1,7 @@
 import { expectSaga, SagaType } from 'redux-saga-test-plan';
 import uuidv1 from 'uuid/v1';
 
-import Api, { createBoardArgs, createThreadArgs } from '../Api';
+import Api, { createBoardArgs, createThreadArgsType } from '../Api';
 import * as threadsSagas from '../sagas/threads';
 import boardsReducer, {
   boardInitLoading,
@@ -13,6 +13,12 @@ import threadsReducer, { threadsInitState } from '../store/threads/reducers';
 import { combineReducers } from 'redux';
 import { createThread, createThreadSuccess } from '../store/threads/actions';
 import { BoardTypeResponse } from './boards.test';
+import { ThreadLoadingType, ThreadErrorType } from '../store/boards/types';
+import { repliesInitState } from '../store/replies/reducers';
+import repliesReducer, {
+  threadInitLoading,
+  threadInitError
+} from '../store/threads/reducers';
 
 export class ThreadTypeResponse {
   board_id: string;
@@ -23,6 +29,8 @@ export class ThreadTypeResponse {
   text: string;
   updated_on: string;
   _id: string;
+  loading: ThreadLoadingType;
+  error: ThreadErrorType;
 
   constructor(params: {
     text?: string;
@@ -40,6 +48,8 @@ export class ThreadTypeResponse {
     this.text = params.text || 'CREATE BOARD TEST';
     this.updated_on = dateNow;
     this._id = genId;
+    this.loading = threadInitLoading;
+    this.error = threadInitError;
   }
 }
 describe.only('Threads Sagas', () => {
@@ -49,7 +59,7 @@ describe.only('Threads Sagas', () => {
       delete_password: 'abcd123'
     };
     const mockBoard = new BoardTypeResponse(createBoardArgs);
-    const createThreadArgs: createThreadArgs = {
+    const createThreadArgs: createThreadArgsType = {
       board_id: mockBoard._id,
       text: 'CREATE THREAD TEST',
       delete_password: uuidv1()

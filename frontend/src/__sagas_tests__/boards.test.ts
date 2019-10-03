@@ -1,8 +1,8 @@
-import { expectSaga, SagaType, RunResult } from 'redux-saga-test-plan';
+import { expectSaga, SagaType } from 'redux-saga-test-plan';
 import uuidv1 from 'uuid/v1';
 
 import Api, { createBoardArgs, updateNameArgs } from '../Api';
-import boardsSagas from '../sagas/boards';
+import * as BoardsSagas from '../sagas/boards';
 import boardsReducer, {
   boardInitLoading,
   boardInitError,
@@ -10,12 +10,7 @@ import boardsReducer, {
 } from '../store/boards/reducers';
 
 import { BoardLoadingType, BoardErrorType } from '../store/boards/types';
-import {
-  createboardSuccess,
-  createBoard,
-  updateName,
-  updateNameSuccess
-} from '../store/boards/actions';
+import * as BoardsActions from '../store/boards/actions';
 import { combineReducers } from 'redux';
 
 export class BoardTypeResponse {
@@ -54,6 +49,74 @@ export class BoardTypeResponse {
 }
 
 describe.only('Boards Sagas', () => {
+  it('should delete board', async () => {
+    const createBoardArgs: createBoardArgs = {
+      name: 'CREATE BOARD TEST',
+      delete_password: 'abcd123'
+    };
+    // create board to be used on initial boards reducer state
+    // this should be deleted from running test
+    const mockBoard = new BoardTypeResponse(createBoardArgs);
+    const { storeState } = await expectSaga(
+      BoardsSagas.deleteBoard as SagaType,
+      // dispatch initial action it wants to test
+      // referencing the created board above to delete
+      BoardsActions.deleteBoard({
+        board_id: mockBoard._id,
+        delete_password: createBoardArgs.delete_password
+      })
+    )
+      .withReducer(
+        // mimic reducer form
+        combineReducers({
+          boards: boardsReducer
+        }),
+        // initial state of boards
+        {
+          boards: {
+            ...boardsInitState,
+            // assign the mock board on boards reducer
+            // with initial loading end error state
+            boards: {
+              ...boardsInitState.boards,
+              [mockBoard._id]: {
+                ...mockBoard,
+                loading: boardInitLoading,
+                error: boardInitError
+              }
+            }
+          }
+        }
+      ) // Mock the response from API
+      .provide({
+        call: (effect, next) => {
+          // Check for the API call to return fake value
+          if (effect.fn === Api.boards.deleteBoard) {
+            // mocking the provided argument to match board to delete as it is required in api
+            //  effect.args = [ { name: 'CREATE BOARD TEST', delete_password: 'abcd123' } ]
+            if (mockBoard.delete_password === effect.args[0].delete_password)
+              return { data: { deletedBoard: mockBoard } };
+            else return { data: 'Invalid Password' };
+          }
+          // Allow Redux Saga to handle other `call` effects
+          return next();
+        }
+      })
+      .put(BoardsActions.deleteBoardSuccess(mockBoard))
+      .silentRun();
+
+    // we are using normalizr on the state so when we initialize the board above we have this:
+    // boards: {
+    //   error: { ... },
+    //   loading: { ... },
+    //   boards: {
+    //     my_board_id: { ...my_board_props }
+    //   }
+    // }
+
+    // we have the id of mockBoard on initial boards as you see above below we test if it's been removed
+    expect(storeState.boards.boards).not.toHaveProperty(mockBoard._id);
+  });
   it('should create board', async () => {
     const createBoardArgs: createBoardArgs = {
       name: 'CREATE BOARD TEST',
@@ -61,9 +124,9 @@ describe.only('Boards Sagas', () => {
     };
     const mockBoard = new BoardTypeResponse(createBoardArgs);
     const { storeState } = await expectSaga(
-      boardsSagas.createBoard as SagaType,
+      BoardsSagas.createBoard as SagaType,
       // dispatch initial action it wants to test
-      createBoard('CREATE BOARD TEST', 'abcd123')
+      BoardsActions.createBoard(createBoardArgs)
     )
       .withReducer(
         // mimic reducer form
@@ -83,7 +146,7 @@ describe.only('Boards Sagas', () => {
         }
       })
       .put(
-        createboardSuccess({
+        BoardsActions.createboardSuccess({
           ...mockBoard,
           loading: boardInitLoading,
           error: boardInitError
@@ -116,9 +179,9 @@ describe.only('Boards Sagas', () => {
       delete_password: mockBoard.delete_password
     };
     const { storeState } = await expectSaga(
-      boardsSagas.updateName as SagaType,
+      BoardsSagas.updateName as SagaType,
       // initial dispatch to test
-      updateName(updateNameArgs)
+      BoardsActions.updateName(updateNameArgs)
     )
       .withReducer(
         // mimic reducer form
@@ -160,7 +223,10 @@ describe.only('Boards Sagas', () => {
       })
       .put(
         // reference updateNameArgs assuming the operation succeeds
-        updateNameSuccess({ ...mockBoard, name: updateNameArgs.board_name })
+        BoardsActions.updateNameSuccess({
+          ...mockBoard,
+          name: updateNameArgs.board_name
+        })
       )
       .run();
 

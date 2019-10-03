@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import Pagination from 'react-js-pagination';
 import { AppState } from '../store';
 import * as BoardsActions from '../store/boards/actions';
@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { fetchBoardsParamsType } from '../store/boards/actions';
 import { BoardsState } from '../store/boards/types';
 import Api from '../Api';
+import { Row, Col } from 'reactstrap';
 
 interface PaginatorProps {
   boards: BoardsState;
@@ -51,14 +52,21 @@ class Paginator extends Component<PaginatorProps, PaginatorState> {
   render() {
     const { active_page, count_per_page, total_count } = this.state;
     return (
-      <Pagination
-        innerClass='pagination my-0 mx-auto'
-        activePage={active_page}
-        itemsCountPerPage={count_per_page}
-        totalItemsCount={total_count}
-        pageRangeDisplayed={3}
-        onChange={this.onPageChange}
-      />
+      <Row className='mt-4'>
+        <Col xs='12'>
+          <div className='d-flex align-items-center justify-content-between w-100'>
+            <h5 className='mb-0'>Total Count: {total_count}</h5>
+            <Pagination
+              innerClass='pagination my-0'
+              activePage={active_page}
+              itemsCountPerPage={count_per_page}
+              totalItemsCount={total_count}
+              pageRangeDisplayed={3}
+              onChange={this.onPageChange}
+            />
+          </div>
+        </Col>
+      </Row>
     );
   }
 }

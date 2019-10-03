@@ -211,7 +211,7 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                   board_id: board._id,
                   delete_password: this.state.board_delete_password,
                   callBack: () => {
-                    this.props.history.push('/');
+                    this.props.history.replace('/');
                   }
                 })
               }>

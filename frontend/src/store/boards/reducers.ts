@@ -276,11 +276,13 @@ const boardsReducer = (
         ...state,
         loading: { ...state.loading, createBoard: false },
         boards: {
-          ...state.boards,
           [board._id]: {
             ...board,
-            ...action.payload.board
-          }
+            ...action.payload.board,
+            error: boardInitError,
+            loading: boardInitLoading
+          },
+          ...state.boards
         }
       };
     }

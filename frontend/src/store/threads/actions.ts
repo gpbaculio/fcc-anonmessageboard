@@ -10,7 +10,7 @@ import {
   updateThreadTextArgsType,
   deleteThreadArgsType
 } from '../../Api';
-import { ThreadType, ReplyType } from '../boards/types';
+import { ThreadType } from '../boards/types';
 import { DELETE_THREAD_FAILURE, RESET_THREAD_ERROR } from './types';
 import {
   updateThreadTextSuccessArgsType,

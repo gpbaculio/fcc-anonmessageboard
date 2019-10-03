@@ -1,7 +1,7 @@
 import { expectSaga, SagaType } from 'redux-saga-test-plan';
 import uuidv1 from 'uuid/v1';
 
-import Api, { createBoardArgs, createThreadArgs } from '../Api';
+import Api, { createBoardArgs, createThreadArgsType } from '../Api';
 import * as repliesSagas from '../sagas/replies';
 import boardsReducer, {
   boardInitLoading,
@@ -15,6 +15,8 @@ import { BoardTypeResponse } from './boards.test';
 import { ThreadTypeResponse } from './threads.test';
 import repliesReducer, { repliesInitState } from '../store/replies/reducers';
 import { createReply, createReplySuccess } from '../store/replies/actions';
+import { ReplyLoadingType, ReplyErrorType } from '../store/boards/types';
+import { replyInitLoading, replyInitError } from '../store/replies/reducers';
 
 export class ReplyTypeResponse {
   created_on: string;
@@ -24,6 +26,8 @@ export class ReplyTypeResponse {
   thread_id: string;
   updated_on: string;
   _id: string;
+  loading: ReplyLoadingType;
+  error: ReplyErrorType;
 
   constructor(params: {
     delete_password?: string;
@@ -40,6 +44,8 @@ export class ReplyTypeResponse {
     this.thread_id = params.thread_id;
     this.updated_on = dateNow;
     this._id = genId;
+    this.loading = replyInitLoading;
+    this.error = replyInitError;
   }
 }
 describe.only('Replies Sagas', () => {
@@ -49,7 +55,7 @@ describe.only('Replies Sagas', () => {
       delete_password: 'abcd123'
     };
     const mockBoard = new BoardTypeResponse(createBoardArgs);
-    const createThreadArgs: createThreadArgs = {
+    const createThreadArgs: createThreadArgsType = {
       board_id: mockBoard._id,
       text: 'CREATE THREAD TEST',
       delete_password: uuidv1()

@@ -196,7 +196,7 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
                   },
                   () => {
                     console.log(' GO BACK');
-                    this.props.history.push(`/b/${thread.board_id}`);
+                    this.props.history.replace(`/b/${thread.board_id}`);
                   }
                 );
               }}>

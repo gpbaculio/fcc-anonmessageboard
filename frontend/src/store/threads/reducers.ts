@@ -303,6 +303,7 @@ const repliesReducer = (
     }
     case CREATE_THREAD_SUCCESS: {
       const { thread } = action.payload;
+
       return {
         ...state,
         error: {
@@ -311,7 +312,11 @@ const repliesReducer = (
         },
         threads: {
           ...state.threads,
-          [thread._id]: { ...thread }
+          [thread._id]: {
+            ...thread,
+            loading: threadInitLoading,
+            error: threadInitError
+          }
         },
         loading: { ...state.loading, createThread: false }
       };
