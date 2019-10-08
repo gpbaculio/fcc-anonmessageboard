@@ -178,7 +178,11 @@ const repliesReducer = (
       };
     }
     case UPDATE_THREAD_TEXT_SUCCESS: {
-      const thread = { ...action.payload.thread, loading: threadInitLoading };
+      const thread = {
+        ...action.payload.thread,
+        loading: threadInitLoading,
+        error: threadInitError
+      };
       return {
         ...state,
         threads: {

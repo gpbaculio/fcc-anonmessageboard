@@ -54,7 +54,15 @@ class ThreadsController {
         this.updateThreadName = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { text, delete_password } = req.body;
             const { thread_id } = req.params;
-            yield Thread_1.default.findById(thread_id, function (error, thread) {
+            yield Thread_1.default.findById(thread_id, null, {
+                populate: [
+                    {
+                        path: 'replies',
+                        model: 'Reply',
+                        select: '-delete_password -reported'
+                    }
+                ]
+            }, function (error, thread) {
                 return __awaiter(this, void 0, void 0, function* () {
                     if (error)
                         res.status(400).send(error);

@@ -201,7 +201,14 @@ const repliesReducer = (
       };
     }
     case UPDATE_THREAD_TEXT_SUCCESS:
-      const { replies } = action.payload;
+      let replies = {};
+      if (action.payload.replies && Object.keys(action.payload.replies).length)
+        replies = Object.fromEntries(
+          Object.entries(action.payload.replies).map(([k, v]) => [
+            k,
+            { ...v, loading: replyInitLoading, error: replyInitError }
+          ])
+        );
       return {
         ...state,
         replies: {

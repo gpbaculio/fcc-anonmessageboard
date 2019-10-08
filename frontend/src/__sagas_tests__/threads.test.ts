@@ -2,7 +2,7 @@ import { expectSaga, SagaType } from 'redux-saga-test-plan';
 import uuidv1 from 'uuid/v1';
 
 import Api, { createBoardArgs, createThreadArgsType } from '../Api';
-import * as threadsSagas from '../sagas/threads';
+import * as ThreadsSagas from '../sagas/threads';
 import boardsReducer, {
   boardInitLoading,
   boardInitError,
@@ -11,7 +11,7 @@ import boardsReducer, {
 
 import threadsReducer, { threadsInitState } from '../store/threads/reducers';
 import { combineReducers } from 'redux';
-import { createThread, createThreadSuccess } from '../store/threads/actions';
+import * as ThreadsActions from '../store/threads/actions';
 import { BoardTypeResponse } from './boards.test';
 import { ThreadLoadingType, ThreadErrorType } from '../store/boards/types';
 import { repliesInitState } from '../store/replies/reducers';
@@ -29,6 +29,7 @@ export class ThreadTypeResponse {
   text: string;
   updated_on: string;
   _id: string;
+  delete_password: string;
   loading: ThreadLoadingType;
   error: ThreadErrorType;
 
@@ -40,6 +41,7 @@ export class ThreadTypeResponse {
     const genId = uuidv1();
     const genDelPass = uuidv1();
     const dateNow = new Date().toISOString();
+    this.delete_password = params.delete_password || genDelPass;
     this.board_id = params.board_id;
     this.bumped_on = dateNow;
     this.created_on = dateNow;
@@ -53,6 +55,96 @@ export class ThreadTypeResponse {
   }
 }
 describe.only('Threads Sagas', () => {
+  it('should update thread name', async () => {
+    const createBoardArgs: createBoardArgs = {
+      name: 'CREATE BOARD TEST',
+      delete_password: 'abcd123'
+    };
+    // create mock board where you put thread
+    const mockBoard = new BoardTypeResponse(createBoardArgs);
+
+    const createThreadArgs: createThreadArgsType = {
+      // use mock board id to establish connection as foreign key
+      board_id: mockBoard._id,
+      text: 'CREATE THREAD TEST',
+      delete_password: uuidv1()
+    };
+    // create mock thread
+    const mockThread = new ThreadTypeResponse(createThreadArgs);
+
+    const updateThreadArgs = {
+      text: 'UPDATE THREAD ARG TEXT',
+      delete_password: createThreadArgs.delete_password,
+      thread_id: mockThread._id
+    };
+    const { storeState } = await expectSaga(
+      ThreadsSagas.updateThread as SagaType,
+      // initial dispatch to test
+      ThreadsActions.updateThreadText(updateThreadArgs)
+    )
+      .withReducer(
+        // mimic reducer form
+        combineReducers({
+          boards: boardsReducer,
+          threads: threadsReducer
+        }),
+        // initial state of boards
+        {
+          boards: {
+            ...boardsInitState,
+            // assign the mock board on boards reducer
+            // with initial loading end error state
+            boards: {
+              ...boardsInitState.boards,
+              [mockBoard._id]: {
+                ...mockBoard,
+                loading: boardInitLoading,
+                error: boardInitError
+              }
+            }
+          },
+          threads: {
+            ...threadsInitState,
+            threads: {
+              ...threadsInitState.threads,
+              // assign the created thread as it will be used to test
+              [mockThread._id]: {
+                ...mockThread,
+                loading: threadInitLoading,
+                error: threadInitError
+              }
+            }
+          }
+        }
+      )
+      // Mock the response from API
+      .provide({
+        call: (effect, next) => {
+          // Check for the API call to return fake value
+          if (effect.fn === Api.threads.updateThreadText) {
+            // mocking the provided argument to match board to delete as it is required in api
+            //  effect.args = [ { text, delete_password, thread_id } ]
+            if (mockThread.delete_password === effect.args[0].delete_password)
+              return {
+                // reference updateThreadArgs to assume for successful operation testing
+                data: { thread: { ...mockThread, text: updateThreadArgs.text } }
+              };
+            else return { data: 'Invalid Password' };
+          }
+          // Allow Redux Saga to handle other `call` effects
+          return next();
+        }
+      })
+      .put(
+        // normalizr on replies
+        ThreadsActions.updateThreadTextSuccess({
+          thread: { ...mockThread, text: updateThreadArgs.text },
+          // no replies
+          replies: undefined
+        })
+      )
+      .silentRun();
+  });
   it('should create thread on board', async () => {
     const createBoardArgs: createBoardArgs = {
       name: 'CREATE BOARD TEST',
@@ -66,10 +158,10 @@ describe.only('Threads Sagas', () => {
     };
     const mockThread = new ThreadTypeResponse(createThreadArgs);
     const { storeState } = await expectSaga(
-      threadsSagas.createThread as SagaType,
+      ThreadsSagas.createThread as SagaType,
       // dispatch initial action it wants to test
       // with the mockBoard since we have it on initial state of this test
-      createThread(createThreadArgs)
+      ThreadsActions.createThread(createThreadArgs)
     )
       .withReducer(
         // mimic reducer form
@@ -106,7 +198,7 @@ describe.only('Threads Sagas', () => {
           return next();
         }
       })
-      .put(createThreadSuccess(mockThread))
+      .put(ThreadsActions.createThreadSuccess(mockThread))
       .silentRun();
 
     // expect board on state to include thread id of thread created

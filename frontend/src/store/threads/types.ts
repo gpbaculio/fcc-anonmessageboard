@@ -42,9 +42,12 @@ export interface updateThreadTextRequest {
 
 export interface updateThreadTextSuccessArgsType {
   thread: ThreadType;
-  replies: {
-    [_id: string]: ReplyType;
-  };
+  // replies can be undefined when the thread has no replies
+  replies:
+    | undefined
+    | {
+        [_id: string]: ReplyType;
+      };
 }
 
 export interface updateThreadTextSuccessType {
