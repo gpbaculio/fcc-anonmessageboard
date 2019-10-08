@@ -55,7 +55,7 @@ export class ThreadTypeResponse {
   }
 }
 describe.only('Threads Sagas', () => {
-  it('should update thread name', async () => {
+  it('should update thread text', async () => {
     const createBoardArgs: createBoardArgs = {
       name: 'CREATE BOARD TEST',
       delete_password: 'abcd123'
@@ -144,6 +144,9 @@ describe.only('Threads Sagas', () => {
         })
       )
       .silentRun();
+      // we assumed the test operation to succeed
+      // the thread text from state should match the one from args
+      expect(storeState.threads.threads[mockThread._id].text).toEqual(updateThreadArgs.text)
   });
   it('should create thread on board', async () => {
     const createBoardArgs: createBoardArgs = {
