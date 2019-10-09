@@ -44,7 +44,7 @@ export const createReplyFailure = (error: string) => ({
 
 export const updateReplyTextRequest = (
   { reply_id, text, delete_password }: updateReplyTextParamsType,
-  callBack: () => void
+  callBack?: () => void
 ) => ({
   type: UPDATE_REPLY_TEXT_REQUEST,
   payload: { reply_id, text, delete_password },

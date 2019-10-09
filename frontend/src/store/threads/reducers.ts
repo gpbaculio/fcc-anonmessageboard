@@ -132,10 +132,13 @@ const repliesReducer = (
       const thread = state.threads[thread_id];
       return {
         ...state,
-        [thread._id]: {
-          ...thread,
-          // remove deletedReply _id
-          replies: thread.replies.filter(r_id => r_id !== reply_id)
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            // remove deletedReply _id
+            replies: thread.replies.filter(r_id => r_id !== reply_id)
+          }
         }
       };
     }

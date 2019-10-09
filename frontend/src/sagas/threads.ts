@@ -76,9 +76,8 @@ export function* deleteThreadSaga(action: deleteThreadRequestType) {
       data: { deletedThread }
     } = yield call(Api.threads.deleteThread, action.payload);
 
-    if (action.callBack) {
-      action.callBack();
-    }
+    if (action.callBack) action.callBack();
+
     yield put(ThreadsActions.deleteThreadSuccess(deletedThread));
   } catch (error) {
     yield put(ThreadsActions.deleteThreadFailure(error.message));

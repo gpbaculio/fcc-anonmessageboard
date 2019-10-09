@@ -14,11 +14,7 @@ import { combineReducers } from 'redux';
 import * as ThreadsActions from '../store/threads/actions';
 import { BoardTypeResponse } from './boards.test';
 import { ThreadLoadingType, ThreadErrorType } from '../store/boards/types';
-import { repliesInitState } from '../store/replies/reducers';
-import repliesReducer, {
-  threadInitLoading,
-  threadInitError
-} from '../store/threads/reducers';
+import { threadInitLoading, threadInitError } from '../store/threads/reducers';
 
 export class ThreadTypeResponse {
   board_id: string;
@@ -55,6 +51,98 @@ export class ThreadTypeResponse {
   }
 }
 describe.only('Threads Sagas', () => {
+  it('should delete thread on board', async () => {
+    const createBoardArgs: createBoardArgs = {
+      name: 'CREATE BOARD TEST',
+      delete_password: 'abcd123'
+    };
+    // create mock board where you put thread
+    const mockBoard = new BoardTypeResponse(createBoardArgs);
+
+    const createThreadArgs: createThreadArgsType = {
+      // use mock board id to establish connection as foreign key
+      board_id: mockBoard._id,
+      text: 'CREATE THREAD TEST',
+      delete_password: uuidv1()
+    };
+    // create mock thread
+    const mockThread = new ThreadTypeResponse(createThreadArgs);
+    // we are refering data from mockThread
+    const deleteThreadArgs = {
+      thread_id: mockThread._id,
+      delete_password: mockThread.delete_password
+    };
+    const { storeState } = await expectSaga(
+      ThreadsSagas.deleteThreadSaga as SagaType,
+      // initial dispatch to test
+      ThreadsActions.deleteThreadRequest(deleteThreadArgs)
+    )
+      .withReducer(
+        // mimic reducer form
+        combineReducers({
+          boards: boardsReducer,
+          threads: threadsReducer
+        }),
+        // initial state of boards
+        {
+          boards: {
+            ...boardsInitState,
+            // assign the mock board on boards reducer
+            // with initial loading end error state
+            boards: {
+              ...boardsInitState.boards,
+              [mockBoard._id]: {
+                ...mockBoard,
+                // add created thread on threads, we are using normalizr
+                // for the state so a board will contain array of thread ids on threads prop
+                // and refer to the state object with ids prop that has thread data
+                threads: [mockThread._id],
+                // loading and error prop for the UI
+                loading: boardInitLoading,
+                error: boardInitError
+              }
+            }
+          },
+          threads: {
+            ...threadsInitState,
+            threads: {
+              ...threadsInitState.threads,
+              // assign the created thread as it will be used to test
+              [mockThread._id]: {
+                ...mockThread,
+                loading: threadInitLoading,
+                error: threadInitError
+              }
+            }
+          }
+        }
+      )
+      // Mock the response from API
+      .provide({
+        call: (effect, next) => {
+          // Check for the API call to return fake value
+          if (effect.fn === Api.threads.deleteThread) {
+            // mocking the provided argument to match board to delete as it is required in api
+            //  effect.args = [ { text, delete_password, thread_id } ]
+            if (mockThread.delete_password === effect.args[0].delete_password)
+              return {
+                // reference created thread to assume for successful delete test
+                data: { deletedThread: mockThread }
+              };
+            else return { data: 'Invalid Password' };
+          }
+          // Allow Redux Saga to handle other `call` effects
+          return next();
+        }
+      })
+      .put(ThreadsActions.deleteThreadSuccess(mockThread))
+      .silentRun();
+    // thread id on boards should be removed from the operation, we assigned it on initial reducer
+    expect(storeState.boards.boards[mockBoard._id].threads).not.toContain(
+      mockThread._id
+    );
+    expect(storeState.threads.threads).not.toHaveProperty(mockThread._id);
+  });
   it('should update thread text', async () => {
     const createBoardArgs: createBoardArgs = {
       name: 'CREATE BOARD TEST',
@@ -144,9 +232,11 @@ describe.only('Threads Sagas', () => {
         })
       )
       .silentRun();
-      // we assumed the test operation to succeed
-      // the thread text from state should match the one from args
-      expect(storeState.threads.threads[mockThread._id].text).toEqual(updateThreadArgs.text)
+    // we assumed the test operation to succeed
+    // the thread text from state should match the one from args
+    expect(storeState.threads.threads[mockThread._id].text).toEqual(
+      updateThreadArgs.text
+    );
   });
   it('should create thread on board', async () => {
     const createBoardArgs: createBoardArgs = {
