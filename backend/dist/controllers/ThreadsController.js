@@ -87,6 +87,7 @@ class ThreadsController {
             return __awaiter(this, void 0, void 0, function* () {
                 const { board_id } = req.params;
                 const { text, delete_password } = req.body;
+                console.log(' create thread fired');
                 yield Thread_1.default.create({ board_id, text, delete_password }, function (error, thread) {
                     return __awaiter(this, void 0, void 0, function* () {
                         if (error)

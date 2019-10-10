@@ -69,6 +69,7 @@ export default class ThreadsController {
   public createThread = async function(req: Request, res: Response) {
     const { board_id } = req.params;
     const { text, delete_password } = req.body;
+    console.log(' create thread fired');
     await Thread.create({ board_id, text, delete_password }, async function(
       error,
       thread
