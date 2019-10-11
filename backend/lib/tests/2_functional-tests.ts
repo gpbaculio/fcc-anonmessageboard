@@ -10,12 +10,12 @@ import Reply from '../models/Reply';
  */
 
 const chaiHttp = require('chai-http');
-const chaiModule = require('chai');
+const chai_module = require('chai');
 const axios = require('axios');
 import * as mongoose from 'mongoose';
-const assert = chaiModule.assert;
+const assert = chai_module.assert;
 import server from '../server';
-chaiModule.use(chaiHttp);
+chai_module.use(chaiHttp);
 
 // create board
 const create_test_board = async function(
@@ -41,6 +41,7 @@ const create_test_board = async function(
         .save()
         .then(function(rec) {
           if (call_back) call_back(new_board._id);
+          console.log('create board with id ', new_board._id);
           done();
         })
         .catch(function(err) {
@@ -138,17 +139,61 @@ const create_board_thread = async function(
         done();
       }
       // push created thread on board and save
-      board.threads.push(thread);
+      await board.threads.push(thread);
       await board.save(function(board_save_error) {
         if (board_save_error) {
           console.error(board_save_error.message);
           done();
         } else {
           if (call_back) call_back(thread._id);
+          console.log('created thread with id', thread._id);
           done();
         }
       });
     });
+  });
+};
+const delete_board_thread = async function(done, thread_id: { _id: string }) {
+  await Thread.findOneAndDelete(thread_id, async function(
+    thread_delete_error,
+    deleted_thread
+  ) {
+    if (thread_delete_error) {
+      console.error(thread_delete_error.message);
+      done();
+      return;
+    }
+    // if thread has no replies
+    if (deleted_thread && !deleted_thread.replies.length) {
+      console.log('deleted thread with id', deleted_thread._id);
+      done();
+      return;
+    }
+    // if thread has replies
+    else if (deleted_thread && deleted_thread.replies.length) {
+      const deleted_thread_reply_ids = deleted_thread.replies.map(thread =>
+        mongoose.Types.ObjectId(thread.id)
+      );
+      await Reply.deleteMany(
+        {
+          _id: { $in: deleted_thread_reply_ids }
+        },
+        async function(delete_replies_error) {
+          if (delete_replies_error) {
+            console.error(delete_replies_error.message);
+            done();
+            return;
+          } else {
+            console.log(
+              'deleted replies associated with thread id',
+              deleted_thread._id
+            );
+            done();
+            return;
+          }
+        }
+      );
+    }
   });
 };
 suite('Functional Tests', function() {
@@ -186,39 +231,94 @@ suite('Functional Tests', function() {
   suite(`API ROUTING FOR ${threads_route}/:board_id`, function() {
     this.timeout(10000);
     suite('POST', function() {
+      let thread_id = null;
       this.timeout(10000);
       test(`CREATE NEW THREAD ON BOARD`, function(done) {
-        chaiModule
+        this.timeout(10000);
+        const request_body = {
+          text: gen_rand_string(),
+          delete_password: gen_rand_string()
+        };
+        const expected_status = 200;
+        const expected_keys = [
+          'reported',
+          'replies',
+          '_id',
+          'board_id',
+          'text',
+          'bumped_on',
+          'created_on',
+          'updated_on'
+        ];
+        chai_module
           .request(server)
           .post(`${threads_route}/${test_board_id}`)
-          .send({
-            text: gen_rand_string(),
-            delete_password: gen_rand_string()
-          })
-          .end(function(create_thread_error, res) {
-            //testId = res.body._id;
-            console.log('res body ', res.body);
-            assert.equal(res.status, 200);
-            // assert.equal(res.body.issue_title, 'Title');
-            // assert.equal(res.body.issue_text, 'text');
-            // assert.equal(
-            //   res.body.created_by,
-            //   'Functional Test - Every field filled in'
-            // );
-            // assert.equal(res.body.assigned_to, 'Chai and Mocha');
-            // assert.equal(res.body.status_text, 'In QA');
-            // assert.equal(res.body.open, true);
+          .send(request_body)
+          .end(function(create_thread_error, response) {
+            const { thread: result_thread } = response.body;
+            thread_id = result_thread._id;
+            // should be no error
+            assert.equal(create_thread_error, null);
+            assert.equal(response.status, expected_status);
+            // thread should contain expected keys
+            assert.hasAllKeys(result_thread, expected_keys);
+            // text should match text from argument request
+            assert.propertyVal(result_thread, 'text', request_body.text);
+            // initialized to false
+            assert.isFalse(result_thread.reported);
+            // replies should be array
+            assert.isArray(result_thread.replies);
+            assert.isEmpty(result_thread.replies);
             done();
           });
       });
-      // delete board after testing
+
+      // delete thread after testing
       teardown(done => {
         this.timeout(10000);
-        delete_test_board(done, { _id: test_board_id });
+        delete_board_thread(done, { _id: thread_id });
       });
     });
 
-    suite('GET', function() {});
+    suite('GET', function() {
+      let thread_id = null;
+      this.timeout(10000);
+      console.log('GET BOARD ID ', test_board_id);
+      setup(done => {
+        const request_body = {
+          board_id: test_board_id,
+          text: gen_rand_string(),
+          delete_password: gen_rand_string()
+        };
+        create_board_thread(done, request_body, function(created_thread_id) {
+          thread_id = created_thread_id;
+          return;
+        });
+      });
+
+      test(`GET THREADS OF BOARD`, function(done) {
+        const expected_status = 200;
+        chai_module
+          .request(server)
+          .get(`/api/threads/${test_board_id}`)
+          .end((get_threads_error, response) => {
+            const { status: actual_status } = response;
+            const { threads: result_threads } = response.body;
+            // const ac = response.body.threads;
+            console.log('get threads response ', response.body);
+            // // assert
+            assert.equal(actual_status, expected_status);
+            assert.isArray(result_threads);
+
+            done();
+          });
+      });
+      // delete thread after testing
+      teardown(done => {
+        this.timeout(10000);
+        delete_board_thread(done, { _id: thread_id });
+      });
+    });
 
     suite('DELETE', function() {});
 

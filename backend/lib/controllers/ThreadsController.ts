@@ -69,7 +69,6 @@ export default class ThreadsController {
   public createThread = async function(req: Request, res: Response) {
     const { board_id } = req.params;
     const { text, delete_password } = req.body;
-    console.log(' create thread fired');
     await Thread.create({ board_id, text, delete_password }, async function(
       error,
       thread
@@ -92,10 +91,21 @@ export default class ThreadsController {
   public getThreads = async (req: Request, res: Response) => {
     const { board_id } = req.params;
     await Thread.find(
-      { boardId: board_id },
+      { board_id },
       null,
-      { sort: '-createdAt', limit: 10 },
+      {
+        sort: '-createdAt',
+        limit: 10,
+        populate: [
+          {
+            path: 'threads',
+            model: 'Thread',
+            select: '-delete_password'
+          }
+        ]
+      },
       (error, threads) => {
+        console.log('threads controller getThreads', threads);
         if (error) res.status(400).send(error);
         else res.status(200).json({ threads });
       }

@@ -87,7 +87,6 @@ class ThreadsController {
             return __awaiter(this, void 0, void 0, function* () {
                 const { board_id } = req.params;
                 const { text, delete_password } = req.body;
-                console.log(' create thread fired');
                 yield Thread_1.default.create({ board_id, text, delete_password }, function (error, thread) {
                     return __awaiter(this, void 0, void 0, function* () {
                         if (error)
@@ -114,7 +113,18 @@ class ThreadsController {
         };
         this.getThreads = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { board_id } = req.params;
-            yield Thread_1.default.find({ boardId: board_id }, null, { sort: '-createdAt', limit: 10 }, (error, threads) => {
+            yield Thread_1.default.find({ board_id }, null, {
+                sort: '-createdAt',
+                limit: 10,
+                populate: [
+                    {
+                        path: 'threads',
+                        model: 'Thread',
+                        select: '-delete_password'
+                    }
+                ]
+            }, (error, threads) => {
+                console.log('threads controller getThreads', threads);
                 if (error)
                     res.status(400).send(error);
                 else
