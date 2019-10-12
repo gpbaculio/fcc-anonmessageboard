@@ -261,8 +261,8 @@ suite('Functional Tests', function () {
         suite('GET', function () {
             let thread_id = null;
             this.timeout(10000);
-            console.log('GET BOARD ID ', test_board_id);
             setup(done => {
+                this.timeout(10000);
                 const request_body = {
                     board_id: test_board_id,
                     text: gen_rand_string(),
@@ -274,6 +274,7 @@ suite('Functional Tests', function () {
                 });
             });
             test(`GET THREADS OF BOARD`, function (done) {
+                this.timeout(10000);
                 const expected_status = 200;
                 chai_module
                     .request(server_1.default)
@@ -282,7 +283,6 @@ suite('Functional Tests', function () {
                     const { status: actual_status } = response;
                     const { threads: result_threads } = response.body;
                     // const ac = response.body.threads;
-                    console.log('get threads response ', response.body);
                     // // assert
                     assert.equal(actual_status, expected_status);
                     assert.isArray(result_threads);
@@ -303,6 +303,11 @@ suite('Functional Tests', function () {
         suite('GET', function () { });
         suite('PUT', function () { });
         suite('DELETE', function () { });
+    });
+    // delete board 'general'
+    suiteTeardown(done => {
+        console.log('suite teardown');
+        delete_test_board(done, { _id: test_board_id });
     });
 });
 //# sourceMappingURL=2_functional-tests.js.map

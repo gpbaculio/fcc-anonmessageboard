@@ -162,7 +162,7 @@ class BoardsController {
         this.getBoards = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { search_text, page, limit, no_pagination_search } = req.query;
             // for input searching, returning only 5
-            if (no_pagination_search) {
+            if (no_pagination_search === 'true' ? true : false) {
                 return this.search_boards(req, res);
             }
             const query = {};

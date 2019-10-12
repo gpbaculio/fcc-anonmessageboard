@@ -143,7 +143,7 @@ export default class BoardsController {
     }
     const { search_text, page, limit, no_pagination_search } = req.query;
     // for input searching, returning only 5
-    if (no_pagination_search) {
+    if (no_pagination_search === 'true' ? true : false) {
       return this.search_boards(req, res);
     }
     const query: BookQueryType = {};

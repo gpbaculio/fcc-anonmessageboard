@@ -51,9 +51,10 @@ class ThreadsController {
                 });
             });
         });
-        this.updateThreadName = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { text, delete_password } = req.body;
+        this.update_thread = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { text, delete_password, report_thread } = req.body;
             const { thread_id } = req.params;
+            console.log('report_thread ', report_thread);
             yield Thread_1.default.findById(thread_id, null, {
                 populate: [
                     {
@@ -113,7 +114,7 @@ class ThreadsController {
         };
         this.getThreads = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { board_id } = req.params;
-            yield Thread_1.default.find({ board_id }, null, {
+            yield Thread_1.default.find({ board_id }, '-delete_password', {
                 sort: '-createdAt',
                 limit: 10,
                 populate: [

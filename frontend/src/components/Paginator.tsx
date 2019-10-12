@@ -61,7 +61,7 @@ class Paginator extends Component<PaginatorProps, PaginatorState> {
               activePage={active_page}
               itemsCountPerPage={count_per_page}
               totalItemsCount={total_count}
-              pageRangeDisplayed={3}
+              pageRangeDisplayed={5}
               onChange={this.onPageChange}
             />
           </div>

@@ -34,9 +34,10 @@ export default class ThreadsController {
       } else res.status(400).send('Incorrect Delete Password');
     });
   };
-  public updateThreadName = async (req: Request, res: Response) => {
-    const { text, delete_password } = req.body;
+  public update_thread = async (req: Request, res: Response) => {
+    const { text, delete_password, report_thread } = req.body;
     const { thread_id } = req.params;
+    console.log('report_thread ', report_thread);
     await Thread.findById(
       thread_id,
       null,
@@ -92,7 +93,7 @@ export default class ThreadsController {
     const { board_id } = req.params;
     await Thread.find(
       { board_id },
-      null,
+      '-delete_password',
       {
         sort: '-createdAt',
         limit: 10,

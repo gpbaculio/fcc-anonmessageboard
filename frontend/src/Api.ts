@@ -95,7 +95,7 @@ export default {
       delete_password,
       thread_id
     }: updateThreadTextArgsType) => {
-      return axios.post(`/api/thread/${thread_id}`, { text, delete_password });
+      return axios.put(`/api/thread/${thread_id}`, { text, delete_password });
     },
     getThread: (thread_id: string) => axios.get(`/api/thread/${thread_id}`)
   },

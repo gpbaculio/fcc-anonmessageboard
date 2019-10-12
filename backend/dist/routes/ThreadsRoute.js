@@ -20,7 +20,7 @@ class ThreadsRoute {
             app
                 .route('/api/thread/:thread_id')
                 .get(this.threadsController.getThread)
-                .post(this.threadsController.updateThreadName)
+                .put(this.threadsController.update_thread)
                 .delete(this.threadsController.deleteThread);
         };
     }

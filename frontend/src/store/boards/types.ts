@@ -67,10 +67,12 @@ export interface deleteBoardRequestType {
 export interface ThreadLoadingType {
   update_text: boolean;
   delete_thread: boolean;
+  report_thread: boolean;
 }
 export interface ThreadErrorType {
   update_text: string;
   delete_thread: string;
+  report_thread: string;
 }
 
 export interface ThreadType {

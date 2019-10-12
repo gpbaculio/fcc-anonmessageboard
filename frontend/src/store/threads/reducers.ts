@@ -51,12 +51,14 @@ export const threadsInitState: ThreadsState = {
 
 export const threadInitLoading = {
   update_text: false,
-  delete_thread: false
+  delete_thread: false,
+  report_thread: false
 };
 
 export const threadInitError = {
   update_text: '',
-  delete_thread: ''
+  delete_thread: '',
+  report_thread: ''
 };
 
 const repliesReducer = (

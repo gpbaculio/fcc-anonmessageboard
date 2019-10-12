@@ -158,7 +158,7 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
           isOpen={this.state.deleteModal}
           toggle={() => this.toggleModal('deleteModal')}>
           <ModalHeader toggle={() => this.toggleModal('deleteModal')}>
-            Delete Board
+            Delete Thread
           </ModalHeader>
           <ModalBody
             className={classNames({
