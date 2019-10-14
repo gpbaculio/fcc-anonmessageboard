@@ -11,7 +11,34 @@ import {
 import * as ThreadsActions from '../store/threads/actions';
 import { thread } from './normalizrEntities';
 import { normalize } from 'normalizr';
-import { updateThreadTextRequest } from '../store/threads/types';
+import {
+  REPORT_THREAD_FAILURE,
+  REPORT_THREAD_SUCCESS
+} from '../store/threads/types';
+import {
+  updateThreadTextRequest,
+  type_report_thread_request
+} from '../store/threads/types';
+
+export function* report_thread({ payload }: type_report_thread_request) {
+  try {
+    const response = yield call(Api.threads.report_thread, payload);
+    // log successful operation since api response is only text as required on project
+    console.log(
+      `Toggle report operation of thread with id ${payload.thread_id}`,
+      response.data
+    );
+    yield put({
+      type: REPORT_THREAD_SUCCESS,
+      payload: { thread_id: payload.thread_id }
+    });
+  } catch (error) {
+    yield put({
+      type: REPORT_THREAD_FAILURE,
+      payload: { error: error.response.data, thread_id: payload.thread_id }
+    });
+  }
+}
 
 export function* createThread({ payload, callBack }: createThreadRequest) {
   try {

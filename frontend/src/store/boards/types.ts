@@ -78,6 +78,7 @@ export interface ThreadErrorType {
 export interface ThreadType {
   _id: string;
   text: string;
+  reported: boolean;
   created_on: string;
   replies: string[];
   bumped_on: string;

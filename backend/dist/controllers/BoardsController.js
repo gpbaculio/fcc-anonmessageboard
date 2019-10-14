@@ -168,18 +168,18 @@ class BoardsController {
             const query = {};
             if (search_text !== undefined)
                 query.name = search_text;
-            yield Board_1.default.find(query, '-delete_password -reported', {
+            yield Board_1.default.find(query, '-delete_password', {
                 skip: Number(page - 1) * Number(limit),
                 limit: Number(limit),
                 sort: '-created_on',
                 populate: {
                     path: 'threads',
                     model: 'Thread',
-                    select: '-delete_password -reported',
+                    select: '-delete_password',
                     populate: {
                         path: 'replies',
                         model: 'Reply',
-                        select: '-delete_password -reported'
+                        select: '-delete_password'
                     }
                 }
             }, function (error, boards) {

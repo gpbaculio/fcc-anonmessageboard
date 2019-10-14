@@ -5,6 +5,7 @@ import { ReplyDocument } from './Reply';
 export interface ThreadDocument extends mongoose.Document {
   text: string;
   board_id: string;
+  reported: boolean;
   delete_password: string;
   bumped_on: Date;
   replies: ReplyDocument[];

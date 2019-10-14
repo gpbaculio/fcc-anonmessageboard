@@ -15,12 +15,14 @@ import { ThreadType } from '../store/boards/types';
 import { use_text_input } from './hooks/input_hook';
 import { AppState } from '../store/index';
 import { connect } from 'react-redux';
+
 interface Modal_Report_Thread_Props {
   report_thread_modal_view: boolean;
   toggle_modal: (modal_type: string) => void;
   thread: ThreadType;
   thread_id: string;
 }
+
 class Modal_Report_Thread extends Component<Modal_Report_Thread_Props> {
   render() {
     const { report_thread_modal_view, toggle_modal, thread } = this.props;

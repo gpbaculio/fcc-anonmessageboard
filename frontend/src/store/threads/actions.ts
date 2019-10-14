@@ -11,7 +11,12 @@ import {
   deleteThreadArgsType
 } from '../../Api';
 import { ThreadType } from '../boards/types';
-import { DELETE_THREAD_FAILURE, RESET_THREAD_ERROR } from './types';
+import { report_thread_args_type } from '../../Api';
+import {
+  DELETE_THREAD_FAILURE,
+  RESET_THREAD_ERROR,
+  REPORT_THREAD_REQUEST
+} from './types';
 import {
   updateThreadTextSuccessArgsType,
   DELETE_THREAD_SUCCESS
@@ -20,6 +25,14 @@ import {
   UPDATE_THREAD_TEXT_SUCCESS,
   UPDATE_THREAD_TEXT_FAILURE
 } from './types';
+
+export const report_thread = ({
+  board_id,
+  thread_id
+}: report_thread_args_type) => ({
+  type: REPORT_THREAD_REQUEST,
+  payload: { board_id, thread_id }
+});
 
 export const deleteThreadRequest = (
   { thread_id, delete_password }: deleteThreadArgsType,

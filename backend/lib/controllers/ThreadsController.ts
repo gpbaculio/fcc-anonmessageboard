@@ -4,6 +4,32 @@ import Thread from '../models/Thread';
 import Reply from '../models/Reply';
 
 export default class ThreadsController {
+  public report_thread = async (req: Request, res: Response) => {
+    const { board_id } = req.params;
+    const { thread_id } = req.body;
+    await Thread.findById(
+      thread_id,
+      '-delete_password',
+      {
+        populate: [
+          {
+            path: 'replies',
+            model: 'Reply',
+            select: '-delete_password'
+          }
+        ]
+      },
+      async function(error, thread) {
+        if (error) res.status(400).send(error);
+        // toggle reported status
+        thread.reported = !thread.reported;
+        thread.save(function(error) {
+          if (error) res.status(400).send(error);
+          res.status(200).send('success');
+        });
+      }
+    );
+  };
   public deleteThread = async (req: Request, res: Response) => {
     const { thread_id } = req.params;
     const { delete_password } = req.body;
@@ -37,7 +63,6 @@ export default class ThreadsController {
   public update_thread = async (req: Request, res: Response) => {
     const { text, delete_password, report_thread } = req.body;
     const { thread_id } = req.params;
-    console.log('report_thread ', report_thread);
     await Thread.findById(
       thread_id,
       null,
@@ -46,7 +71,7 @@ export default class ThreadsController {
           {
             path: 'replies',
             model: 'Reply',
-            select: '-delete_password -reported'
+            select: '-delete_password'
           }
         ]
       },
@@ -116,13 +141,13 @@ export default class ThreadsController {
     const { thread_id } = req.params;
     await Thread.findById(
       thread_id,
-      '-delete_password -reported',
+      '-delete_password',
       {
         populate: [
           {
             path: 'replies',
             model: 'Reply',
-            select: '-delete_password -reported'
+            select: '-delete_password'
           }
           // {
           //   path: 'board_id',

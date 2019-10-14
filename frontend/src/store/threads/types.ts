@@ -24,6 +24,10 @@ export const DELETE_THREAD_FAILURE = 'DELETE_THREAD_FAILURE';
 
 export const RESET_THREAD_ERROR = 'RESET_THREAD_ERROR';
 
+export const REPORT_THREAD_REQUEST = 'REPORT_THREAD_REQUEST';
+export const REPORT_THREAD_SUCCESS = 'REPORT_THREAD_SUCCESS';
+export const REPORT_THREAD_FAILURE = 'REPORT_THREAD_FAILURE';
+
 export interface resetThreadErrorType {
   type: typeof RESET_THREAD_ERROR;
   payload: {
@@ -127,7 +131,33 @@ export interface updateThreadTextFailureType {
   };
 }
 
+export interface type_report_thread_request {
+  type: typeof REPORT_THREAD_REQUEST;
+  payload: {
+    thread_id: string;
+    board_id: string;
+  };
+}
+
+export interface type_report_thread_success {
+  type: typeof REPORT_THREAD_SUCCESS;
+  payload: {
+    thread_id: string;
+  };
+}
+
+export interface type_report_thread_failure {
+  type: typeof REPORT_THREAD_FAILURE;
+  payload: {
+    thread_id: string;
+    error: string;
+  };
+}
+
 export type ThreadsActionTypes =
+  | type_report_thread_failure
+  | type_report_thread_request
+  | type_report_thread_success
   | AddBoardSearchResultType
   | deleteReplySuccessType
   | resetThreadErrorType

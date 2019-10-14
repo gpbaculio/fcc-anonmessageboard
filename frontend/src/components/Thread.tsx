@@ -21,10 +21,13 @@ import {
 import { connect } from 'react-redux';
 import { AppState } from '../store';
 import { createReply } from '../store/replies/actions';
-import { getThread } from '../store/threads/actions';
 import { timeDifferenceForDate, getTimeDate } from './utils';
-import { createReplyArgsType, deleteThreadArgsType } from '../Api';
-import * as ThreadsActions from '../store/threads/actions';
+import {
+  createReplyArgsType,
+  deleteThreadArgsType,
+  report_thread_args_type
+} from '../Api';
+import * as Threads_Actions from '../store/threads/actions';
 import { RepliesState } from '../store/replies/types';
 import {
   ThreadsState,
@@ -43,6 +46,10 @@ interface ThreadProps extends RouteComponentProps<{ thread_id: string }> {
 }
 
 interface ThreadDispatchProps {
+  dispatch_report_thread: ({
+    board_id,
+    thread_id
+  }: report_thread_args_type) => void;
   createReply: ({
     delete_password,
     text,
@@ -84,7 +91,8 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
       bumped_on: '',
       board_id: '',
       loading: threadInitLoading,
-      error: threadInitError
+      error: threadInitError,
+      reported: false
     }
   };
   setIsEditing = (show: boolean) => {
@@ -150,7 +158,12 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
     }));
   };
   render() {
-    const { replies, threads, resetThreadError } = this.props;
+    const {
+      replies,
+      threads,
+      resetThreadError,
+      dispatch_report_thread
+    } = this.props;
     const { thread, isEditing } = this.state;
     return (
       <Container>
@@ -264,18 +277,31 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
                   </legend>
                   <div
                     className={classNames(
-                      'board-controllers d-flex w-25 justify-content-between',
+                      'board-controllers d-flex ml-auto justify-content-between',
                       {
                         hide: isEditing
                       }
                     )}>
                     <Button
+                      outline={thread.reported ? false : true}
+                      color='primary'
+                      onClick={() =>
+                        dispatch_report_thread({
+                          board_id: thread.board_id,
+                          thread_id: thread._id
+                        })
+                      }>
+                      Report
+                    </Button>
+                    <Button
                       color='success'
+                      className='ml-1'
                       onClick={() => this.setIsEditing(true)}>
                       Edit
                     </Button>
                     <Button
                       color='danger'
+                      className='ml-1'
                       onClick={() => this.toggleModal('deleteModal')}>
                       Delete
                     </Button>
@@ -381,9 +407,10 @@ const mapStateToProps = ({ threads, replies }: AppState) => ({
 
 const mapDispatchToProps = {
   createReply,
-  getThread,
-  deleteThread: ThreadsActions.deleteThreadRequest,
-  resetThreadError: ThreadsActions.resetThreadError
+  getThread: Threads_Actions.getThread,
+  dispatch_report_thread: Threads_Actions.report_thread,
+  deleteThread: Threads_Actions.deleteThreadRequest,
+  resetThreadError: Threads_Actions.resetThreadError
 };
 
 export default connect(

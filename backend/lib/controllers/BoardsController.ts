@@ -150,7 +150,7 @@ export default class BoardsController {
     if (search_text !== undefined) query.name = search_text;
     await Board.find(
       query,
-      '-delete_password -reported',
+      '-delete_password',
       {
         skip: Number(page - 1) * Number(limit),
         limit: Number(limit),
@@ -158,11 +158,11 @@ export default class BoardsController {
         populate: {
           path: 'threads',
           model: 'Thread',
-          select: '-delete_password -reported',
+          select: '-delete_password',
           populate: {
             path: 'replies',
             model: 'Reply',
-            select: '-delete_password -reported'
+            select: '-delete_password'
           }
         }
       },

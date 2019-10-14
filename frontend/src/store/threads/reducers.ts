@@ -23,8 +23,13 @@ import {
   UPDATE_THREAD_TEXT_SUCCESS
 } from './types';
 import { updateName } from '../boards/actions';
-import { UPDATE_THREAD_TEXT_FAILURE, RESET_THREAD_ERROR } from './types';
+import {
+  UPDATE_THREAD_TEXT_FAILURE,
+  RESET_THREAD_ERROR,
+  REPORT_THREAD_REQUEST
+} from './types';
 import { ADD_BOARD_SEARCH_RESULT } from '../boards/types';
+import { REPORT_THREAD_SUCCESS, REPORT_THREAD_FAILURE } from './types';
 import {
   DELETE_THREAD_REQUEST,
   DELETE_THREAD_SUCCESS,
@@ -66,6 +71,66 @@ const repliesReducer = (
   action: ThreadsActionTypes | fetchBoardsSuccess | createReplySuccess
 ) => {
   switch (action.type) {
+    case REPORT_THREAD_REQUEST: {
+      const { thread_id } = action.payload;
+      const thread = state.threads[thread_id];
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            // this is optimistic response
+            // toggle reported status upon successful operation
+            reported: !thread.reported,
+            loading: {
+              ...thread.loading,
+              report_thread: true
+            }
+          }
+        }
+      };
+    }
+    case REPORT_THREAD_SUCCESS: {
+      const { thread_id } = action.payload;
+      const thread = state.threads[thread_id];
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            loading: {
+              ...thread.loading,
+              report_thread: false
+            }
+          }
+        }
+      };
+    }
+    case REPORT_THREAD_FAILURE: {
+      const { thread_id, error } = action.payload;
+      const thread = state.threads[thread_id];
+      return {
+        ...state,
+        threads: {
+          ...state.threads,
+          [thread._id]: {
+            ...thread,
+            // toggle reported status upon successful operation
+            reported: !thread.reported,
+            loading: {
+              ...thread.loading,
+              report_thread: false
+            },
+            error: {
+              ...thread.error,
+              error
+            }
+          }
+        }
+      };
+    }
     case ADD_BOARD_SEARCH_RESULT: {
       let threads = {};
       if (

@@ -44,6 +44,10 @@ export interface deleteReplyParamsType {
   delete_password: string;
 }
 
+export interface report_thread_args_type {
+  board_id: string;
+  thread_id: string;
+}
 export default {
   boards: {
     createBoard: ({ name, delete_password }: createBoardArgs) =>
@@ -97,7 +101,12 @@ export default {
     }: updateThreadTextArgsType) => {
       return axios.put(`/api/thread/${thread_id}`, { text, delete_password });
     },
-    getThread: (thread_id: string) => axios.get(`/api/thread/${thread_id}`)
+    getThread: (thread_id: string) => axios.get(`/api/thread/${thread_id}`),
+    report_thread: ({ board_id, thread_id }: report_thread_args_type) => {
+      return axios.put(`/api/threads/${board_id}`, {
+        thread_id
+      });
+    }
   },
   replies: {
     createReply: ({
