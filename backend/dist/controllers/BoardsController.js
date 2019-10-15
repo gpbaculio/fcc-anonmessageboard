@@ -123,6 +123,7 @@ class BoardsController {
                     path: 'threads',
                     model: 'Thread',
                     select: '-delete_password -reported',
+                    options: { limit: 10, sort: { bumped_on: 'descending' } },
                     populate: {
                         path: 'replies',
                         model: 'Reply',

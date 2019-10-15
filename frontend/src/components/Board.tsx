@@ -399,24 +399,37 @@ class Board extends Component<BoardProps & BoardDispatchProps, BoardState> {
                           <td colSpan={3}>No Threads</td>
                         </tr>
                       )}
-                      {board.threads.map(thId => {
-                        const thread = threads.threads[thId];
-                        return (
-                          <tr key={thread._id}>
-                            <td>
-                              <Link
-                                to={{
-                                  pathname: `/b/${board._id}/${thread._id}`,
-                                  state: { thread_id: thread._id }
-                                }}>
-                                {thread.text}
-                              </Link>
-                            </td>
-                            <td>{thread.replies.length}</td>
-                            <td>{getTimeDate(thread.bumped_on)}</td>
-                          </tr>
-                        );
-                      })}
+                      {/*
+                        api returns sorted threads but we use sort when bumped_on
+                        prop is updated from creating reply on a thread
+                      */}
+                      {board.threads
+                        .sort((thread_id_1, thread_id_2) => {
+                          const thread_1 = threads.threads[thread_id_1];
+                          const thread_2 = threads.threads[thread_id_2];
+                          return (
+                            new Date(thread_2.bumped_on).getTime() -
+                            new Date(thread_1.bumped_on).getTime()
+                          );
+                        })
+                        .map(thId => {
+                          const thread = threads.threads[thId];
+                          return (
+                            <tr key={thread._id}>
+                              <td>
+                                <Link
+                                  to={{
+                                    pathname: `/b/${board._id}/${thread._id}`,
+                                    state: { thread_id: thread._id }
+                                  }}>
+                                  {thread.text}
+                                </Link>
+                              </td>
+                              <td>{thread.replies.length}</td>
+                              <td>{getTimeDate(thread.bumped_on)}</td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </Table>
                 </div>

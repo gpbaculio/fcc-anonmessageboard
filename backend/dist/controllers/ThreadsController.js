@@ -136,10 +136,10 @@ class ThreadsController {
                 });
             });
         };
-        this.getThreads = (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.get_threads = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { board_id } = req.params;
             yield Thread_1.default.find({ board_id }, '-delete_password', {
-                sort: '-createdAt',
+                sort: { bumped_on: -1 },
                 limit: 10,
                 populate: [
                     {

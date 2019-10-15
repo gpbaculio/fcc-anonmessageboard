@@ -87,7 +87,6 @@ export function* fetchBoard(action: fetchBoardRequest) {
       },
       { board }
     ).entities;
-    console.log('{ boards, threads, replies } ', { boards, threads, replies });
     if (normalized_threads) threads = normalized_threads;
     if (normalized_replies) replies = normalized_replies;
     yield put(boardActions.fetchBoardSuccess({ boards, threads, replies }));

@@ -114,13 +114,13 @@ export default class ThreadsController {
       });
     });
   };
-  public getThreads = async (req: Request, res: Response) => {
+  public get_threads = async (req: Request, res: Response) => {
     const { board_id } = req.params;
     await Thread.find(
       { board_id },
       '-delete_password',
       {
-        sort: '-createdAt',
+        sort: { bumped_on: -1 },
         limit: 10,
         populate: [
           {

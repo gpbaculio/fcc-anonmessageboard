@@ -14,7 +14,7 @@ class ThreadsRoute {
         this.routes = (app) => {
             app
                 .route('/api/threads/:board_id')
-                .get(this.threadsController.getThreads)
+                .get(this.threadsController.get_threads)
                 .post(this.threadsController.createThread)
                 .delete(this.threadsController.deleteThread)
                 .put(this.threadsController.report_thread);

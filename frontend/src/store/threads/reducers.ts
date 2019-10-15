@@ -327,6 +327,7 @@ const repliesReducer = (
           ...state.threads,
           [thread._id]: {
             ...thread,
+            bumped_on: new Date(reply.created_on).toISOString(),
             replies: [...thread.replies, reply._id]
           }
         }
