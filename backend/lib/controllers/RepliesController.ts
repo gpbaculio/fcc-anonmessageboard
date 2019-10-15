@@ -3,6 +3,37 @@ import Reply from '../models/Reply';
 import Thread from '../models/Thread';
 
 export default class RepliesController {
+  public report_reply = async (req: Request, res: Response) => {
+    const { board_id } = req.params;
+    const { thread_id, reply_id } = req.body;
+    // make sure the board and thread is existing
+    await Thread.findOne({ board_id, _id: thread_id }, async function(
+      error,
+      thread
+    ) {
+      if (error) res.status(400).send(error);
+      await Reply.findOne(
+        { _id: reply_id, thread_id: thread._id },
+        '-delete_password',
+        {
+          populate: {
+            path: 'thread_id',
+            model: 'Thread',
+            select: '-delete_password'
+          }
+        },
+        async function(error, reply) {
+          if (error) res.status(400).send(error);
+          // toggle reported status
+          reply.reported = !reply.reported;
+          reply.save(function(error) {
+            if (error) res.status(400).send(error);
+            res.status(200).send('success');
+          });
+        }
+      );
+    });
+  };
   public deleteReply = async (req: Request, res: Response) => {
     const { reply_id } = req.params;
     const { delete_password } = req.body;

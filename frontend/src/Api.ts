@@ -48,6 +48,12 @@ export interface report_thread_args_type {
   board_id: string;
   thread_id: string;
 }
+
+export interface report_reply_params_type {
+  board_id: string;
+  thread_id: string;
+  reply_id: string;
+}
 export default {
   boards: {
     createBoard: ({ name, delete_password }: createBoardArgs) =>
@@ -109,6 +115,16 @@ export default {
     }
   },
   replies: {
+    report_reply: ({
+      reply_id,
+      board_id,
+      thread_id
+    }: report_reply_params_type) => {
+      return axios.put(`/api/replies/${board_id}`, {
+        thread_id,
+        reply_id
+      });
+    },
     createReply: ({
       text,
       delete_password,

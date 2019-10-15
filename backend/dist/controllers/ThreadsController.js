@@ -16,7 +16,7 @@ class ThreadsController {
         this.report_thread = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { board_id } = req.params;
             const { thread_id } = req.body;
-            yield Thread_1.default.findById(thread_id, '-delete_password', {
+            yield Thread_1.default.findOne({ _id: thread_id, board_id }, '-delete_password', {
                 populate: [
                     {
                         path: 'replies',

@@ -12,6 +12,36 @@ const Reply_1 = require("../models/Reply");
 const Thread_1 = require("../models/Thread");
 class RepliesController {
     constructor() {
+        this.report_reply = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { board_id } = req.params;
+            const { thread_id, reply_id } = req.body;
+            // make sure the board and thread is existing
+            yield Thread_1.default.findOne({ board_id, _id: thread_id }, function (error, thread) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error)
+                        res.status(400).send(error);
+                    yield Reply_1.default.findOne({ _id: reply_id, thread_id: thread._id }, '-delete_password', {
+                        populate: {
+                            path: 'thread_id',
+                            model: 'Thread',
+                            select: '-delete_password'
+                        }
+                    }, function (error, reply) {
+                        return __awaiter(this, void 0, void 0, function* () {
+                            if (error)
+                                res.status(400).send(error);
+                            // toggle reported status
+                            reply.reported = !reply.reported;
+                            reply.save(function (error) {
+                                if (error)
+                                    res.status(400).send(error);
+                                res.status(200).send('success');
+                            });
+                        });
+                    });
+                });
+            });
+        });
         this.deleteReply = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { reply_id } = req.params;
             const { delete_password } = req.body;

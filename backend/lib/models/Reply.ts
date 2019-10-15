@@ -7,6 +7,7 @@ export interface ReplyDocument extends mongoose.Document {
   delete_password: string;
   encryptPassword: (delete_password: string) => Promise<string>;
   authenticate: (plainTextPassword: string) => boolean;
+  reported: boolean;
 }
 
 const ReplySchema = new mongoose.Schema(

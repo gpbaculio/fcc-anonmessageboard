@@ -7,8 +7,8 @@ export default class ThreadsController {
   public report_thread = async (req: Request, res: Response) => {
     const { board_id } = req.params;
     const { thread_id } = req.body;
-    await Thread.findById(
-      thread_id,
+    await Thread.findOne(
+      { _id: thread_id, board_id },
       '-delete_password',
       {
         populate: [
