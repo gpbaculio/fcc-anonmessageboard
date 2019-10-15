@@ -77,8 +77,8 @@ const boardsReducer = (
       };
     }
     case DELETE_THREAD_SUCCESS: {
-      const { deletedThread } = action.payload;
-      const board = state.boards[deletedThread.board_id];
+      const { board_id, thread_id } = action.payload;
+      const board = state.boards[board_id];
       return {
         ...state,
         boards: {
@@ -86,7 +86,7 @@ const boardsReducer = (
           [board._id]: {
             ...board,
             // remove deleted thread id
-            threads: board.threads.filter(thId => thId !== deletedThread._id)
+            threads: board.threads.filter(th_id => th_id !== thread_id)
           }
         }
       };

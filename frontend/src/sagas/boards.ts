@@ -71,7 +71,13 @@ export function* updateName({ payload, callBack }: updateNameRequest) {
 export function* fetchBoard(action: fetchBoardRequest) {
   try {
     const { data } = yield call(Api.boards.fetchBoard, action.payload.board_id);
-    const { boards, threads, replies } = normalize(
+    let threads = {},
+      replies = {};
+    const {
+      boards,
+      threads: normalized_threads,
+      replies: normalized_replies
+    } = normalize(
       {
         board: {
           ...data.board,
@@ -81,6 +87,9 @@ export function* fetchBoard(action: fetchBoardRequest) {
       },
       { board }
     ).entities;
+    console.log('{ boards, threads, replies } ', { boards, threads, replies });
+    if (normalized_threads) threads = normalized_threads;
+    if (normalized_replies) replies = normalized_replies;
     yield put(boardActions.fetchBoardSuccess({ boards, threads, replies }));
   } catch (error) {
     yield put({ type: FETCH_BOARD_FAILURE, payload: { error: error.message } });

@@ -119,7 +119,8 @@ export interface getThreadSuccess {
 export interface deleteThreadSuccessType {
   type: typeof DELETE_THREAD_SUCCESS;
   payload: {
-    deletedThread: ThreadType;
+    thread_id: string;
+    board_id: string;
   };
 }
 

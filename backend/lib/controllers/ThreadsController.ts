@@ -55,9 +55,9 @@ export default class ThreadsController {
                 else res.json({ deletedThread });
               }
             );
-          } else res.json({ deletedThread });
+          } else res.status(200).send('success');
         });
-      } else res.status(400).send('Incorrect Delete Password');
+      } else res.status(400).send('incorrect password');
     });
   };
   public update_thread = async (req: Request, res: Response) => {

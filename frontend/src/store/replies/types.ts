@@ -16,6 +16,10 @@ export const DELETE_REPLY_REQUEST = 'DELETE_REPLY_REQUEST';
 export const DELETE_REPLY_SUCCESS = 'DELETE_REPLY_SUCCESS';
 export const DELETE_REPLY_FAILURE = 'DELETE_REPLY_FAILURE';
 
+export const REPORT_REPLY_REQUEST = 'REPORT_REPLY_REQUEST';
+export const REPORT_REPLY_SUCCESS = 'REPORT_REPLY_SUCCESS';
+export const REPORT_REPLY_FAILURE = 'REPORT_REPLY_FAILURE';
+
 export interface RepliesState {
   replies: { [_id: string]: ReplyType };
   loading: {
@@ -102,7 +106,34 @@ export interface deleteReplyFailureType {
   };
 }
 
+export interface type_report_reply_request {
+  type: typeof REPORT_REPLY_REQUEST;
+  payload: {
+    thread_id: string;
+    board_id: string;
+    reply_id: string;
+  };
+}
+
+export interface type_report_reply_success {
+  type: typeof REPORT_REPLY_SUCCESS;
+  payload: {
+    reply_id: string;
+  };
+}
+
+export interface type_report_reply_failure {
+  type: typeof REPORT_REPLY_FAILURE;
+  payload: {
+    reply_id: string;
+    error: string;
+  };
+}
+
 export type RepliesActionTypes =
+  | type_report_reply_request
+  | type_report_reply_success
+  | type_report_reply_failure
   | AddBoardSearchResultType
   | deleteReplyRequestType
   | deleteReplySuccessType

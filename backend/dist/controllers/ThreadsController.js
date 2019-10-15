@@ -67,12 +67,12 @@ class ThreadsController {
                                     });
                                 }
                                 else
-                                    res.json({ deletedThread });
+                                    res.status(200).send('success');
                             });
                         });
                     }
                     else
-                        res.status(400).send('Incorrect Delete Password');
+                        res.status(400).send('incorrect password');
                 });
             });
         });

@@ -1,5 +1,10 @@
 import { ADD_BOARD_SEARCH_RESULT } from '../boards/types';
 import {
+  REPORT_REPLY_REQUEST,
+  REPORT_REPLY_SUCCESS,
+  REPORT_REPLY_FAILURE
+} from './types';
+import {
   DELETE_REPLY_REQUEST,
   DELETE_REPLY_SUCCESS,
   DELETE_REPLY_FAILURE
@@ -37,15 +42,81 @@ export const repliesInitState: RepliesState = {
 
 export const replyInitLoading = {
   update_text: false,
-  delete_reply: false
+  delete_reply: false,
+  report_reply: false
 };
-export const replyInitError = { update_text: '', delete_reply: '' };
+export const replyInitError = {
+  update_text: '',
+  delete_reply: '',
+  report_reply: ''
+};
 
 const repliesReducer = (
   state = repliesInitState,
   action: RepliesActionTypes | fetchBoardsSuccess | getThreadSuccess
 ) => {
   switch (action.type) {
+    case REPORT_REPLY_REQUEST: {
+      const { reply_id } = action.payload;
+      const reply = state.replies[reply_id];
+      return {
+        ...state,
+        replies: {
+          ...state.replies,
+          [reply._id]: {
+            ...reply,
+            // this is optimistic response
+            // toggle reported status upon successful operation
+            reported: !reply.reported,
+            loading: {
+              ...reply.loading,
+              report_reply: true
+            }
+          }
+        }
+      };
+    }
+    case REPORT_REPLY_SUCCESS: {
+      const { reply_id } = action.payload;
+      // we change nothing since we toggled the report status on request since we want optimistic response
+      const reply = state.replies[reply_id];
+      return {
+        ...state,
+        replies: {
+          ...state.replies,
+          [reply._id]: {
+            ...reply,
+            loading: {
+              ...reply.loading,
+              report_reply: false
+            }
+          }
+        }
+      };
+    }
+    case REPORT_REPLY_FAILURE: {
+      const { reply_id, error } = action.payload;
+      const reply = state.replies[reply_id];
+      return {
+        ...state,
+        replies: {
+          ...state.replies,
+          [reply._id]: {
+            ...reply,
+            // toggle reported status upon successful operation
+            reported: !reply.reported,
+            loading: {
+              ...reply.loading,
+              report_thread: false
+            },
+            error: {
+              ...reply.error,
+              error
+            }
+          }
+        }
+      };
+    }
     case ADD_BOARD_SEARCH_RESULT: {
       let replies = {};
       if (

@@ -10,7 +10,8 @@ import {
   deleteReplyParamsType
 } from '../../Api';
 import { ReplyType, CREATE_BOARD_SUCCESS } from '../boards/types';
-import { DELETE_REPLY_FAILURE } from './types';
+import { DELETE_REPLY_FAILURE, REPORT_REPLY_REQUEST } from './types';
+import { report_reply_params_type } from '../../Api';
 import {
   RESET_REPLY_ERROR,
   DELETE_REPLY_REQUEST,
@@ -21,6 +22,15 @@ import {
   updateReplyTextRequestType,
   UPDATE_REPLY_TEXT_REQUEST
 } from './types';
+
+export const report_reply = ({
+  thread_id,
+  board_id,
+  reply_id
+}: report_reply_params_type) => ({
+  type: REPORT_REPLY_REQUEST,
+  payload: { thread_id, board_id, reply_id }
+});
 
 export const createReply = ({
   board_id,

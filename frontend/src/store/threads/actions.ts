@@ -96,10 +96,11 @@ export const updateThreadTextFailure = (error: string, thread_id: string) => ({
   }
 });
 
-export const deleteThreadSuccess = (deletedThread: ThreadType) => ({
+export const delete_thread_success = (thread_id: string, board_id: string) => ({
   type: DELETE_THREAD_SUCCESS,
   payload: {
-    deletedThread
+    thread_id,
+    board_id
   }
 });
 

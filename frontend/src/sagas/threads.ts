@@ -1,4 +1,4 @@
-import { call, put, delay } from 'redux-saga/effects';
+import { call, put, select } from 'redux-saga/effects';
 import Api from '../Api';
 import {
   createThreadRequest,
@@ -19,6 +19,7 @@ import {
   updateThreadTextRequest,
   type_report_thread_request
 } from '../store/threads/types';
+import { AppState } from '../store';
 
 export function* report_thread({ payload }: type_report_thread_request) {
   try {
@@ -28,6 +29,7 @@ export function* report_thread({ payload }: type_report_thread_request) {
       `Toggle report operation of thread with id ${payload.thread_id}`,
       response.data
     );
+    // just pass the id on success
     yield put({
       type: REPORT_THREAD_SUCCESS,
       payload: { thread_id: payload.thread_id }
@@ -99,13 +101,24 @@ export function* updateThread({ payload }: updateThreadTextRequest) {
 }
 export function* deleteThreadSaga(action: deleteThreadRequestType) {
   try {
-    const {
-      data: { deletedThread }
-    } = yield call(Api.threads.deleteThread, action.payload);
-
+    // data is only text of success or incorrect password
+    const { data } = yield call(Api.threads.deleteThread, action.payload);
+    console.log(
+      `Delete operation of thread with id ${action.payload.thread_id}`,
+      data
+    );
+    const thread_board_id = yield select(
+      (state: AppState) =>
+        state.threads.threads[action.payload.thread_id].board_id
+    );
     if (action.callBack) action.callBack();
 
-    yield put(ThreadsActions.deleteThreadSuccess(deletedThread));
+    yield put(
+      ThreadsActions.delete_thread_success(
+        action.payload.thread_id,
+        thread_board_id
+      )
+    );
   } catch (error) {
     yield put(ThreadsActions.deleteThreadFailure(error.message));
   }

@@ -1,11 +1,15 @@
 import React, { Component, Fragment } from 'react';
 import * as H from 'history';
 import { AppState } from '../store';
-import * as RepliesActions from '../store/replies/actions';
+import * as Replies_Actions from '../store/replies/actions';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { RepliesState } from '../store/replies/types';
-import { updateReplyTextParamsType, deleteReplyParamsType } from '../Api';
+import {
+  updateReplyTextParamsType,
+  deleteReplyParamsType,
+  report_reply_params_type
+} from '../Api';
 import { timeDifferenceForDate } from './utils';
 import {
   Button,
@@ -21,11 +25,13 @@ import {
 } from 'reactstrap';
 import classNames from 'classnames';
 import EditReplyTextInput from './EditReplyTextInput';
+import { ThreadsState } from '../store/threads/reducers';
 
 interface ReplyProps extends RouteComponentProps {
   location: H.Location;
   reply_id: string;
   replies: RepliesState;
+  threads: ThreadsState;
 }
 
 interface ReplyDispatchProps {
@@ -34,6 +40,11 @@ interface ReplyDispatchProps {
     reply_id,
     delete_password
   }: deleteReplyParamsType) => void;
+  dispatch_report_reply: ({
+    thread_id,
+    reply_id,
+    board_id
+  }: report_reply_params_type) => void;
 }
 
 interface ReplyState {
@@ -70,7 +81,12 @@ class Reply extends Component<ReplyProps & ReplyDispatchProps, ReplyState> {
     }));
   };
   render() {
-    const { reply_id, replies, resetReplyError } = this.props;
+    const {
+      reply_id,
+      replies,
+      resetReplyError,
+      dispatch_report_reply
+    } = this.props;
     const reply = replies.replies[reply_id];
     const { isEditing } = this.state;
     if (!reply) return null;
@@ -173,6 +189,22 @@ class Reply extends Component<ReplyProps & ReplyDispatchProps, ReplyState> {
               })}>
               <Button
                 size='sm'
+                className='mr-2'
+                outline={reply.reported ? false : true}
+                color='primary'
+                onClick={() => {
+                  const { threads } = this.props;
+                  const thread = threads.threads[reply.thread_id];
+                  return dispatch_report_reply({
+                    board_id: thread.board_id,
+                    thread_id: thread._id,
+                    reply_id: reply._id
+                  });
+                }}>
+                Report
+              </Button>
+              <Button
+                size='sm'
                 color='success'
                 className='mr-2'
                 onClick={() => this.setIsEditing(true)}>
@@ -192,13 +224,15 @@ class Reply extends Component<ReplyProps & ReplyDispatchProps, ReplyState> {
   }
 }
 
-const mapStateToProps = ({ replies }: AppState) => ({
-  replies
+const mapStateToProps = ({ replies, threads }: AppState) => ({
+  replies,
+  threads
 });
 
 const mapDispatchToProps = {
-  resetReplyError: RepliesActions.resetReplyError,
-  deleteReplyRequest: RepliesActions.deleteReplyRequest
+  resetReplyError: Replies_Actions.resetReplyError,
+  deleteReplyRequest: Replies_Actions.deleteReplyRequest,
+  dispatch_report_reply: Replies_Actions.report_reply
 };
 
 export default connect(

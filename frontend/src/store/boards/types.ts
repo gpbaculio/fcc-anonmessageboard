@@ -39,11 +39,13 @@ export interface AddBoardSearchResultType {
 export interface ReplyLoadingType {
   update_text: boolean;
   delete_reply: boolean;
+  report_reply: boolean;
 }
 
 export interface ReplyErrorType {
   update_text: string;
   delete_reply: string;
+  report_reply: string;
 }
 
 export interface ReplyType {
@@ -51,6 +53,7 @@ export interface ReplyType {
   text: string;
   created_on: string;
   thread_id: string;
+  reported: boolean;
   loading: ReplyLoadingType;
   error: ReplyErrorType;
 }

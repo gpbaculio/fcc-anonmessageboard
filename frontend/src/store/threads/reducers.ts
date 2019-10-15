@@ -186,9 +186,9 @@ const repliesReducer = (
       };
     }
     case DELETE_THREAD_SUCCESS: {
-      const { deletedThread } = action.payload;
+      const { thread_id } = action.payload;
       // deconstruct deleted Thread
-      const { [deletedThread._id]: removedThread, ...threads } = state.threads;
+      const { [thread_id]: removed_thread, ...threads } = state.threads;
       return {
         ...state,
         threads: { ...threads }
