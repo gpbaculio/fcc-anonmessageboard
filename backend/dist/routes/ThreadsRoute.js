@@ -16,13 +16,13 @@ class ThreadsRoute {
                 .route('/api/threads/:board_id')
                 .get(this.threadsController.get_threads)
                 .post(this.threadsController.createThread)
-                .delete(this.threadsController.deleteThread)
+                .delete(this.threadsController.delete_thread)
                 .put(this.threadsController.report_thread);
             app
                 .route('/api/thread/:thread_id')
                 .get(this.threadsController.getThread)
                 .put(this.threadsController.update_thread)
-                .delete(this.threadsController.deleteThread);
+                .delete(this.threadsController.delete_thread);
         };
     }
 }

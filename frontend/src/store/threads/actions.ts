@@ -35,11 +35,11 @@ export const report_thread = ({
 });
 
 export const deleteThreadRequest = (
-  { thread_id, delete_password }: deleteThreadArgsType,
+  { thread_id, delete_password, board_id }: deleteThreadArgsType,
   callBack?: () => void
 ) => ({
   type: DELETE_THREAD_REQUEST,
-  payload: { thread_id, delete_password },
+  payload: { thread_id, delete_password, board_id },
   callBack
 });
 

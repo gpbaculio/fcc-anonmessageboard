@@ -38,31 +38,35 @@ class ThreadsController {
                 });
             });
         });
-        this.deleteThread = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { thread_id } = req.params;
-            const { delete_password } = req.body;
-            yield Thread_1.default.findById(thread_id, function (error, thread) {
+        this.delete_thread = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { board_id } = req.params;
+            const { delete_password, thread_id } = req.body;
+            yield Thread_1.default.findOne({ _id: thread_id, board_id }, function (error, thread) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    console.log('thread found ', thread);
                     if (error)
                         res.status(400).send(error);
                     // check if password is correct
                     const correctPassword = yield thread.authenticate(delete_password);
+                    console.log('correctPassword ', correctPassword);
                     if (correctPassword) {
-                        yield Thread_1.default.findOneAndRemove({ _id: thread_id }, function (error, deletedThread) {
+                        yield Thread_1.default.findByIdAndRemove({ _id: thread._id }, function (error, deletedThread) {
                             return __awaiter(this, void 0, void 0, function* () {
+                                console.log('deletedThread ', deletedThread);
                                 if (error)
                                     res.status(400).send(error);
+                                const deleted_thread = deletedThread.toObject();
                                 // if thread has replies
-                                if (deletedThread.replies.length) {
+                                if (deleted_thread.replies.length) {
                                     // delete all replies
                                     yield Reply_1.default.deleteMany({
-                                        thread_id: deletedThread._id
+                                        thread_id: deleted_thread._id
                                     }, function (error) {
                                         return __awaiter(this, void 0, void 0, function* () {
                                             if (error)
                                                 res.status(400).send(error);
                                             else
-                                                res.json({ deletedThread });
+                                                res.status(200).send('success');
                                         });
                                     });
                                 }

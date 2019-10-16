@@ -31,6 +31,7 @@ export interface updateThreadTextArgsType {
 export interface deleteThreadArgsType {
   delete_password: string;
   thread_id: string;
+  board_id: string;
 }
 
 export interface updateReplyTextParamsType {
@@ -88,9 +89,13 @@ export default {
       axios.post(`/api/board/${board_id}`, { board_name, delete_password })
   },
   threads: {
-    deleteThread: ({ delete_password, thread_id }: deleteThreadArgsType) => {
-      return axios.delete(`/api/thread/${thread_id}`, {
-        data: { delete_password }
+    deleteThread: ({
+      delete_password,
+      thread_id,
+      board_id
+    }: deleteThreadArgsType) => {
+      return axios.delete(`/api/threads/${board_id}`, {
+        data: { thread_id, delete_password }
       });
     },
     createThread: ({

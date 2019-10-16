@@ -74,6 +74,7 @@ export interface deleteThreadRequestType {
   payload: {
     delete_password: string;
     thread_id: string;
+    board_id: string;
   };
   callBack: () => void;
 }

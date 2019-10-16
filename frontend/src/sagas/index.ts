@@ -38,7 +38,7 @@ export default function* rootSaga() {
   yield takeEvery(FETCH_BOARD_REQUEST, Boards_Sagas.fetchBoard);
   yield takeEvery(CREATE_BOARD_REQUEST, Boards_Sagas.createBoard);
   yield takeEvery(FETCH_BOARDS_REQUEST, Boards_Sagas.fetchBoards);
-  yield takeEvery(CREATE_THREAD_REQUEST, Threads_Sagas.createThread);
+  yield takeEvery(CREATE_THREAD_REQUEST, Threads_Sagas.create_thread);
   yield takeEvery(CREATE_REPLY_REQUEST, Replies_Sagas.createReply);
   yield takeEvery(GET_THREAD_REQUEST, Threads_Sagas.getThread);
   yield takeEvery(UPDATE_NAME_REQUEST, Boards_Sagas.updateName);

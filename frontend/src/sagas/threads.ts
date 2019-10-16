@@ -42,7 +42,7 @@ export function* report_thread({ payload }: type_report_thread_request) {
   }
 }
 
-export function* createThread({ payload, callBack }: createThreadRequest) {
+export function* create_thread({ payload, callBack }: createThreadRequest) {
   try {
     const {
       data: { thread }

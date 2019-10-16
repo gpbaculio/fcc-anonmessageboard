@@ -58,7 +58,7 @@ interface ThreadDispatchProps {
   }: createReplyArgsType) => void;
   getThread: (thread_id: string) => void;
   deleteThread: (
-    { thread_id, delete_password }: deleteThreadArgsType,
+    { thread_id, delete_password, board_id }: deleteThreadArgsType,
     callBack: () => void
   ) => void;
   resetThreadError: (errorKey: string, thread_id: string) => void;
@@ -204,6 +204,7 @@ class Thread extends Component<ThreadProps & ThreadDispatchProps, ThreadState> {
                 console.log(' del thread');
                 this.props.deleteThread(
                   {
+                    board_id: thread.board_id,
                     thread_id: thread._id,
                     delete_password: this.state.thread_delete_password
                   },
