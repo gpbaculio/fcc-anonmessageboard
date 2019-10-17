@@ -41,38 +41,31 @@ class ThreadsController {
         this.delete_thread = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { board_id } = req.params;
             const { delete_password, thread_id } = req.body;
-            yield Thread_1.default.findOne({ _id: thread_id, board_id }, function (error, thread) {
+            Thread_1.default.findOne({ _id: thread_id, board_id }, function (error, thread) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    console.log('thread found ', thread);
                     if (error)
                         res.status(400).send(error);
                     // check if password is correct
-                    const correctPassword = yield thread.authenticate(delete_password);
-                    console.log('correctPassword ', correctPassword);
+                    const correctPassword = thread.authenticate(delete_password);
                     if (correctPassword) {
-                        yield Thread_1.default.findByIdAndRemove({ _id: thread._id }, function (error, deletedThread) {
-                            return __awaiter(this, void 0, void 0, function* () {
-                                console.log('deletedThread ', deletedThread);
-                                if (error)
-                                    res.status(400).send(error);
-                                const deleted_thread = deletedThread.toObject();
-                                // if thread has replies
-                                if (deleted_thread.replies.length) {
-                                    // delete all replies
-                                    yield Reply_1.default.deleteMany({
-                                        thread_id: deleted_thread._id
-                                    }, function (error) {
-                                        return __awaiter(this, void 0, void 0, function* () {
-                                            if (error)
-                                                res.status(400).send(error);
-                                            else
-                                                res.status(200).send('success');
-                                        });
-                                    });
-                                }
-                                else
-                                    res.status(200).send('success');
-                            });
+                        Thread_1.default.findByIdAndRemove({ _id: thread._id }, function (error, deletedThread) {
+                            if (error)
+                                res.status(400).send(error);
+                            const deleted_thread = deletedThread.toObject();
+                            // if thread has replies
+                            if (deleted_thread.replies.length) {
+                                // delete all replies
+                                Reply_1.default.deleteMany({
+                                    thread_id: deleted_thread._id
+                                }, function (error) {
+                                    if (error)
+                                        res.status(400).send(error);
+                                    else
+                                        res.status(200).send('success');
+                                });
+                            }
+                            else
+                                res.status(200).send('success');
                         });
                     }
                     else
@@ -153,7 +146,6 @@ class ThreadsController {
                     }
                 ]
             }, (error, threads) => {
-                console.log('threads controller getThreads', threads);
                 if (error)
                     res.status(400).send(error);
                 else

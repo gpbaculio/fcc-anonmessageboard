@@ -67,28 +67,24 @@ class RepliesController {
                 });
             });
         });
-        this.createReply = function (req, res) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const { board_id } = req.params;
-                const { thread_id, text, delete_password } = req.body;
-                yield Reply_1.default.create({ thread_id, text, delete_password }, function (error, reply) {
-                    return __awaiter(this, void 0, void 0, function* () {
+        this.create_reply = function (req, res) {
+            const { board_id } = req.params;
+            const { thread_id, text, delete_password } = req.body;
+            const new_reply = new Reply_1.default({ thread_id, text, delete_password });
+            new_reply.save((new_reply_error, saved_reply) => {
+                if (new_reply_error)
+                    res.status(400).send(new_reply_error);
+                Thread_1.default.findOne({ board_id, _id: thread_id }, function (error, thread) {
+                    if (error)
+                        res.status(400).send(error);
+                    thread.bumped_on = new Date();
+                    thread.replies.push(saved_reply);
+                    thread.save(function (error) {
                         if (error)
-                            return res.status(400).send(error);
-                        else
-                            yield Thread_1.default.findOne({ board_id, _id: thread_id }, function (error, thread) {
-                                return __awaiter(this, void 0, void 0, function* () {
-                                    if (error)
-                                        res.status(400).send(error);
-                                    thread.bumped_on = new Date();
-                                    thread.replies.push(reply);
-                                    thread.save(function (error) {
-                                        if (error)
-                                            res.status(400).send(error);
-                                        return res.status(200).json({ reply });
-                                    });
-                                });
-                            });
+                            res.status(400).send(error);
+                        const saved_reply_object = saved_reply.toObject();
+                        delete saved_reply_object.delete_password;
+                        return res.status(200).json({ reply: saved_reply_object });
                     });
                 });
             });

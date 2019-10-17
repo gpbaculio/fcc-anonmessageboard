@@ -53,27 +53,23 @@ export default class RepliesController {
       } else res.status(400).send('Incorrect Delete Password');
     });
   };
-  public createReply = async function(req: Request, res: Response) {
+  public create_reply = function(req: Request, res: Response) {
     const { board_id } = req.params;
     const { thread_id, text, delete_password } = req.body;
-    await Reply.create({ thread_id, text, delete_password }, async function(
-      error,
-      reply
-    ) {
-      if (error) return res.status(400).send(error);
-      else
-        await Thread.findOne({ board_id, _id: thread_id }, async function(
-          error,
-          thread
-        ) {
+    const new_reply = new Reply({ thread_id, text, delete_password });
+    new_reply.save((new_reply_error, saved_reply) => {
+      if (new_reply_error) res.status(400).send(new_reply_error);
+      Thread.findOne({ board_id, _id: thread_id }, function(error, thread) {
+        if (error) res.status(400).send(error);
+        thread.bumped_on = new Date();
+        thread.replies.push(saved_reply);
+        thread.save(function(error) {
           if (error) res.status(400).send(error);
-          thread.bumped_on = new Date();
-          thread.replies.push(reply);
-          thread.save(function(error) {
-            if (error) res.status(400).send(error);
-            return res.status(200).json({ reply });
-          });
+          const saved_reply_object = saved_reply.toObject();
+          delete saved_reply_object.delete_password;
+          return res.status(200).json({ reply: saved_reply_object });
         });
+      });
     });
   };
   public updateReplyText = async function(req: Request, res: Response) {
