@@ -29,12 +29,14 @@ class App {
             });
             mongoose.set('useFindAndModify', false);
         };
-        this.app.use(bodyParser.json());
-        this.app.use(cors({ optionSuccessStatus: 200, origin: '*' }));
         this.mongoSetup();
+        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.urlencoded({ extended: true }));
+        this.app.use(cors({ origin: '*' }));
         this.app.use(helmet());
         this.app.use(helmet.noSniff());
         this.app.use(helmet.xssFilter());
+        this.app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
         // secure cookies with express-session
         const sessionConfig = {
             secret: process.env.SECRET_KEY,
@@ -52,10 +54,10 @@ class App {
         this.threadsRoute.routes(this.app);
         this.repliesRoute.routes(this.app);
         // Serve any static files
-        const staticPath = path.join(__dirname, '..', '..', 'frontend', 'public'); // change /public to /build on deploy
-        const publicPath = path.join(__dirname, '..', '..', 'frontend', 'public', 'index.html');
-        this.app.use(express.static(staticPath));
-        this.app.get('/*', (_req, res) => res.sendFile(publicPath));
+        const static_path = path.join(__dirname, '..', '..', 'frontend', 'build'); // change /public to /build on deploy
+        const public_path = path.join(__dirname, '..', '..', 'frontend', 'build', 'index.html');
+        this.app.use(express.static(static_path));
+        this.app.get('/*', (_req, res) => res.sendFile(public_path));
         //404 Not Found Middleware
         this.app.use((_req, res, _next) => {
             res
